@@ -267,7 +267,7 @@ export const GovernmentCommandCenter: React.FC = () => {
 
             {/* Nav item 9: Administration */}
             <button
-              onClick={() => setActiveNav('administration')}
+              onClick={() => navigate('/admin')}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
             >
               <Settings className="w-4 h-4 text-slate-500" />

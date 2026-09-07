@@ -8,6 +8,8 @@ import { RouteIntelligencePage } from './pages/RouteIntelligencePage';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import { DataIntegrationPage } from './pages/DataIntegrationPage';
+import { AdminPage } from './pages/AdminPage';
 import { LogisticsOverviewPage } from './pages/logistics/LogisticsOverviewPage';
 import { SupplyMissionsPage } from './pages/logistics/SupplyMissionsPage';
 import { MissionDetailPage } from './pages/logistics/MissionDetailPage';
@@ -27,6 +29,9 @@ function App() {
         <Route path="/incidents" element={<IncidentsPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/data-integration" element={<DataIntegrationPage />} />
+        <Route path="/data-sources" element={<Navigate to="/data-integration" replace />} />
+        <Route path="/admin" element={<AdminPage />} />
         
         {/* Logistics & Fleet Module */}
         <Route path="/logistics" element={<LogisticsOverviewPage />} />
