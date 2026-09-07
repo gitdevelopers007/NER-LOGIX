@@ -14,10 +14,9 @@ import {
   RECENT_UPDATES
 } from '../data/nerGisData';
 import type { Incident } from '../data/nerGisData';
-import { nerApiService } from '../services/nerApiService';
+import { nerApiService, type StateRainfall } from '../services/nerApiService';
 
 export const GovernmentCommandCenter: React.FC = () => {
-  
   
   const [selectedIncident, setSelectedIncident] = useState<Incident>(INCIDENTS_DATA[0]);
   const [tableTab, setTableTab] = useState<'connectivity' | 'incidents' | 'vehicles'>('connectivity');
@@ -37,6 +36,7 @@ export const GovernmentCommandCenter: React.FC = () => {
 
   // Live Backend & Open-Meteo telemetry state
   const [weatherList, setWeatherList] = useState(WEATHER_RISKS);
+  const [rainfallData, setRainfallData] = useState<StateRainfall[]>([]);
   const [metrics, setMetrics] = useState({
     accessibleRoadsKm: 1248,
     accessiblePercentage: 82,
@@ -53,6 +53,9 @@ export const GovernmentCommandCenter: React.FC = () => {
     nerApiService.getHazardsAndWeather().then(data => {
       if (data?.weatherOverview) {
         setWeatherList(data.weatherOverview);
+      }
+      if (data?.rainfallTelemetry) {
+        setRainfallData(data.rainfallTelemetry);
       }
     });
 
@@ -293,6 +296,79 @@ export const GovernmentCommandCenter: React.FC = () => {
               </div>
             </div>
 
+          </div>
+
+          {/* LIVE RAINFALL & IMD DOPPLER RADAR TELEMETRY BAR */}
+          <div className="bg-gradient-to-r from-slate-950 via-[#0b1e38] to-slate-950 text-white rounded-xl p-3.5 border border-blue-900/60 shadow-md space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* Left Title */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 text-xl shadow-xs">
+                  🌧️
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-xs tracking-wider uppercase text-white">Live Rainfall &amp; Doppler Radar Telemetry</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      18 DOPPLER RADARS LIVE
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">IMD &amp; Open-Meteo Gateway</span>
+                  </div>
+                  <p className="text-[11.5px] text-slate-300 mt-0.5">
+                    Real-time precipitation rates, catchment inundation levels &amp; cloudburst indicators across the 8 North Eastern States.
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick Summary Pill Stats */}
+              <div className="flex items-center gap-2 text-xs">
+                <div className="bg-slate-800/80 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-slate-400 text-[11px]">Peak Rain:</span>
+                  <span className="text-blue-400 font-bold">14.8 mm/hr (Meghalaya)</span>
+                </div>
+                <div className="bg-slate-800/80 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-slate-400 text-[11px]">Regional Avg:</span>
+                  <span className="text-white font-bold">4.8 mm/hr</span>
+                </div>
+                <div className="bg-slate-800/80 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-slate-400 text-[11px]">24h Volume:</span>
+                  <span className="text-amber-400 font-bold">78.2 mm</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 8 State Rainfall Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 pt-2 border-t border-slate-800/80">
+              {(rainfallData.length > 0 ? rainfallData : [
+                { state: 'Meghalaya', currentPrecipitationMm: 14.8, status: 'Heavy Downpour', alertLevel: 'ORANGE_ALERT' },
+                { state: 'Assam', currentPrecipitationMm: 6.2, status: 'Moderate Rain', alertLevel: 'YELLOW_WATCH' },
+                { state: 'Arunachal', currentPrecipitationMm: 4.5, status: 'Showers', alertLevel: 'YELLOW_WATCH' },
+                { state: 'Nagaland', currentPrecipitationMm: 2.1, status: 'Light Rain', alertLevel: 'WATCH' },
+                { state: 'Manipur', currentPrecipitationMm: 1.4, status: 'Overcast', alertLevel: 'NORMAL' },
+                { state: 'Mizoram', currentPrecipitationMm: 3.2, status: 'Scattered', alertLevel: 'WATCH' },
+                { state: 'Tripura', currentPrecipitationMm: 0.8, status: 'Passing Cloud', alertLevel: 'NORMAL' },
+                { state: 'Sikkim', currentPrecipitationMm: 5.0, status: 'High Altitude', alertLevel: 'YELLOW_WATCH' },
+              ]).map((st: any, idx: number) => {
+                const isOrange = st.alertLevel === 'ORANGE_ALERT' || st.currentPrecipitationMm >= 10;
+                const isYellow = st.alertLevel === 'YELLOW_WATCH' || st.currentPrecipitationMm >= 4;
+                const badgeColor = isOrange ? 'bg-red-500/25 text-red-300 border-red-500/40' : isYellow ? 'bg-amber-500/25 text-amber-300 border-amber-500/40' : 'bg-blue-500/25 text-blue-300 border-blue-500/40';
+                return (
+                  <div key={idx} className="bg-slate-800/60 hover:bg-slate-800 transition-colors border border-slate-700/70 rounded-lg p-2 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-200 truncate">{st.state}</span>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}`}>
+                        {st.currentPrecipitationMm} mm/h
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 truncate mt-1 flex items-center gap-1">
+                      <span>{st.currentPrecipitationMm > 5 ? '🌧️' : '🌦️'}</span>
+                      <span className="truncate">{st.status}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* C. MIDDLE SECTION: GIS MAP (Left) + INCIDENT & FILTERS PANEL (Right) */}

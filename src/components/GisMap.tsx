@@ -40,7 +40,7 @@ export const GisMap: React.FC<GisMapProps> = ({
     fieldIncidents: true,
     floodRisk: false,
     landslideRisk: false,
-    heavyRainfall: false,
+    heavyRainfall: true,
     weather: true,
     vehicles: true,
     emergencyRoutes: false,
@@ -252,12 +252,12 @@ export const GisMap: React.FC<GisMapProps> = ({
   useEffect(() => {
     const radar = radarOverlayRef.current;
     if (!radar) return;
-    if (layers.weather) {
+    if (layers.weather || layers.heavyRainfall) {
       radar.setOpacity(0.72);
     } else {
       radar.setOpacity(0);
     }
-  }, [layers.weather]);
+  }, [layers.weather, layers.heavyRainfall]);
 
   // Update Base Layer
   const handleBaseMapChange = (type: 'satellite' | 'terrain') => {
@@ -355,6 +355,43 @@ export const GisMap: React.FC<GisMapProps> = ({
       });
     }
 
+    // 4. Plot Doppler Weather Radar & Rainfall Telemetry Stations
+    if (layers.weather || layers.heavyRainfall) {
+      const radarStations = [
+        { name: 'IMD Doppler Radar — Cherrapunji', state: 'Meghalaya', lat: 25.30, lng: 91.70, rain: 14.8, status: '14.8 mm/h', alert: 'Orange Alert: Heavy Downpour' },
+        { name: 'IMD Radar — Silchar / Cachar', state: 'Assam', lat: 24.83, lng: 92.80, rain: 6.2, status: '6.2 mm/h', alert: 'Yellow Watch: Moderate Rain' },
+        { name: 'IMD Radar — Papum Pare', state: 'Arunachal', lat: 27.08, lng: 93.60, rain: 4.5, status: '4.5 mm/h', alert: 'Yellow Watch: Intermittent' },
+        { name: 'IMD Station — Kohima', state: 'Nagaland', lat: 25.67, lng: 94.10, rain: 2.1, status: '2.1 mm/h', alert: 'Light Rain / Mud Risk' },
+        { name: 'Mohanbari Doppler Radar', state: 'Assam', lat: 27.48, lng: 94.90, rain: 3.8, status: '3.8 mm/h', alert: 'Passing Clouds' },
+      ];
+
+      radarStations.forEach((st) => {
+        const radarIcon = L.divIcon({
+          className: 'doppler-radar-marker',
+          html: `<div style="position: relative; cursor: pointer; text-align: center;">
+            <div style="width: 26px; height: 26px; border-radius: 50%; background: #0284c7; border: 2px solid #ffffff; box-shadow: 0 0 10px rgba(56, 189, 248, 0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 13px;">
+              🌧️
+            </div>
+            <div style="margin-top: 1px; white-space: nowrap; background: rgba(15,23,42,0.9); color: #38bdf8; font-size: 9.5px; font-weight: 800; padding: 0.5px 4px; border-radius: 3px; border: 1px solid rgba(56,189,248,0.5); display: inline-block;">
+              ${st.status}
+            </div>
+          </div>`,
+          iconSize: [50, 42],
+          iconAnchor: [25, 13],
+        });
+
+        const m = L.marker([st.lat, st.lng], { icon: radarIcon }).addTo(markersGroup);
+        m.bindTooltip(
+          `<div style="font-family: sans-serif; font-size: 11px;">
+            <b style="color: #0284c7; font-size: 12px;">${st.name}</b><br/>
+            <span>Precipitation: <b>${st.rain} mm/hr</b></span><br/>
+            <span style="color: #ea580c; font-weight: 600;">${st.alert}</span>
+          </div>`,
+          { direction: 'top' }
+        );
+      });
+    }
+
   }, [selectedIncident, layers]);
 
   const handleZoomIn = () => mapInstanceRef.current?.zoomIn();
@@ -392,7 +429,10 @@ export const GisMap: React.FC<GisMapProps> = ({
 
   const handlePillClick = (pill: string) => {
     setActivePill(pill);
-    if (pill === 'weather') toggleLayer('weather');
+    if (pill === 'weather') {
+      const next = !(layers.weather || layers.heavyRainfall);
+      setLayers((prev) => ({ ...prev, weather: next, heavyRainfall: next }));
+    }
     else if (pill === 'incidents') toggleLayer('fieldIncidents');
     else if (pill === 'vehicles') toggleLayer('vehicles');
     else if (pill === 'roads') toggleLayer('roads');
@@ -425,12 +465,12 @@ export const GisMap: React.FC<GisMapProps> = ({
         <div className="pointer-events-auto hidden md:flex items-center gap-1.5 bg-white/95 backdrop-blur-xs p-1 rounded-md border border-slate-200 shadow-sm">
           <button
             onClick={() => handlePillClick('weather')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              layers.weather ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold transition-colors cursor-pointer ${
+              layers.weather || layers.heavyRainfall ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <CloudRain className="w-3.5 h-3.5" />
-            <span>Weather</span>
+            <span>🌧️ Rainfall Radar</span>
           </button>
           <button
             onClick={() => handlePillClick('flood')}
@@ -621,6 +661,38 @@ export const GisMap: React.FC<GisMapProps> = ({
           <Maximize className="w-3.5 h-3.5 text-slate-600" />
         </button>
       </div>
+
+      {/* 3.5 RAINFALL DOPPLER INTENSITY SCALE */}
+      {(layers.weather || layers.heavyRainfall) && (
+        <div className="absolute bottom-11 left-4 z-20 bg-slate-950/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-[10px] border border-blue-500/40 shadow-lg select-none">
+          <div className="flex items-center gap-1.5 font-bold text-blue-400 mb-1">
+            <span>🌧️</span>
+            <span>IMD Doppler Rainfall Radar (mm/hr)</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="flex flex-col items-center">
+              <span className="w-5 h-2 rounded-xs bg-cyan-400"></span>
+              <span className="text-[8px] text-slate-300 mt-0.5">&lt;2.5</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="w-5 h-2 rounded-xs bg-emerald-400"></span>
+              <span className="text-[8px] text-slate-300 mt-0.5">5.0</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="w-5 h-2 rounded-xs bg-yellow-400"></span>
+              <span className="text-[8px] text-slate-300 mt-0.5">15.0</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="w-5 h-2 rounded-xs bg-orange-500"></span>
+              <span className="text-[8px] text-slate-300 mt-0.5">35.0</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="w-5 h-2 rounded-xs bg-red-600"></span>
+              <span className="text-[8px] text-slate-300 mt-0.5">&gt;50</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4. MAP SCALE INDICATOR */}
       <div className="absolute bottom-3 left-4 z-20 bg-white/90 backdrop-blur-xs text-slate-800 px-2.5 py-1 rounded text-[10px] font-mono border border-slate-300 shadow-xs flex items-center gap-2 select-none">
