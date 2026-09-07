@@ -4,6 +4,7 @@ import { AccessPortalPage } from './pages/AccessPortalPage';
 import { GovernmentLogin } from './pages/GovernmentLogin';
 import { GovernmentOverview } from './pages/GovernmentOverview';
 import { GovernmentCommandCenter } from './pages/GovernmentCommandCenter';
+import { RouteIntelligencePage } from './pages/RouteIntelligencePage';
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
         <Route path="/government-login" element={<GovernmentLogin />} />
         <Route path="/government-command-center" element={<GovernmentOverview />} />
         <Route path="/live-map" element={<GovernmentCommandCenter />} />
+        <Route path="/route-intelligence" element={<RouteIntelligencePage />} />
+        {/* Fallback redirect */}
         <Route path="*" element={<Navigate to="/access-portal" replace />} />
       </Routes>
     </BrowserRouter>
