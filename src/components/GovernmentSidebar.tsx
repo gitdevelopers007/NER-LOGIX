@@ -79,7 +79,7 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
   };
 
   return (
-    <aside className="w-60 bg-white border-r border-slate-200 flex flex-col justify-between p-3 shrink-0 hidden md:flex select-none">
+    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between p-3 shrink-0 hidden md:flex select-none">
       <div className="space-y-1">
         <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
           Navigation
@@ -99,7 +99,7 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
                   : 'text-slate-600 hover:bg-slate-50 font-medium'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 min-w-0 pr-2">
                 <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-slate-500'}`} />
                 <span className="truncate">{item.name}</span>
               </div>
@@ -107,7 +107,7 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
               {/* Dynamic Badges */}
               {item.badge ? (
                 <span
-                  className={`text-[10px] font-bold flex items-center justify-center transition-all ${
+                  className={`text-[10px] font-bold flex items-center justify-center shrink-0 transition-all ${
                     active
                       ? 'w-5 h-5 rounded-full bg-white text-[#1a56db]'
                       : 'w-5 h-5 rounded-full bg-red-500 text-white'

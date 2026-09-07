@@ -33,8 +33,10 @@ export const IncidentMiniMap: React.FC<IncidentMiniMapProps> = ({
         attributionControl: false
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors, © CARTO'
       }).addTo(map);
 
       mapInstanceRef.current = map;
