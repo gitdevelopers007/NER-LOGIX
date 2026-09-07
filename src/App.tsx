@@ -5,6 +5,7 @@ import { GovernmentLogin } from './pages/GovernmentLogin';
 import { GovernmentOverview } from './pages/GovernmentOverview';
 import { GovernmentCommandCenter } from './pages/GovernmentCommandCenter';
 import { RouteIntelligencePage } from './pages/RouteIntelligencePage';
+import { IncidentsPage } from './pages/IncidentsPage';
 import { LogisticsOverviewPage } from './pages/logistics/LogisticsOverviewPage';
 import { SupplyMissionsPage } from './pages/logistics/SupplyMissionsPage';
 import { MissionDetailPage } from './pages/logistics/MissionDetailPage';
@@ -21,6 +22,7 @@ function App() {
         <Route path="/government-command-center" element={<GovernmentOverview />} />
         <Route path="/live-map" element={<GovernmentCommandCenter />} />
         <Route path="/route-intelligence" element={<RouteIntelligencePage />} />
+        <Route path="/incidents" element={<IncidentsPage />} />
         
         {/* Logistics & Fleet Module */}
         <Route path="/logistics" element={<LogisticsOverviewPage />} />

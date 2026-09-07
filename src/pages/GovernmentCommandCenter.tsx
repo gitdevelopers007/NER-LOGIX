@@ -203,7 +203,7 @@ export const GovernmentCommandCenter: React.FC = () => {
 
             {/* Nav item 3: Incidents */}
             <button
-              onClick={() => { setActiveNav('incidents'); alert('Navigating to Incident Ground Intelligence...'); }}
+              onClick={() => navigate('/incidents')}
               className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
             >
               <div className="flex items-center gap-3">

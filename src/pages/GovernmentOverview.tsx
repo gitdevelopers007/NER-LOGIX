@@ -88,7 +88,7 @@ export const GovernmentOverview: React.FC = () => {
 
             {/* Live Map -> Click goes to Page 5 */}
             <button
-              onClick={() => navigate('/live-map')}
+              onClick={() => navigate('/incidents')}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
             >
               <MapPin className="w-4 h-4 text-slate-500" />
