@@ -1,11 +1,11 @@
+import { GovernmentSidebar } from '../components/GovernmentSidebar';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { 
   Search, Bell, User, Calendar, RefreshCw, MapPin, 
-  AlertTriangle, Route, ShieldAlert, X, Home, 
-  Truck, BarChart3, FileText, Database, Settings, CloudRain,
+  AlertTriangle, Route, ShieldAlert, X, Truck, FileText, CloudRain,
   ChevronDown, ArrowLeft, Eye, Clock, ShieldCheck, Thermometer,
-  Waves, Mountain, Radio, Navigation, Share2
+  Waves, Mountain, Radio, Navigation
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { GisMap } from '../components/GisMap';
@@ -17,8 +17,8 @@ import type { Incident } from '../data/nerGisData';
 import { nerApiService } from '../services/nerApiService';
 
 export const GovernmentCommandCenter: React.FC = () => {
-  const navigate = useNavigate();
-  const [activeNav, setActiveNav] = useState('live-map');
+  
+  
   const [selectedIncident, setSelectedIncident] = useState<Incident>(INCIDENTS_DATA[0]);
   const [tableTab, setTableTab] = useState<'connectivity' | 'incidents' | 'vehicles'>('connectivity');
 
@@ -46,8 +46,7 @@ export const GovernmentCommandCenter: React.FC = () => {
     blockedPercentage: 6,
     affectedBridges: 14,
     activeIncidents: 28,
-    lastSync: '2 min ago',
-  });
+    lastSync: '2 min ago'});
 
   useEffect(() => {
     // Fetch live weather & hazard telemetry
@@ -68,8 +67,7 @@ export const GovernmentCommandCenter: React.FC = () => {
       state: filterState,
       status: filterRoadStatus,
       severity: filterSeverity,
-      type: filterIncidentType,
-    });
+      type: filterIncidentType});
     if (list && list.length > 0) {
       setSelectedIncident(list[0]);
     }
@@ -171,129 +169,7 @@ export const GovernmentCommandCenter: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT SIDEBAR (White background) */}
-        <aside className="w-56 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 select-none">
-          <div className="p-3 space-y-1">
-            
-            {/* Nav item 1: Overview */}
-            <button
-              onClick={() => navigate('/government-command-center')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Home className="w-4 h-4 text-slate-500" />
-              <span>Overview</span>
-            </button>
-
-            {/* Nav item 2: Live Map (ACTIVE in Screenshot) */}
-            <button
-              onClick={() => setActiveNav('live-map')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-left cursor-pointer ${activeNav === 'live-map' ? 'bg-[#1a56db] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <MapPin className="w-4 h-4 text-white" />
-              <span>Live Map</span>
-            </button>
-
-            {/* Nav item 2b: Route Intelligence */}
-            <button
-              onClick={() => navigate('/route-intelligence')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Share2 className="w-4 h-4 text-slate-500" />
-              <span>Route Intelligence</span>
-            </button>
-
-            {/* Nav item 3: Incidents */}
-            <button
-              onClick={() => navigate('/incidents')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-4 h-4 text-slate-500" />
-                <span>Incidents</span>
-              </div>
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                3
-              </span>
-            </button>
-
-            {/* Nav item 4: Logistics */}
-            <button
-              onClick={() => navigate('/logistics')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Truck className="w-4 h-4 text-slate-500" />
-              <span>Logistics</span>
-            </button>
-
-            {/* Nav item 5: Alerts */}
-            <button
-              onClick={() => navigate('/alerts')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <Bell className="w-4 h-4 text-slate-500" />
-                <span>Alerts</span>
-              </div>
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                3
-              </span>
-            </button>
-
-            {/* Nav item 6: Analytics */}
-            <button
-              onClick={() => navigate('/analytics')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <BarChart3 className="w-4 h-4 text-slate-500" />
-              <span>Analytics</span>
-            </button>
-
-            {/* Nav item 7: Reports */}
-            <button
-              onClick={() => setActiveNav('reports')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <FileText className="w-4 h-4 text-slate-500" />
-              <span>Reports</span>
-            </button>
-
-            {/* Nav item 8: Data Sources */}
-            <button
-              onClick={() => setActiveNav('data-sources')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Database className="w-4 h-4 text-slate-500" />
-              <span>Data Sources</span>
-            </button>
-
-            {/* Nav item 9: Administration */}
-            <button
-              onClick={() => navigate('/admin')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Settings className="w-4 h-4 text-slate-500" />
-              <span>Administration</span>
-            </button>
-
-          </div>
-
-          {/* Bottom Regional Branding Panel (Exact from Screenshot) */}
-          <div className="p-3">
-            <div className="bg-[#eaf3ff] border border-blue-100 rounded-xl p-3 flex items-center gap-2.5">
-              <NerLogixLogo variant="blue" showText={false} className="shrink-0" />
-              <div className="flex flex-col text-left">
-                <span className="text-[11px] font-bold text-[#1e40af] leading-tight">
-                  North Eastern Region
-                </span>
-                <span className="text-[10px] text-slate-600 leading-tight">
-                  Stronger Connectivity
-                </span>
-                <span className="text-[9.5px] text-slate-500 leading-tight">
-                  Safer Tomorrow
-                </span>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <GovernmentSidebar />
 
         {/* MAIN CONTENT AREA */}
         <main className="flex-1 overflow-y-auto px-5 py-4 space-y-4">

@@ -1,9 +1,8 @@
+import { GovernmentSidebar } from '../../components/GovernmentSidebar';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  User, MapPin, AlertTriangle, Home, 
-  Truck, BarChart3, Settings, 
-  Plus, Search, Share2
+  User, Plus, Search
 } from 'lucide-react';
 import { NerLogixLogo } from '../../components/NerLogixLogo';
 import { LogisticsNavigationTabs } from '../../components/logistics/LogisticsNavigationTabs';
@@ -79,49 +78,7 @@ export const SupplyMissionsPage: React.FC = () => {
       {/* BODY */}
       <div className="flex flex-1 overflow-hidden">
         {/* SIDEBAR */}
-        <aside className="w-60 bg-white border-r border-slate-200 flex flex-col justify-between p-3 shrink-0 hidden md:flex">
-          <div className="space-y-1">
-            <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Navigation
-            </div>
-            <button onClick={() => navigate('/government-command-center')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <Home className="w-4 h-4 text-slate-500" />
-              <span>Overview</span>
-            </button>
-            <button onClick={() => navigate('/incidents')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <MapPin className="w-4 h-4 text-slate-500" />
-              <span>Live Map</span>
-            </button>
-            <button onClick={() => navigate('/route-intelligence')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <Share2 className="w-4 h-4 text-slate-500" />
-              <span>Route Intelligence</span>
-            </button>
-            <button onClick={() => navigate('/logistics')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold bg-[#1a56db] text-white shadow-xs cursor-pointer">
-              <Truck className="w-4 h-4 text-white" />
-              <span>Logistics</span>
-            </button>
-            <button onClick={() => navigate('/live-map')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <AlertTriangle className="w-4 h-4 text-slate-500" />
-              <span>Incidents</span>
-            </button>
-            <button onClick={() => navigate('/live-map')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <BarChart3 className="w-4 h-4 text-slate-500" />
-              <span>Analytics</span>
-            </button>
-            <button onClick={() => navigate('/live-map')} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <Settings className="w-4 h-4 text-slate-500" />
-              <span>Administration</span>
-            </button>
-          </div>
-
-          <div className="mt-auto p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-center space-y-1">
-            <div className="flex justify-center">
-              <NerLogixLogo variant="blue"  />
-            </div>
-            <div className="text-[11px] font-bold text-blue-950">North Eastern Region</div>
-            <div className="text-[10px] text-blue-700/80">Stronger Connectivity</div>
-          </div>
-        </aside>
+        <GovernmentSidebar />
 
         {/* MAIN */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">

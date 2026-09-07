@@ -1,10 +1,9 @@
+import { GovernmentSidebar } from '../components/GovernmentSidebar';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Bell, User, MapPin, AlertTriangle, Home, 
-  Truck, BarChart3, Database, Settings, ChevronDown, 
-  Search, Plus, CheckCircle2, Share2, 
-  X, Users, Shield, Sliders, History, Lock
+  Bell, User, Settings, ChevronDown, 
+  Search, Plus, CheckCircle2, X, Users, Shield, Sliders, History, Lock
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { adminService } from '../services/adminService';
@@ -158,108 +157,7 @@ export const AdminPage: React.FC = () => {
       {/* 2. BODY CONTAINER: SIDEBAR + MAIN */}
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT SIDEBAR (LIGHT THEME - ESTABLISHED GOVERNMENT DESIGN) */}
-        <aside className="w-60 bg-white border-r border-slate-200 flex flex-col justify-between p-3 shrink-0 hidden md:flex">
-          <div className="space-y-1">
-            <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Navigation
-            </div>
-
-            <button
-              onClick={() => navigate('/government-command-center')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Home className="w-4 h-4 text-slate-500" />
-              <span>Overview</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/live-map')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 text-slate-500" />
-              <span>Live Accessibility Map</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/route-intelligence')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Share2 className="w-4 h-4 text-slate-500" />
-              <span>Route Intelligence</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/logistics')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Truck className="w-4 h-4 text-slate-500" />
-              <span>Logistics &amp; Vehicles</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/incidents')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-4 h-4 text-slate-500" />
-                <span>Incidents &amp; Field Reports</span>
-              </div>
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                8
-              </span>
-            </button>
-
-            <button
-              onClick={() => navigate('/alerts')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <Bell className="w-4 h-4 text-slate-500" />
-                <span>Alerts &amp; Emergency Response</span>
-              </div>
-              <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center">
-                6
-              </span>
-            </button>
-
-            <button
-              onClick={() => navigate('/analytics')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <BarChart3 className="w-4 h-4 text-slate-500" />
-              <span>Analytics &amp; Planning</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/data-integration')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Database className="w-4 h-4 text-slate-500" />
-              <span>Data &amp; Integration</span>
-            </button>
-
-            {/* ADMINISTRATION -> ACTIVE BLUE */}
-            <button
-              onClick={() => navigate('/admin')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold bg-[#1a56db] text-white shadow-xs text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <Settings className="w-4 h-4 text-white" />
-                <span>Administration</span>
-              </div>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            </button>
-          </div>
-
-          <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg text-center space-y-1">
-            <div className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">
-              Security Level 4
-            </div>
-            <div className="text-[9.5px] text-slate-500">
-              Government Administrative Clearance
-            </div>
-          </div>
-        </aside>
+        <GovernmentSidebar />
 
         {/* 3. MAIN WORKSPACE CONTAINER */}
         <main className="flex-1 overflow-y-auto flex flex-col p-4 md:p-6 space-y-6">

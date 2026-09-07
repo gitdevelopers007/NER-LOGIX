@@ -1,10 +1,9 @@
+import { GovernmentSidebar } from '../components/GovernmentSidebar';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Bell, User, Calendar, RefreshCw, MapPin, 
-  AlertTriangle, Route, ShieldAlert, Home, 
-  Truck, BarChart3, FileText, Database, Settings, CloudRain,
-  ChevronDown, ArrowRight, ShieldCheck, Activity, Layers, CheckCircle2, Mountain, Share2
+  Bell, User, Calendar, RefreshCw, AlertTriangle, Route, ShieldAlert, Truck, CloudRain,
+  ChevronDown, ArrowRight, ShieldCheck, Activity, Layers, CheckCircle2, Mountain
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 
@@ -74,110 +73,7 @@ export const GovernmentOverview: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         
         {/* LEFT SIDEBAR */}
-        <aside className="w-56 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 select-none">
-          <div className="p-3 space-y-1">
-            
-            {/* Overview -> ACTIVE */}
-            <button
-              onClick={() => navigate('/government-command-center')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold bg-[#1a56db] text-white shadow-xs text-left cursor-pointer"
-            >
-              <Home className="w-4 h-4 text-white" />
-              <span>Overview</span>
-            </button>
-
-            {/* Live Map -> Click goes to Page 5 */}
-            <button
-              onClick={() => navigate('/incidents')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 text-slate-500" />
-              <span>Live Map</span>
-            </button>
-
-            {/* Route Intelligence -> Click goes to Page 6 */}
-            <button
-              onClick={() => navigate('/route-intelligence')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Share2 className="w-4 h-4 text-slate-500" />
-              <span>Route Intelligence</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/live-map')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-4 h-4 text-slate-500" />
-                <span>Incidents</span>
-              </div>
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">3</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/logistics')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Truck className="w-4 h-4 text-slate-500" />
-              <span>Logistics</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/alerts')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <Bell className="w-4 h-4 text-slate-500" />
-                <span>Alerts</span>
-              </div>
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">3</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/analytics')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <BarChart3 className="w-4 h-4 text-slate-500" />
-              <span>Analytics</span>
-            </button>
-
-            <button
-              onClick={() => alert('Regional SITREP Reports')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <FileText className="w-4 h-4 text-slate-500" />
-              <span>Reports</span>
-            </button>
-
-            <button
-              onClick={() => alert('Data Sources')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Database className="w-4 h-4 text-slate-500" />
-              <span>Data Sources</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/admin')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-            >
-              <Settings className="w-4 h-4 text-slate-500" />
-              <span>Administration</span>
-            </button>
-          </div>
-
-          <div className="p-3">
-            <div className="bg-[#eaf3ff] border border-blue-100 rounded-xl p-3 flex items-center gap-2.5">
-              <NerLogixLogo variant="blue" showText={false} className="shrink-0" />
-              <div className="flex flex-col text-left">
-                <span className="text-[11px] font-bold text-[#1e40af] leading-tight">North Eastern Region</span>
-                <span className="text-[10px] text-slate-600 leading-tight">Stronger Connectivity</span>
-                <span className="text-[9.5px] text-slate-500 leading-tight">Safer Tomorrow</span>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <GovernmentSidebar />
 
         {/* MAIN CONTENT AREA */}
         <main className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
