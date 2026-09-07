@@ -201,7 +201,7 @@ export const IncidentsPage: React.FC = () => {
 
             {/* Alerts */}
             <button
-              onClick={() => alert('Emergency alert broadcasts')}
+              onClick={() => navigate('/alerts')}
               className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors text-left cursor-pointer"
             >
               <div className="flex items-center gap-3">
