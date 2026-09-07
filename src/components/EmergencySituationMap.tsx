@@ -25,26 +25,18 @@ export const EmergencySituationMap: React.FC<EmergencySituationMapProps> = ({
     if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
-      const northeastBounds = L.latLngBounds(
-        L.latLng(22.0, 89.4),
-        L.latLng(28.8, 97.4)
-      );
-
       const map = L.map(mapContainerRef.current, {
-        center: [26.4, 93.3],
-        zoom: 7.5,
-        minZoom: 7,
-        maxZoom: 16,
-        maxBounds: northeastBounds,
-        maxBoundsViscosity: 0.95,
+        center: [26.2, 93.0],
+        zoom: 7.8,
+        minZoom: 6.8,
+        maxZoom: 18,
         zoomControl: false,
         attributionControl: false
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors, © CARTO'
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
       }).addTo(map);
 
       layersGroupRef.current = L.layerGroup().addTo(map);

@@ -99,15 +99,15 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
                   : 'text-slate-600 hover:bg-slate-50 font-medium'
               }`}
             >
-              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+              <div className="flex items-center gap-2.5 min-w-0 pr-1">
                 <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-slate-500'}`} />
-                <span className="truncate">{item.name}</span>
+                <span className="leading-tight text-left">{item.name}</span>
               </div>
 
               {/* Dynamic Badges */}
               {item.badge ? (
                 <span
-                  className={`text-[10px] font-bold flex items-center justify-center shrink-0 transition-all ${
+                  className={`text-[10px] font-bold flex items-center justify-center shrink-0 ml-2 transition-all ${
                     active
                       ? 'w-5 h-5 rounded-full bg-white text-[#1a56db]'
                       : 'w-5 h-5 rounded-full bg-red-500 text-white'
