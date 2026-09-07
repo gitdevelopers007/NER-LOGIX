@@ -1,0 +1,116 @@
+{
+  "incidents": [
+    {
+      "id": "INC-AR-2025-082",
+      "type": "Landslide",
+      "title": "Landslide",
+      "severity": "High Severity",
+      "state": "Arunachal Pradesh",
+      "district": "Papum Pare",
+      "road": "NH-15",
+      "status": "BLOCKED",
+      "reported": "14 min ago",
+      "source": "Field Operations",
+      "lat": 27.185,
+      "lng": 93.682,
+      "photoUrl": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=400&q=80",
+      "description": "Debris flow and heavy boulder displacement covering 45 meters of roadway on NH-15. BRO Heavy Earth Movers mobilized."
+    },
+    {
+      "id": "INC-NL-2025-041",
+      "type": "Road Damage",
+      "title": "Road Surface Subsidence",
+      "severity": "High Severity",
+      "state": "Nagaland",
+      "district": "Kohima",
+      "road": "NH-29",
+      "status": "BLOCKED",
+      "reported": "12 min ago",
+      "source": "Field Operations",
+      "lat": 25.75,
+      "lng": 94.02,
+      "photoUrl": "https://images.unsplash.com/photo-1515260268569-9271009adfdb?auto=format&fit=crop&w=400&q=80",
+      "description": "Road damage reported on NH-129 (Kohima-Dimapur) due to hillside seepage."
+    },
+    {
+      "id": "INC-SK-2025-019",
+      "type": "Bridge Damage",
+      "title": "Bridge Expansion Joint Gap",
+      "severity": "Moderate",
+      "state": "Sikkim",
+      "district": "Mangan",
+      "road": "NH-10",
+      "status": "RESTRICTED",
+      "reported": "28 min ago",
+      "source": "Field Operations",
+      "lat": 27.51,
+      "lng": 88.53,
+      "photoUrl": "https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80",
+      "description": "Single-lane restriction for commercial vehicles exceeding 18 tonnes."
+    },
+    {
+      "id": "INC-ML-2025-063",
+      "type": "Heavy Rainfall",
+      "title": "Flash Flood Watch",
+      "severity": "Moderate",
+      "state": "Meghalaya",
+      "district": "East Khasi Hills",
+      "road": "NH-206",
+      "status": "RESTRICTED",
+      "reported": "42 min ago",
+      "source": "IMD Telemetry",
+      "lat": 25.32,
+      "lng": 91.75,
+      "photoUrl": "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=400&q=80",
+      "description": "Intense precipitation recorded in Mawsynram-Cherrapunji belt."
+    },
+    {
+      "id": "INC-MN-2025-055",
+      "type": "Landslide",
+      "title": "Multiple Rockfalls",
+      "severity": "Critical",
+      "state": "Manipur",
+      "district": "Tamenglong",
+      "road": "NH-37",
+      "status": "BLOCKED",
+      "reported": "1 hour ago",
+      "source": "District Administration",
+      "lat": 24.98,
+      "lng": 93.48,
+      "photoUrl": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=400&q=80",
+      "description": "5 road blocks identified along arterial freight corridor."
+    }
+  ],
+  "convoys": [
+    {
+      "id": "CONVOY-NE-104",
+      "origin": "Guwahati Logistics Park",
+      "destination": "Kohima Supply Depot",
+      "lat": 26.2,
+      "lng": 92.05,
+      "cargo": "Emergency Rice & Pulses",
+      "vehiclesCount": 14,
+      "status": "In Transit"
+    },
+    {
+      "id": "CONVOY-NE-218",
+      "origin": "Silchar Railhead",
+      "destination": "Agartala Central Hub",
+      "lat": 24.83,
+      "lng": 92.8,
+      "cargo": "Petroleum & LPG Cylinders",
+      "vehiclesCount": 8,
+      "status": "In Transit"
+    },
+    {
+      "id": "CONVOY-NE-305",
+      "origin": "Tezpur Ordnance",
+      "destination": "Tawang Base",
+      "lat": 27.2,
+      "lng": 92.4,
+      "cargo": "Bridge Reconstruction Steel",
+      "vehiclesCount": 6,
+      "status": "Delayed at Bhalukpong"
+    }
+  ]
+}
