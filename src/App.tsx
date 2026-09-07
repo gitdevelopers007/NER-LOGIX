@@ -7,6 +7,7 @@ import { GovernmentCommandCenter } from './pages/GovernmentCommandCenter';
 import { RouteIntelligencePage } from './pages/RouteIntelligencePage';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { AlertsPage } from './pages/AlertsPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 import { LogisticsOverviewPage } from './pages/logistics/LogisticsOverviewPage';
 import { SupplyMissionsPage } from './pages/logistics/SupplyMissionsPage';
 import { MissionDetailPage } from './pages/logistics/MissionDetailPage';
@@ -25,6 +26,7 @@ function App() {
         <Route path="/route-intelligence" element={<RouteIntelligencePage />} />
         <Route path="/incidents" element={<IncidentsPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
         
         {/* Logistics & Fleet Module */}
         <Route path="/logistics" element={<LogisticsOverviewPage />} />
