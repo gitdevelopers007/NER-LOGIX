@@ -3,6 +3,7 @@ import { Welcome } from './pages/Welcome';
 import { AccessPortalPage } from './pages/AccessPortalPage';
 import { GovernmentLogin } from './pages/GovernmentLogin';
 import { GovernmentOverview } from './pages/GovernmentOverview';
+import { GovernmentCommandCenter } from './pages/GovernmentCommandCenter';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/access-portal" element={<AccessPortalPage />} />
         <Route path="/government-login" element={<GovernmentLogin />} />
         <Route path="/government-command-center" element={<GovernmentOverview />} />
+        <Route path="/live-map" element={<GovernmentCommandCenter />} />
         <Route path="*" element={<Navigate to="/access-portal" replace />} />
       </Routes>
     </BrowserRouter>
