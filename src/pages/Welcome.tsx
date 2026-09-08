@@ -801,7 +801,7 @@ export const Welcome: React.FC = () => {
           {/* 6 Members Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
             
-            {/* Member 1: Sai Ganesh */}
+            {/* Member 1: Sai Ganesh Pushadapu */}
             <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#1a56db] hover:shadow-md transition-all group">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-[#0c2340] text-white flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] transition-colors shadow-xs">
@@ -809,13 +809,13 @@ export const Welcome: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-[#0c2340] uppercase tracking-wide">
-                    SAI GANESH
+                    SAI GANESH PUSHADAPU
                   </h3>
                   <div className="text-xs font-bold text-[#1a56db]">
                     Team Lead &amp; System Integration
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    System architecture, core backend integration, and regional platform deployment.
+                    Architecture, integration, platform coordination and final build.
                   </p>
                 </div>
               </div>
@@ -835,87 +835,87 @@ export const Welcome: React.FC = () => {
                     AI &amp; Disruption Intelligence
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Predictive disruption models, risk matrix scoring, and real-time rerouting algorithms.
+                    AI/ML risk intelligence and disruption prediction.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Member 3: GIS */}
+            {/* Member 3: Shashank Reddy */}
             <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#1a56db] hover:shadow-md transition-all group">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] group-hover:text-white transition-colors">
-                  03
+                <div className="w-12 h-12 rounded-full bg-[#0c2340] text-white flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] transition-colors shadow-xs">
+                  SR
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-[#0c2340] uppercase tracking-wide">
-                    TEAM MEMBER
+                    SHASHANK REDDY
                   </h3>
-                  <div className="text-xs font-bold text-slate-700">
+                  <div className="text-xs font-bold text-[#1a56db]">
                     GIS &amp; Route Intelligence
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Geospatial network topology, digital elevation mapping, and corridor choke-point indexing.
+                    GIS mapping, road accessibility and route intelligence.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Member 4: Command Center */}
+            {/* Member 4: Jahnavi */}
             <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#1a56db] hover:shadow-md transition-all group">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] group-hover:text-white transition-colors">
-                  04
+                <div className="w-12 h-12 rounded-full bg-[#0c2340] text-white flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] transition-colors shadow-xs">
+                  J
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-[#0c2340] uppercase tracking-wide">
-                    TEAM MEMBER
+                    JAHNAVI
                   </h3>
-                  <div className="text-xs font-bold text-slate-700">
+                  <div className="text-xs font-bold text-[#1a56db]">
                     Government Command Dashboard
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Executive multi-level RBAC portal, administrative analytics, and cross-department telemetry.
+                    Government-facing monitoring, visualization and command interface.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Member 5: Logistics & Fleets */}
+            {/* Member 5: Hamsika */}
             <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#1a56db] hover:shadow-md transition-all group">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] group-hover:text-white transition-colors">
-                  05
+                <div className="w-12 h-12 rounded-full bg-[#0c2340] text-white flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] transition-colors shadow-xs">
+                  H
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-[#0c2340] uppercase tracking-wide">
-                    TEAM MEMBER
+                    HAMSIKA
                   </h3>
-                  <div className="text-xs font-bold text-slate-700">
+                  <div className="text-xs font-bold text-[#1a56db]">
                     Logistics &amp; Vehicle Tracking
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Fleet GPS integration, critical supply convoy scheduling, and bridge weight limits.
+                    Vehicle movement, logistics missions and delivery monitoring.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Member 6: Field Intelligence */}
+            {/* Member 6: Niharika */}
             <div className="p-6 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#1a56db] hover:shadow-md transition-all group">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] group-hover:text-white transition-colors">
-                  06
+                <div className="w-12 h-12 rounded-full bg-[#0c2340] text-white flex items-center justify-center font-black text-sm group-hover:bg-[#1a56db] transition-colors shadow-xs">
+                  N
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-[#0c2340] uppercase tracking-wide">
-                    TEAM MEMBER
+                    NIHARIKA
                   </h3>
-                  <div className="text-xs font-bold text-slate-700">
+                  <div className="text-xs font-bold text-[#1a56db]">
                     Field Intelligence &amp; Alerts
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Ground incident reporting verification, road blockade alerts, and emergency response feeds.
+                    Field reporting, incident intelligence and alert workflows.
                   </p>
                 </div>
               </div>
@@ -1011,20 +1011,28 @@ export const Welcome: React.FC = () => {
 
               <div className="space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Sai Ganesh</span>
+                  <span className="font-bold text-white">Sai Ganesh Pushadapu</span>
                   <span className="text-[11px] text-slate-400">Team Lead &amp; Integration</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-white">Koushik Rahul</span>
                   <span className="text-[11px] text-slate-400">AI &amp; Disruption Intelligence</span>
                 </div>
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>GIS &amp; Routes Team</span>
-                  <span className="text-[11px] text-slate-500">Route Topography</span>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white">Shashank Reddy</span>
+                  <span className="text-[11px] text-slate-400">GIS &amp; Route Intelligence</span>
                 </div>
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>Logistics &amp; Field Ops</span>
-                  <span className="text-[11px] text-slate-500">Field Telemetry</span>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white">Jahnavi</span>
+                  <span className="text-[11px] text-slate-400">Command Dashboard</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white">Hamsika</span>
+                  <span className="text-[11px] text-slate-400">Logistics &amp; Vehicle Tracking</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white">Niharika</span>
+                  <span className="text-[11px] text-slate-400">Field Intelligence &amp; Alerts</span>
                 </div>
               </div>
 
