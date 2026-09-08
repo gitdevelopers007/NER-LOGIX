@@ -95,15 +95,16 @@ export const EmergencySituationMap: React.FC<EmergencySituationMapProps> = ({
       const isSelected = alt.id === selectedAlertId;
       const isCritical = alt.severity === 'CRITICAL';
       const isHigh = alt.severity === 'HIGH';
+      const isEarthquake = alt.category === 'EARTHQUAKE';
 
-      const pinColor = isCritical ? '#dc2626' : isHigh ? '#ea580c' : '#2563eb';
-      const haloClass = isCritical ? 'animate-ping' : '';
+      const pinColor = isEarthquake ? '#dc2626' : isCritical ? '#dc2626' : isHigh ? '#ea580c' : '#2563eb';
+      const haloClass = (isCritical || isEarthquake) ? 'animate-ping' : '';
 
       const iconHtml = `
         <div style="position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-          <span style="position:absolute;width:34px;height:34px;border-radius:50%;background:${pinColor};opacity:0.3;" class="${haloClass}"></span>
+          <span style="position:absolute;width:34px;height:34px;border-radius:50%;background:${pinColor};opacity:0.35;" class="${haloClass}"></span>
           <div style="width:${isSelected ? '32px' : '26px'};height:${isSelected ? '32px' : '26px'};border-radius:50%;background:${pinColor};border:2.5px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;transition:all 0.2s;">
-            ${isCritical ? '!' : isHigh ? '▲' : '●'}
+            ${isEarthquake ? '⚡' : isCritical ? '!' : isHigh ? '▲' : '●'}
           </div>
         </div>
       `;
@@ -122,11 +123,13 @@ export const EmergencySituationMap: React.FC<EmergencySituationMapProps> = ({
       });
 
       marker.bindPopup(`
-        <div style="font-family:sans-serif;font-size:12px;">
-          <div style="color:${pinColor};font-weight:bold;margin-bottom:2px;">● ${alt.severity} ALERT</div>
+        <div style="font-family:sans-serif;font-size:12px;max-width:220px;">
+          <div style="color:${pinColor};font-weight:bold;margin-bottom:2px;">● ${alt.severity} ${alt.category} ALERT</div>
           <div style="font-weight:bold;color:#0f172a;">${alt.title}</div>
           <div style="color:#64748b;font-size:11px;">${alt.road} • ${alt.district}</div>
           <div style="color:#dc2626;font-weight:bold;margin-top:4px;">Status: ${alt.roadCondition}</div>
+          <div style="color:#059669;font-size:10px;font-weight:600;margin-top:2px;">Source: ${alt.source}</div>
+          ${alt.eventUrl ? `<div style="margin-top:5px;border-top:1px solid #e2e8f0;padding-top:3px;"><a href="${alt.eventUrl}" target="_blank" rel="noreferrer" style="color:#2563eb;font-size:10.5px;font-weight:bold;text-decoration:underline;">Official NCS Bulletin ↗</a></div>` : ''}
         </div>
       `);
 

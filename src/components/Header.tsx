@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, Check, X, Phone, Mail } from 'lucide-react';
 import { EmblemOfIndia } from './EmblemOfIndia';
 import { NerLogixLogo } from './NerLogixLogo';
+import { LiveTelemetryToggle } from './LiveTelemetryToggle';
 
 interface HeaderProps {
   onHelpClick?: () => void;
@@ -53,6 +54,9 @@ export const Header: React.FC<HeaderProps> = () => {
 
         {/* Right Status & Tools Group */}
         <div className="flex items-center text-[13px] text-slate-700 font-medium">
+          {/* Live Government Telemetry Toggle */}
+          <LiveTelemetryToggle className="mr-3" />
+
           {/* System Online Indicator */}
           <div className="flex items-center gap-2 select-none">
             <span className="relative flex h-2 w-2">

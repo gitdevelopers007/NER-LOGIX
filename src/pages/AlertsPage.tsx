@@ -1,14 +1,16 @@
 import { GovernmentSidebar } from '../components/GovernmentSidebar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Bell, User, MapPin, Route, ChevronDown, 
-  Search, CheckCircle2, Volume2, Eye
+  Search, CheckCircle2, Volume2, Eye, ExternalLink
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { EmergencySituationMap } from '../components/EmergencySituationMap';
+import { LiveTelemetryToggle } from '../components/LiveTelemetryToggle';
 import { alertService } from '../services/alertService';
 import type { AlertItem, AlertSeverity } from '../services/alertService';
+import { liveGovtService } from '../services/liveGovtService';
 
 export const AlertsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +20,23 @@ export const AlertsPage: React.FC = () => {
     alerts[0] || alertService.getAlerts()[0]
   );
   const [stats, setStats] = useState(alertService.getStats());
+
+  // Auto-sync with live government telemetry
+  useEffect(() => {
+    const sync = async () => {
+      const list = await alertService.syncLiveGovtFeeds();
+      setAlerts([...list]);
+      setStats(alertService.getStats());
+      if (list.length > 0) {
+        setSelectedAlert((prev) => list.find((a) => a.id === prev?.id) || list[0]);
+      }
+    };
+    sync();
+    const unsub = liveGovtService.onModeChange(() => {
+      sync();
+    });
+    return () => unsub();
+  }, []);
 
   // Filters & Search
   const [search, setSearch] = useState('');
@@ -104,6 +123,8 @@ export const AlertsPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          <LiveTelemetryToggle />
+
           <div className="hidden sm:flex items-center gap-2 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full text-[11px] text-emerald-400 font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Alert Engine Operational</span>
@@ -403,6 +424,18 @@ export const AlertsPage: React.FC = () => {
                 <Route className="w-3.5 h-3.5" />
                 <span>[ ANALYZE ROUTE ]</span>
               </button>
+
+              {selectedAlert.eventUrl && (
+                <a
+                  href={selectedAlert.eventUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-xs font-bold border border-red-200 flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-red-600" />
+                  <span>[ OFFICIAL NCS BULLETIN ↗ ]</span>
+                </a>
+              )}
             </div>
 
             {/* Recommended Response Checklist */}

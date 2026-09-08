@@ -6,6 +6,7 @@ import {
   ChevronDown, ArrowRight, ShieldCheck, Activity, Layers, CheckCircle2, Mountain
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
+import { LiveTelemetryToggle } from '../components/LiveTelemetryToggle';
 import { nerApiService, type StateRainfall } from '../services/nerApiService';
 
 export const GovernmentOverview: React.FC = () => {
@@ -51,6 +52,8 @@ export const GovernmentOverview: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3.5 text-xs font-medium">
+          <LiveTelemetryToggle />
+
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
             <span className="text-slate-200 font-semibold tracking-wide text-[11.5px]">System Online</span>

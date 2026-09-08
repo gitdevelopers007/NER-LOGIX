@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { INCIDENTS_DATA, NER_NODES } from '../data/nerGisData';
 import type { Incident } from '../data/nerGisData';
+import { liveGovtService, type LiveEarthquake, type LiveRainPoint, type DataMode } from '../services/liveGovtService';
 
 interface GisMapProps {
   selectedIncident: Incident;
@@ -29,6 +30,26 @@ export const GisMap: React.FC<GisMapProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [activeBaseMap, setActiveBaseMap] = useState<'satellite' | 'terrain'>('satellite');
   const [activePill, setActivePill] = useState<string>('weather');
+  const [dataMode, setDataMode] = useState<DataMode>(liveGovtService.getMode());
+  const [liveEarthquakes, setLiveEarthquakes] = useState<LiveEarthquake[]>([]);
+  const [liveRainPoints, setLiveRainPoints] = useState<LiveRainPoint[]>([]);
+
+  useEffect(() => {
+    const sync = () => {
+      const m = liveGovtService.getMode();
+      setDataMode(m);
+      if (m === 'LIVE') {
+        liveGovtService.getEarthquakes().then(setLiveEarthquakes);
+        liveGovtService.getRainAlerts().then(setLiveRainPoints);
+      } else {
+        setLiveEarthquakes([]);
+        setLiveRainPoints([]);
+      }
+    };
+    sync();
+    const unsub = liveGovtService.onModeChange(sync);
+    return () => unsub();
+  }, []);
 
   // Layer visibility toggles (exact 13 layers from screenshot)
   const [layers, setLayers] = useState({
@@ -45,6 +66,7 @@ export const GisMap: React.FC<GisMapProps> = ({
     vehicles: true,
     emergencyRoutes: false,
     satelliteImagery: true,
+    earthquakes: true,
   });
 
   const toggleLayer = (key: keyof typeof layers) => {
@@ -392,7 +414,67 @@ export const GisMap: React.FC<GisMapProps> = ({
       });
     }
 
-  }, [selectedIncident, layers]);
+  
+    // 5. Real-time NCS Earthquakes from NERDRR
+    if (layers.earthquakes && dataMode === 'LIVE' && liveEarthquakes.length > 0) {
+      liveEarthquakes.slice(0, 20).forEach((eq) => {
+        const eqIcon = L.divIcon({
+          className: 'live-quake-marker',
+          html: `<div style="position: relative; cursor: pointer; text-align: center;">
+            <span style="position: absolute; inset: -5px; border-radius: 50%; background: rgba(239, 68, 68, 0.45); animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+            <div style="width: 30px; height: 30px; border-radius: 50%; background: #dc2626; border: 2.5px solid #ffffff; box-shadow: 0 0 14px rgba(220,38,38,0.9); display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900; font-size: 11px; font-family: monospace;">
+              ${eq.magnitude.toFixed(1)}
+            </div>
+            <div style="margin-top: 1px; white-space: nowrap; background: rgba(15,23,42,0.95); color: #fca5a5; font-size: 9px; font-weight: 800; padding: 0.5px 5px; border-radius: 4px; border: 1px solid rgba(239,68,68,0.6); display: inline-block;">
+              ${eq.depthKm}km
+            </div>
+          </div>`,
+          iconSize: [44, 44],
+          iconAnchor: [22, 15],
+        });
+
+        const m = L.marker([eq.latitude, eq.longitude], { icon: eqIcon }).addTo(markersGroup);
+        m.bindTooltip(
+          `<div style="font-family: sans-serif; font-size: 11px; max-width: 240px; padding: 2px;">
+            <div style="display: flex; align-items: center; gap: 4px; color: #dc2626; font-weight: 800; font-size: 12px;">
+              <span>⚡ Seismic Event M ${eq.magnitude.toFixed(1)}</span>
+            </div>
+            <div style="font-weight: 700; color: #1e293b; margin-top: 2px;">${eq.place}</div>
+            <div style="color: #64748b; font-size: 10.5px; margin-top: 2px;">Focal Depth: <b>${eq.depthKm} km</b> (${eq.status})</div>
+            <div style="color: #64748b; font-size: 10px;">Time: ${new Date(eq.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            <div style="color: #15803d; font-weight: 700; font-size: 9.5px; margin-top: 4px; border-top: 1px solid #e2e8f0; padding-top: 2px;">
+              ● Source: National Centre for Seismology / NESAC NERDRR
+            </div>
+          </div>`,
+          { direction: 'top' }
+        );
+      });
+    }
+
+    // 6. Live MOSDAC Heavy Rain Cells
+    if (dataMode === 'LIVE' && (layers.heavyRainfall || layers.weather) && liveRainPoints.length > 0) {
+      liveRainPoints.slice(0, 35).forEach((pt) => {
+        const rainDot = L.circleMarker([pt.lat, pt.lng], {
+          radius: 6,
+          fillColor: '#0284c7',
+          color: '#ffffff',
+          weight: 1.5,
+          opacity: 0.95,
+          fillOpacity: 0.75
+        }).addTo(markersGroup);
+
+        rainDot.bindTooltip(
+          `<div style="font-family: sans-serif; font-size: 10.5px; padding: 2px;">
+            <b style="color: #0284c7;">🌧️ ISRO MOSDAC Rain Cell</b><br/>
+            <span>Radar Ref: <b>${pt.radInf}</b></span><br/>
+            <span style="color: #0369a1; font-weight: 600;">${pt.forecast}</span>
+          </div>`,
+          { direction: 'top' }
+        );
+      });
+    }
+
+  }, [selectedIncident, layers, dataMode, liveEarthquakes, liveRainPoints]);
 
   const handleZoomIn = () => mapInstanceRef.current?.zoomIn();
   const handleZoomOut = () => mapInstanceRef.current?.zoomOut();
@@ -519,6 +601,25 @@ export const GisMap: React.FC<GisMapProps> = ({
           </button>
         </div>
 
+        {/* Live Telemetry Attribution Pill */}
+        <div className="pointer-events-auto flex items-center gap-2 bg-[#0b1a30]/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/80 shadow-md text-xs text-white">
+          {dataMode === 'LIVE' ? (
+            <>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="font-semibold text-emerald-300">ISRO-NESAC NERDRR &amp; NCS Seismology</span>
+              <span className="text-slate-400 text-[10px] hidden sm:inline">
+                ({liveEarthquakes.length} Quakes | {liveRainPoints.length} Rain Cells)
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
+              <span className="font-semibold text-indigo-300">Simulation Scenario</span>
+              <span className="text-slate-400 text-[10px] hidden sm:inline">(Curated Test Matrix)</span>
+            </>
+          )}
+        </div>
+
         {/* Base Map Switcher: Satellite vs Terrain */}
         <div className="pointer-events-auto flex items-center bg-white/95 backdrop-blur-xs p-0.5 rounded-md border border-slate-200 shadow-sm text-xs font-medium">
           <button
@@ -570,6 +671,7 @@ export const GisMap: React.FC<GisMapProps> = ({
                     { id: 'roadAccessibility', label: 'Road Accessibility' },
                     { id: 'traffic', label: 'Traffic' },
                     { id: 'fieldIncidents', label: 'Field Incidents' },
+                    { id: 'earthquakes', label: 'Earthquakes (NCS Live)' },
                     { id: 'floodRisk', label: 'Flood Risk' },
                     { id: 'landslideRisk', label: 'Landslide Risk' },
                     { id: 'heavyRainfall', label: 'Heavy Rainfall' },

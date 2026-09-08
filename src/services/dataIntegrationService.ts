@@ -44,6 +44,8 @@ const DATA_SOURCES: DataSourceItem[] = [
   { id: 'SRC-08', source: 'Satellite / Remote Data', type: 'GIS', status: 'Connected', lastUpdated: '19:55 IST', refreshFrequency: 'Every 30m', endpoint: 'https://isro.bhuvan.gov.in/geoportal/optical-radar', recordsCount: '8 multispectral tiles' },
   { id: 'SRC-09', source: 'State Disaster Data (SDRF)', type: 'Government DB', status: 'Connected', lastUpdated: '20:15 IST', refreshFrequency: 'Every 30m', endpoint: 'https://asdma.gov.in/telemetry/feed', recordsCount: '8 state nodes' },
   { id: 'SRC-10', source: 'Border Roads Task Force Feed', type: 'Government DB', status: 'Connected', lastUpdated: '20:30 IST', refreshFrequency: 'Every 20m', endpoint: 'https://bro.nic.in/operations/project-vartak', recordsCount: '14 sectors' },
+  { id: 'SRC-11', source: 'ISRO NESAC (NERDRR Portal)', type: 'Government DB', status: 'Connected', lastUpdated: 'Live Active', refreshFrequency: 'Every 3m', endpoint: 'https://nerdrr.gov.in/tempdbacc/getLastDayEqs.php', recordsCount: '147 active telemetry points' },
+  { id: 'SRC-12', source: 'ISRO MOSDAC Atmospheric Radar', type: 'API', status: 'Connected', lastUpdated: 'Live Active', refreshFrequency: 'Every 5m', endpoint: 'https://www.mosdac.gov.in/live/backend/rain_cloudburst.php', recordsCount: '621 rainfall vectors' },
 ];
 
 const API_SERVICES: ApiServiceItem[] = [
@@ -54,6 +56,7 @@ const API_SERVICES: ApiServiceItem[] = [
   { id: 'API-05', service: 'Vehicle Tracking API', status: 'ONLINE', responseMs: 143, uptimePct: 99.99, protocol: 'WebSocket' },
   { id: 'API-06', service: 'Field Reporting API', status: 'ONLINE', responseMs: 162, uptimePct: 99.95, protocol: 'REST / HTTPS' },
   { id: 'API-07', service: 'Alert Engine', status: 'ONLINE', responseMs: 109, uptimePct: 100.0, protocol: 'WebSocket' },
+  { id: 'API-08', service: 'ISRO-NESAC NERDRR Gateway', status: 'ONLINE', responseMs: 44, uptimePct: 99.99, protocol: 'REST / HTTPS' },
 ];
 
 const DATA_QUALITY: DataQualityMetric[] = [

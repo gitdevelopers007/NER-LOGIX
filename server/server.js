@@ -3,6 +3,12 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { 
+  getLiveEarthquakes, 
+  getLiveLandslides, 
+  getLiveRainCloudburst, 
+  getLiveSummary 
+} from './nerdrrService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -330,6 +336,66 @@ app.get('/api/metrics', (req, res) => {
     activeIncidents: db.incidents.length,
     lastSync: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
   });
+});
+
+// ==========================================
+// 5. LIVE GOVT TELEMETRY: ISRO / NESAC NERDRR & NCS
+// ==========================================
+
+// Real-time NCS Earthquakes in North East Region
+app.get('/api/live/earthquakes', async (req, res) => {
+  try {
+    const data = await getLiveEarthquakes();
+    res.json({
+      success: true,
+      source: 'National Centre for Seismology / NESAC NERDRR',
+      count: data.length,
+      earthquakes: data
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Real-time Active Landslides from NESDR
+app.get('/api/live/landslides', async (req, res) => {
+  try {
+    const data = await getLiveLandslides();
+    res.json({
+      success: true,
+      source: 'NESAC / NERDRR Landslide Node',
+      count: data.length,
+      landslides: data
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Real-time Heavy Rain & Cloudburst Warnings from ISRO MOSDAC
+app.get('/api/live/rain-cloudburst', async (req, res) => {
+  try {
+    const data = await getLiveRainCloudburst();
+    res.json({
+      success: true,
+      source: 'ISRO MOSDAC Space Applications Centre',
+      timestamp: data.timestamp,
+      count: data.count,
+      alerts: data.alerts
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Aggregated Live Government Disaster Summary
+app.get('/api/live/summary', async (req, res) => {
+  try {
+    const summary = await getLiveSummary();
+    res.json(summary);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // Start Server

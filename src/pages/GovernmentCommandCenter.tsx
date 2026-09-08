@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { GisMap } from '../components/GisMap';
+import { LiveTelemetryToggle } from '../components/LiveTelemetryToggle';
 import { 
   INCIDENTS_DATA, DISTRICT_CONNECTIVITY, WEATHER_RISKS, 
   RECENT_UPDATES
@@ -127,6 +128,9 @@ export const GovernmentCommandCenter: React.FC = () => {
         {/* Right Controls */}
         <div className="flex items-center gap-3.5 text-xs font-medium">
           
+          {/* Live Government Telemetry Toggle */}
+          <LiveTelemetryToggle />
+
           {/* Status Online indicator */}
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>

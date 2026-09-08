@@ -1,3 +1,5 @@
+import { liveGovtService } from './liveGovtService';
+
 export type AlertSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
 export type AlertStatus = 'ACTIVE' | 'ACKNOWLEDGED' | 'IN_PROGRESS' | 'RESOLVED';
@@ -7,7 +9,7 @@ export interface AlertItem {
   severity: AlertSeverity;
   status: AlertStatus;
   title: string;
-  category: 'LANDSLIDE' | 'FLOOD' | 'DELIVERY_DELAY' | 'WEATHER' | 'BRIDGE';
+  category: 'LANDSLIDE' | 'FLOOD' | 'DELIVERY_DELAY' | 'WEATHER' | 'BRIDGE' | 'EARTHQUAKE';
   state: string;
   district: string;
   road: string;
@@ -20,6 +22,7 @@ export interface AlertItem {
   longitude: number;
   incidentId?: string;
   routeId?: string;
+  eventUrl?: string;
   recommendedResponse: string[];
   responseStages: {
     alertGenerated: boolean;
@@ -150,25 +153,117 @@ const INITIAL_ALERTS: AlertItem[] = [
 ];
 
 class AlertService {
-  private alerts: AlertItem[] = [...INITIAL_ALERTS];
+  private baseAlerts: AlertItem[] = [...INITIAL_ALERTS];
+  private liveAlerts: AlertItem[] = [];
+
+  constructor() {
+    this.syncLiveGovtFeeds();
+    liveGovtService.onModeChange(() => {
+      this.syncLiveGovtFeeds();
+    });
+  }
+
+  public async syncLiveGovtFeeds(): Promise<AlertItem[]> {
+    if (liveGovtService.getMode() !== 'LIVE') {
+      this.liveAlerts = [];
+      return this.getAlerts();
+    }
+
+    try {
+      const [quakes, landslides] = await Promise.all([
+        liveGovtService.getEarthquakes(),
+        liveGovtService.getLandslides()
+      ]);
+
+      const quakeAlerts: AlertItem[] = quakes.slice(0, 3).map((eq) => ({
+        id: `NCS-EQ-${eq.id}`,
+        severity: eq.magnitude >= 3.2 ? 'CRITICAL' : eq.magnitude >= 2.6 ? 'HIGH' : 'MEDIUM',
+        status: 'ACTIVE',
+        title: `Live Seismic Advisory (M ${eq.magnitude.toFixed(1)}) — ${eq.place}`,
+        category: 'EARTHQUAKE',
+        state: eq.region || 'North East Region',
+        district: eq.place.split(',')[0] || 'Regional Epicenter',
+        road: 'Arterial Mountain Transit Corridor',
+        roadCondition: eq.magnitude >= 3.2 ? 'RESTRICTED' : 'CAUTION',
+        affectedArea: `${eq.place} (Focal Depth: ${eq.depthKm} km)`,
+        source: 'National Centre for Seismology / NESAC NERDRR',
+        reportedAgo: 'Live NCS Bulletin',
+        timestamp: eq.time,
+        latitude: eq.latitude,
+        longitude: eq.longitude,
+        eventUrl: eq.eventUrl,
+        recommendedResponse: [
+          `Seismometer telemetry confirmed at depth ${eq.depthKm}km. Assess elevated pass culverts.`,
+          'Verify bridge structural expansion joints with Border Roads Organisation',
+          'Maintain situational awareness with State Disaster Management Authority'
+        ],
+        responseStages: {
+          alertGenerated: true,
+          fieldTeamNotified: true,
+          routeAnalysisComplete: true,
+          responseStatus: 'IN_PROGRESS'
+        }
+      }));
+
+      const topLandslides: AlertItem[] = landslides
+        .filter(l => l.area > 0)
+        .slice(0, 2)
+        .map((ls) => ({
+          id: `NESAC-LS-${ls.state.replace(/\s+/g, '-').toUpperCase()}`,
+          severity: ls.hazardLevel === 'Critical' ? 'CRITICAL' : 'HIGH',
+          status: 'ACTIVE',
+          title: `Satellite Landslide Warning — ${ls.state} (${ls.area} High-Risk Zones)`,
+          category: 'LANDSLIDE',
+          state: ls.state,
+          district: `${ls.state} Hilly Corridors`,
+          road: 'Primary Freight Corridors',
+          roadCondition: ls.hazardLevel === 'Critical' ? 'BLOCKED' : 'RESTRICTED',
+          affectedArea: `${ls.area} landslide displacement zones documented by NESAC satellite GIS`,
+          source: 'NESAC / NERDRR Landslide Gateway',
+          reportedAgo: 'ISRO Earth Observation',
+          timestamp: new Date().toISOString(),
+          latitude: ls.state === 'Assam' ? 26.24 : ls.state === 'Arunachal Pradesh' ? 27.35 : 25.57,
+          longitude: ls.state === 'Assam' ? 92.40 : ls.state === 'Arunachal Pradesh' ? 93.68 : 91.89,
+          recommendedResponse: [
+            'Alert civil transport authorities of unstable cliff sections',
+            'Mobilize regional quick-response earthmoving units for rapid clearance',
+            'Reroute freight traffic to designated secondary lifelines'
+          ],
+          responseStages: {
+            alertGenerated: true,
+            fieldTeamNotified: true,
+            routeAnalysisComplete: true,
+            responseStatus: 'IN_PROGRESS'
+          }
+        }));
+
+      this.liveAlerts = [...quakeAlerts, ...topLandslides];
+      return this.getAlerts();
+    } catch {
+      return this.getAlerts();
+    }
+  }
 
   public getAlerts(): AlertItem[] {
-    return [...this.alerts];
+    if (liveGovtService.getMode() === 'LIVE' && this.liveAlerts.length > 0) {
+      return [...this.liveAlerts, ...this.baseAlerts];
+    }
+    return [...this.baseAlerts];
   }
 
   public getAlertById(id: string): AlertItem | undefined {
-    return this.alerts.find((a) => a.id === id);
+    return this.getAlerts().find((a) => a.id === id);
   }
 
   public acknowledgeAlert(id: string): AlertItem | undefined {
-    const alert = this.alerts.find((a) => a.id === id);
+    const alert = this.getAlertById(id);
     if (!alert) return undefined;
     alert.status = 'ACKNOWLEDGED';
     return alert;
   }
 
   public dispatchEmergencyAction(id: string): AlertItem | undefined {
-    const alert = this.alerts.find((a) => a.id === id);
+    const alert = this.getAlertById(id);
     if (!alert) return undefined;
     alert.responseStages.responseStatus = 'IN_PROGRESS';
     alert.responseStages.fieldTeamNotified = true;
@@ -176,11 +271,12 @@ class AlertService {
   }
 
   public getStats() {
+    const list = this.getAlerts();
     return {
-      critical: 6,
-      highPriority: 18,
-      active: 32,
-      acknowledged: 14
+      critical: list.filter(a => a.severity === 'CRITICAL').length,
+      highPriority: list.filter(a => a.severity === 'HIGH').length,
+      active: list.filter(a => a.status === 'ACTIVE').length,
+      acknowledged: list.filter(a => a.status === 'ACKNOWLEDGED').length
     };
   }
 }
