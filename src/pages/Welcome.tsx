@@ -4,15 +4,15 @@ import {
   ArrowRight, Shield, HelpCircle, LogIn, 
   AlertTriangle, HardHat, BookOpen, Layers,
   Compass, Radio, Cpu, Satellite, CheckCircle2,
-  ChevronDown, Play, Pause, Activity
+  ChevronDown, Play, Pause, Volume2, VolumeX, Maximize2
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 
 export const Welcome: React.FC = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [hasVideo, setHasVideo] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -38,13 +38,6 @@ export const Welcome: React.FC = () => {
       observer.observe(el);
     });
 
-    // Check if gslv-eos05.mp4 is placed in /public
-    fetch('/gslv-eos05.mp4', { method: 'HEAD' })
-      .then((res) => {
-        if (res.ok) setHasVideo(true);
-      })
-      .catch(() => {});
-
     return () => {
       window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
@@ -58,6 +51,21 @@ export const Welcome: React.FC = () => {
       setIsPlaying(false);
     } else {
       videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+  };
+
+  const handleMuteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
+  const handleFullscreen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    if (videoRef.current.requestFullscreen) {
+      videoRef.current.requestFullscreen();
     }
   };
 
@@ -654,85 +662,109 @@ export const Welcome: React.FC = () => {
 
             </div>
 
-            {/* Right Column: Video Container / Radar Animation */}
-            <div className="lg:col-span-6">
+            {/* Right Column: Video Container - High-Tech Space Mission Console */}
+            <div className="lg:col-span-6 space-y-4">
               
-              <div className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-[#0c2436] to-[#071722] overflow-hidden shadow-2xl min-h-[380px] flex flex-col justify-between p-6">
+              <div className="relative rounded-2xl border border-[#24d6ad]/40 bg-[#061624] p-2.5 sm:p-3 shadow-[0_0_50px_rgba(36,214,173,0.18)] overflow-hidden group">
                 
-                {/* Background Radar concentric rings */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-                  <div className="w-[320px] h-[320px] rounded-full border border-[#24d6ad] animate-ping" style={{ animationDuration: '4s' }}></div>
-                  <div className="absolute w-[240px] h-[240px] rounded-full border border-white/30"></div>
-                  <div className="absolute w-[140px] h-[140px] rounded-full border border-[#24d6ad]/60"></div>
-                  <div className="absolute w-full h-[1px] bg-white/20"></div>
-                  <div className="absolute h-full w-[1px] bg-white/20"></div>
+                {/* Futuristic corner brackets */}
+                <div className="absolute top-1.5 left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-[#24d6ad] z-20 pointer-events-none"></div>
+                <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-[#24d6ad] z-20 pointer-events-none"></div>
+                <div className="absolute bottom-1.5 left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-[#24d6ad] z-20 pointer-events-none"></div>
+                <div className="absolute bottom-1.5 right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-[#24d6ad] z-20 pointer-events-none"></div>
+
+                {/* Video Player Card */}
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center shadow-inner cursor-pointer" onClick={handleVideoToggle}>
+                  <video 
+                    ref={videoRef}
+                    src="/space-eye.mp4"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+
+                  {/* Top Glassmorphism HUD Overlay */}
+                  <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent flex items-center justify-between z-10 select-none">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                      <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-white uppercase drop-shadow-sm">
+                        LIVE SATELLITE FEED • EOS-05
+                      </span>
+                    </div>
+                    <div className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#24d6ad]/20 border border-[#24d6ad]/40 text-[#24d6ad] font-bold">
+                      GSLV-F17
+                    </div>
+                  </div>
+
+                  {/* Center Play/Pause button when paused */}
+                  {!isPlaying && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                      <div className="w-14 h-14 rounded-full bg-[#24d6ad]/90 text-[#06231e] flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+                        <Play className="w-6 h-6 fill-current ml-0.5" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bottom HUD Controls */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/85 via-black/50 to-transparent flex items-center justify-between z-10 select-none" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-2.5">
+                      {/* Play / Pause Toggle */}
+                      <button 
+                        onClick={handleVideoToggle}
+                        className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer"
+                        title={isPlaying ? "Pause" : "Play"}
+                      >
+                        {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
+                      </button>
+
+                      {/* Mute / Unmute Toggle */}
+                      <button 
+                        onClick={handleMuteToggle}
+                        className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer"
+                        title={isMuted ? "Unmute" : "Mute"}
+                      >
+                        {isMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-300" /> : <Volume2 className="w-3.5 h-3.5 text-[#24d6ad]" />}
+                      </button>
+
+                      <span className="text-[10px] text-slate-300 font-mono tracking-wider hidden sm:inline">
+                        EARTH OBSERVATION TELEMETRY
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={handleFullscreen}
+                        className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer"
+                        title="Fullscreen"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
 
-                {/* Video player if video file exists, else interactive radar showcase */}
-                {hasVideo ? (
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
-                    <video 
-                      ref={videoRef}
-                      src="/gslv-eos05.mp4"
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-auto rounded-lg object-cover max-h-[280px]"
-                    />
-                    <button
-                      onClick={handleVideoToggle}
-                      className="mt-4 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
-                    >
-                      {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                      <span>{isPlaying ? 'Pause Video' : 'Play Launch Video'}</span>
-                    </button>
+                {/* Bottom Telemetry HUD Bar */}
+                <div className="grid grid-cols-3 gap-2 mt-2.5 px-2 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-center">
+                  <div>
+                    <span className="text-[9px] text-slate-400 block font-mono">SENSOR SUITE</span>
+                    <span className="text-[11px] font-bold text-white font-mono">C-Band SAR</span>
                   </div>
-                ) : (
-                  <div className="relative z-10 flex flex-col justify-between h-full space-y-6">
-                    
-                    {/* Top status bar */}
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                      <div className="flex items-center gap-2">
-                        <Satellite className="w-4 h-4 text-[#24d6ad]" />
-                        <span className="text-xs font-mono font-bold tracking-wider text-slate-200">ORBITAL TELEMETRY</span>
-                      </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">SIMULATED FEED</span>
-                    </div>
-
-                    {/* Middle graphic */}
-                    <div className="text-center py-6 space-y-2">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-[#24d6ad]/10 border border-[#24d6ad]/40 flex items-center justify-center text-[#24d6ad] shadow-[0_0_20px_rgba(36,214,173,0.3)]">
-                        <Activity className="w-8 h-8 animate-pulse" />
-                      </div>
-                      <div className="text-lg font-black text-white tracking-wide">
-                        GSLV-F17 / EOS-05
-                      </div>
-                      <div className="text-xs text-slate-300 max-w-sm mx-auto">
-                        Earth Observation Satellite • Advanced C-Band Radar Sensor Package
-                      </div>
-                    </div>
-
-                    {/* Bottom Telemetry Bar */}
-                    <div className="grid grid-cols-3 gap-2 border-t border-white/10 pt-3 text-center">
-                      <div>
-                        <span className="text-[10px] text-slate-400 block font-mono">SWATH WIDTH</span>
-                        <span className="text-xs font-bold text-white font-mono">120 km</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 block font-mono">FREQUENCY</span>
-                        <span className="text-xs font-bold text-[#24d6ad] font-mono">5.405 GHz</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 block font-mono">PASS CYCLE</span>
-                        <span className="text-xs font-bold text-white font-mono">12 Days</span>
-                      </div>
-                    </div>
-
+                  <div>
+                    <span className="text-[9px] text-slate-400 block font-mono">ORBITAL ALTITUDE</span>
+                    <span className="text-[11px] font-bold text-[#24d6ad] font-mono">520 km SSPO</span>
                   </div>
-                )}
+                  <div>
+                    <span className="text-[9px] text-slate-400 block font-mono">REVISIT CYCLE</span>
+                    <span className="text-[11px] font-bold text-white font-mono">24h Rapid Pass</span>
+                  </div>
+                </div>
 
-                <div className="text-[10px] text-slate-400 font-mono tracking-widest uppercase mt-4 text-center">
-                  NER-LOGIX SPACE &amp; GEOSPATIAL PIPELINE
+                <div className="text-[10px] text-slate-400 font-mono tracking-widest uppercase mt-2 text-center flex items-center justify-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#24d6ad]"></span>
+                  <span>ALL-WEATHER RADAR SURVEILLANCE • PENETRATES RAIN &amp; CLOUDS</span>
                 </div>
 
               </div>
