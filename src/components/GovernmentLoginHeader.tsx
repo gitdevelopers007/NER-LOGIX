@@ -1,10 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 export const GovernmentLoginHeader: React.FC = () => {
   return (
-    <header className="w-full bg-[#0a101d]/90 border-b border-slate-800/80 backdrop-blur-xs relative z-10">
+    <header className="w-full bg-[#0c2340] border-b border-slate-700/80 shadow-md relative z-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3.5 flex items-center justify-between">
         
         {/* LEFT: NER-LOGIX wordmark & mountain icon (No government seal/emblem) */}
