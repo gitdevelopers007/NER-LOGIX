@@ -971,15 +971,15 @@ export const Welcome: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
             
-            {/* Left Column (5 of 12): Brand & Project info */}
-            <div className="md:col-span-5 space-y-4">
+            {/* Left Column (7 of 12): Brand & Project info */}
+            <div className="md:col-span-7 space-y-4">
               <div className="flex items-center gap-3">
                 <NerLogixLogo variant="white" className="h-8 w-auto" />
               </div>
               <div className="text-xs font-semibold text-slate-200">
                 North Eastern Region Logistics &amp; Accessibility Intelligence
               </div>
-              <p className="text-xs text-slate-400 max-w-md leading-relaxed">
+              <p className="text-xs text-slate-400 max-w-lg leading-relaxed">
                 An advanced civic-tech intelligence initiative engineered for high-altitude connectivity, disaster resilience, and critical supply chain mobility across Arunachal Pradesh, Assam, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, and Tripura.
               </p>
               <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold pt-1">
@@ -988,67 +988,19 @@ export const Welcome: React.FC = () => {
               </div>
             </div>
 
-            {/* Middle Column (3 of 12): Product & Modules */}
-            <div className="md:col-span-3 space-y-3">
+            {/* Right Column (5 of 12): Product & Modules */}
+            <div className="md:col-span-5 space-y-3 md:pl-8">
               <div className="text-xs font-bold text-white uppercase tracking-wider">
                 Product Modules
               </div>
-              <ul className="space-y-2 text-xs text-slate-400">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-400">
                 <li><button onClick={() => navigate('/live-map')} className="hover:text-white transition-colors cursor-pointer text-left">Live Accessibility Map</button></li>
                 <li><button onClick={() => navigate('/route-intelligence')} className="hover:text-white transition-colors cursor-pointer text-left">Corridor Route Intelligence</button></li>
                 <li><button onClick={() => navigate('/alerts')} className="hover:text-white transition-colors cursor-pointer text-left">Risk &amp; Weather Alerts</button></li>
                 <li><button onClick={() => navigate('/incidents')} className="hover:text-white transition-colors cursor-pointer text-left">Field Incident Reporting</button></li>
                 <li><button onClick={() => navigate('/command-center')} className="hover:text-white transition-colors cursor-pointer text-left">Executive Command Center</button></li>
+                <li><button onClick={() => navigate('/access-portal')} className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer text-left font-semibold">Access Portal →</button></li>
               </ul>
-            </div>
-
-            {/* Right Column (4 of 12): Red box area from media_1788866319186.png -> Team Credentials & Governance */}
-            <div className="md:col-span-4 p-5 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-700 pb-2">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Engineering Team</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold">6 MEMBERS</span>
-              </div>
-
-              <div className="space-y-1.5 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Sai Ganesh Pushadapu</span>
-                  <span className="text-[11px] text-slate-400">Team Lead &amp; Integration</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Koushik Rahul</span>
-                  <span className="text-[11px] text-slate-400">AI &amp; Disruption Intelligence</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Shashank Reddy</span>
-                  <span className="text-[11px] text-slate-400">GIS &amp; Route Intelligence</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Jahnavi</span>
-                  <span className="text-[11px] text-slate-400">Command Dashboard</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Hamsika</span>
-                  <span className="text-[11px] text-slate-400">Logistics &amp; Vehicle Tracking</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">Niharika</span>
-                  <span className="text-[11px] text-slate-400">Field Intelligence &amp; Alerts</span>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-slate-700/80 flex items-center justify-between text-[11px] text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-blue-400" />
-                  Government RBAC
-                </span>
-                <button
-                  onClick={() => navigate('/access-portal')}
-                  className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer flex items-center gap-1"
-                >
-                  Access Portal →
-                </button>
-              </div>
-
             </div>
 
           </div>
