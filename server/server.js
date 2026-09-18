@@ -9,6 +9,16 @@ import {
   getLiveRainCloudburst, 
   getLiveSummary 
 } from './nerdrrService.js';
+import {
+  getUser,
+  listUsers,
+  listIncidents as listFieldIncidents,
+  getIncidentById as getFieldIncidentById,
+  createFieldIncident,
+  syncBatch as syncFieldBatch,
+  getAlerts as getFieldAlerts,
+  acknowledgeAlert as acknowledgeFieldAlert
+} from './fieldOpsService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,45 +28,30 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Root endpoint - Redirect browser to Vite frontend UI (http://localhost:5173)
-app.get('/', (req, res) => {
-  if (req.accepts('html')) {
-    return res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>NER-LOGIX Command Center</title>
-        <meta http-equiv="refresh" content="0; url=http://localhost:5173" />
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b1a30; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-          .card { background: #112544; border: 1px solid #1e3a5f; padding: 2.5rem; border-radius: 12px; text-align: center; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-          h1 { font-size: 1.4rem; margin-bottom: 0.5rem; color: #38bdf8; }
-          p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin: 0.75rem 0; }
-          a { display: inline-block; margin-top: 1rem; background: #0284c7; color: white; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 600; }
-          a:hover { background: #0369a1; }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <h1>NER-LOGIX Command Center</h1>
-          <p>Port 3001 is the backend API server.</p>
-          <p>Opening the Web UI dashboard on <strong>http://localhost:5173</strong>...</p>
-          <a href="http://localhost:5173">Click here if not redirected automatically</a>
-        </div>
-      </body>
-      </html>
-    `);
-  }
-  res.json({
-    name: 'NER-LOGIX API Backend',
-    version: '1.0.0',
-    status: 'OPERATIONAL',
-    frontendUrl: 'http://localhost:5173',
-    endpoints: ['/api/hazards', '/api/incidents', '/api/logistics', '/api/metrics']
+const distPath = path.join(__dirname, '../dist');
+const hasDist = fs.existsSync(distPath);
+
+if (hasDist) {
+  // Production / Unified Mode: Serve built Vite static frontend
+  app.use(express.static(distPath));
+} else {
+  // Dev Mode fallback when dist is not yet built
+  app.get('/', (req, res) => {
+    if (req.accepts('html')) {
+      return res.redirect('http://localhost:5173');
+    }
+    res.json({
+      name: 'NER-LOGIX API Backend',
+      version: '1.0.0',
+      status: 'OPERATIONAL',
+      frontendUrl: 'http://localhost:5173',
+      endpoints: ['/api/hazards', '/api/incidents', '/api/logistics', '/api/metrics']
+    });
   });
-});
+}
 
 // Initial Seed Database if not exists
 const DEFAULT_DB = {
@@ -397,6 +392,69 @@ app.get('/api/live/summary', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+// ==========================================
+// FIELD OPERATIONS API (v1 Mobile App Endpoints)
+// ==========================================
+app.get('/api/v1/auth/me', (req, res) => {
+  const userId = req.headers['x-user-id'] || 'usr_officer_01';
+  const user = getUser(userId);
+  res.json({ success: true, data: user, message: 'User profile retrieved' });
+});
+
+app.get('/api/v1/auth/users', (req, res) => {
+  res.json({ success: true, data: listUsers(), message: 'Demo users list retrieved' });
+});
+
+app.get('/api/v1/incidents', (req, res) => {
+  const data = listFieldIncidents(req.query);
+  res.json({ success: true, data, message: 'Incident list retrieved' });
+});
+
+app.get('/api/v1/incidents/:id', (req, res) => {
+  const item = getFieldIncidentById(req.params.id);
+  if (!item) {
+    return res.status(404).json({ success: false, message: 'Incident not found' });
+  }
+  res.json({ success: true, data: item, message: 'Incident retrieved' });
+});
+
+app.post('/api/v1/incidents', (req, res) => {
+  const userId = req.headers['x-user-id'] || 'usr_officer_01';
+  const user = getUser(userId);
+  const incident = createFieldIncident(req.body, user);
+  res.status(201).json({ success: true, data: incident, message: 'Incident report created successfully' });
+});
+
+app.post('/api/v1/incidents/sync', (req, res) => {
+  const userId = req.headers['x-user-id'] || 'usr_officer_01';
+  const user = getUser(userId);
+  const result = syncFieldBatch(req.body.reports || [], user);
+  res.json({ success: true, data: result, message: 'Offline sync complete' });
+});
+
+app.get('/api/v1/alerts', (req, res) => {
+  const data = getFieldAlerts(req.query);
+  res.json({ success: true, data, message: 'Alerts list retrieved' });
+});
+
+app.post('/api/v1/alerts/:id/acknowledge', (req, res) => {
+  const result = acknowledgeFieldAlert(req.params.id);
+  if (!result) {
+    return res.status(404).json({ success: false, message: 'Alert not found' });
+  }
+  res.json({ success: true, data: result, message: 'Alert acknowledged' });
+});
+
+// SPA Client-Side Routing Fallback (for React Router - Express 5 compatible)
+if (hasDist) {
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(distPath, 'index.html'));
+    }
+    next();
+  });
+}
 
 // Start Server
 app.listen(PORT, () => {

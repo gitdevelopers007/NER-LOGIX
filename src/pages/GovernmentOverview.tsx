@@ -2,11 +2,13 @@ import { GovernmentSidebar } from '../components/GovernmentSidebar';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Bell, User, Calendar, RefreshCw, AlertTriangle, Route, ShieldAlert, Truck, CloudRain,
+  Bell, User, AlertTriangle, Route, ShieldAlert, Truck, CloudRain,
   ChevronDown, ArrowRight, ShieldCheck, Activity, Layers, CheckCircle2, Mountain
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { LiveTelemetryToggle } from '../components/LiveTelemetryToggle';
+import { LiveClockBadge } from '../components/LiveClockBadge';
+import { JuryDemoDataButton } from '../components/JuryDemoDataButton';
 import { nerApiService, type StateRainfall } from '../services/nerApiService';
 
 export const GovernmentOverview: React.FC = () => {
@@ -108,16 +110,14 @@ export const GovernmentOverview: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-xs text-slate-500">
-              <div className="flex items-center gap-1.5 font-medium text-slate-700 bg-white border border-slate-200 px-3 py-1 rounded-md shadow-2xs">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <span>Apr 26, 2025  14:32</span>
-              </div>
-              <div className="flex items-center gap-1 text-[11px] text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-md shadow-2xs">
-                <RefreshCw className="w-3 h-3 text-slate-400" />
-                <span>Last updated: 2 min ago</span>
-              </div>
-            </div>
+            <LiveClockBadge 
+              onRefresh={() => {
+                nerApiService.getHazardsAndWeather().then(data => {
+                  if (data?.rainfallTelemetry) setRainfallData(data.rainfallTelemetry);
+                  if (data?.currentTemp) setCurrentTemp(data.currentTemp);
+                });
+              }} 
+            />
           </div>
 
           {/* B. TOP 4 MACRO STAT CARDS */}
@@ -426,6 +426,9 @@ export const GovernmentOverview: React.FC = () => {
           NER-LOGIX Autonomous Geospatial Grid v2.4 • Ministry of DoNER
         </div>
       </footer>
+
+      {/* Floating Demo Data / Jury Mode Button */}
+      <JuryDemoDataButton />
 
     </div>
   );

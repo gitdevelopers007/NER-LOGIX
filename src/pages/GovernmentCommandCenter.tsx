@@ -2,7 +2,7 @@ import { GovernmentSidebar } from '../components/GovernmentSidebar';
 import React, { useState, useEffect } from 'react';
 
 import { 
-  Search, Bell, User, Calendar, RefreshCw, MapPin, 
+  Search, Bell, User, MapPin, 
   AlertTriangle, Route, ShieldAlert, X, Truck, FileText, CloudRain,
   ChevronDown, ArrowLeft, Eye, Clock, ShieldCheck, Thermometer,
   Waves, Mountain, Radio, Navigation
@@ -10,6 +10,8 @@ import {
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { GisMap } from '../components/GisMap';
 import { LiveTelemetryToggle } from '../components/LiveTelemetryToggle';
+import { LiveClockBadge } from '../components/LiveClockBadge';
+import { JuryDemoDataButton } from '../components/JuryDemoDataButton';
 import { 
   INCIDENTS_DATA, DISTRICT_CONNECTIVITY, WEATHER_RISKS, 
   RECENT_UPDATES
@@ -199,26 +201,13 @@ export const GovernmentCommandCenter: React.FC = () => {
               </div>
             </div>
 
-            {/* Date and Sync Stamp */}
-            <div className="flex items-center gap-3 text-xs text-slate-500">
-              <div className="flex items-center gap-1.5 font-medium text-slate-700 bg-white border border-slate-200 px-2.5 py-1 rounded-md shadow-2xs">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <span>Apr 26, 2025  14:32</span>
-              </div>
-
-              <button 
-                onClick={async () => {
-                  const m = await nerApiService.getMetrics();
-                  if (m) setMetrics(m);
-                  alert('Telemetry refreshed from IMD, BRO & Field units.');
-                }}
-                className="flex items-center gap-1 text-[11px] text-slate-500 hover:text-blue-600 transition-colors cursor-pointer bg-white border border-slate-200 px-2 py-1 rounded-md shadow-2xs"
-                title="Refresh Live Telemetry"
-              >
-                <RefreshCw className="w-3 h-3 text-slate-400" />
-                <span>Last updated: 2 min ago</span>
-              </button>
-            </div>
+            {/* Live Date and Ticking Clock */}
+            <LiveClockBadge 
+              onRefresh={async () => {
+                const m = await nerApiService.getMetrics();
+                if (m) setMetrics(m);
+              }}
+            />
 
           </div>
 
@@ -1077,6 +1066,9 @@ export const GovernmentCommandCenter: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Demo Data / Jury Mode Button */}
+      <JuryDemoDataButton />
 
     </div>
   );

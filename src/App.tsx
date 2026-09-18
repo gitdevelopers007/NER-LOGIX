@@ -15,6 +15,14 @@ import { SupplyMissionsPage } from './pages/logistics/SupplyMissionsPage';
 import { MissionDetailPage } from './pages/logistics/MissionDetailPage';
 import { FleetVehiclesPage } from './pages/logistics/FleetVehiclesPage';
 import { VehicleDetailPage } from './pages/logistics/VehicleDetailPage';
+import { LanguageProvider } from './field-ops/features/language/LanguageContext';
+import { Layout as FieldLayout } from './field-ops/app/Layout';
+import { FieldHome } from './field-ops/pages/FieldHome';
+import { ReportIncident } from './field-ops/pages/ReportIncident';
+import { MyReports } from './field-ops/pages/MyReports';
+import { ReportDetails } from './field-ops/pages/ReportDetails';
+import { SyncQueue } from './field-ops/pages/SyncQueue';
+import { FieldAlerts } from './field-ops/pages/FieldAlerts';
 
 function App() {
   return (
@@ -39,6 +47,25 @@ function App() {
         <Route path="/logistics/missions/:missionId" element={<MissionDetailPage />} />
         <Route path="/logistics/vehicles" element={<FleetVehiclesPage />} />
         <Route path="/logistics/vehicles/:vehicleId" element={<VehicleDetailPage />} />
+
+        {/* Field Operations Mobile-First Module */}
+        <Route
+          path="/field"
+          element={
+            <LanguageProvider>
+              <FieldLayout />
+            </LanguageProvider>
+          }
+        >
+          <Route index element={<FieldHome />} />
+          <Route path="report" element={<ReportIncident />} />
+          <Route path="reports" element={<MyReports />} />
+          <Route path="reports/:id" element={<ReportDetails />} />
+          <Route path="sync" element={<SyncQueue />} />
+          <Route path="alerts" element={<FieldAlerts />} />
+        </Route>
+        <Route path="/field-operations" element={<Navigate to="/field" replace />} />
+        <Route path="/field-operations/*" element={<Navigate to="/field" replace />} />
 
         {/* Fallback redirect */}
         <Route path="*" element={<Navigate to="/access-portal" replace />} />

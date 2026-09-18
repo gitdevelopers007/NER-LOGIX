@@ -4,7 +4,7 @@
  * Provides Mode Management (LIVE vs SIMULATION) and subscription
  */
 
-const API_BASE = 'http://localhost:3001/api/live';
+const API_BASE = '/api/live';
 
 export type DataMode = 'LIVE' | 'SIMULATION';
 

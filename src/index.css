@@ -1,6 +1,23 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+@theme {
+  --color-gov-50: #f0f4f8;
+  --color-gov-100: #d9e2ec;
+  --color-gov-200: #bcccdc;
+  --color-gov-300: #9fb3c8;
+  --color-gov-400: #829ab1;
+  --color-gov-500: #627d98;
+  --color-gov-600: #486581;
+  --color-gov-700: #334e68;
+  --color-gov-800: #102a43;
+  --color-gov-900: #0b1d3a;
+  --color-hazard-low: #10b981;
+  --color-hazard-medium: #f59e0b;
+  --color-hazard-high: #ea580c;
+  --color-hazard-critical: #dc2626;
+}
+
 @layer base {
   body {
     background-color: #f8fafc;

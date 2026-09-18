@@ -165,7 +165,7 @@ export const AccessPortalPage: React.FC = () => {
 
             {/* Action Button */}
             <button
-              onClick={() => handlePortalSelect('Field Operations')}
+              onClick={() => navigate('/field')}
               className="w-full py-3 px-4 rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer group-hover:shadow-sm"
             >
               <span>Continue as Field User</span>

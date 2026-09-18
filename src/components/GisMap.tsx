@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { 
-  Search, Layers, Plus, Minus, Crosshair, ChevronDown, Maximize,
-  CloudRain, Waves, Mountain, AlertTriangle, Truck, Route, Info
+  Search, Layers, Plus, Minus, Crosshair, ChevronDown, Maximize2, Minimize2,
+  CloudRain, Waves, Mountain, AlertTriangle, Truck, Route, X
 } from 'lucide-react';
 import { INCIDENTS_DATA, NER_NODES } from '../data/nerGisData';
 import type { Incident } from '../data/nerGisData';
@@ -26,10 +26,10 @@ export const GisMap: React.FC<GisMapProps> = ({
   const satelliteTileRef = useRef<L.TileLayer | null>(null);
   const terrainTileRef = useRef<L.TileLayer | null>(null);
 
-  const [layersOpen, setLayersOpen] = useState(true);
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeBaseMap, setActiveBaseMap] = useState<'satellite' | 'terrain'>('satellite');
-  const [activePill, setActivePill] = useState<string>('weather');
   const [dataMode, setDataMode] = useState<DataMode>(liveGovtService.getMode());
   const [liveEarthquakes, setLiveEarthquakes] = useState<LiveEarthquake[]>([]);
   const [liveRainPoints, setLiveRainPoints] = useState<LiveRainPoint[]>([]);
@@ -476,14 +476,61 @@ export const GisMap: React.FC<GisMapProps> = ({
 
   }, [selectedIncident, layers, dataMode, liveEarthquakes, liveRainPoints]);
 
+  useEffect(() => {
+    const handleFsChange = () => {
+      const isDocFs = !!document.fullscreenElement;
+      setIsFullScreen(isDocFs);
+      setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 150);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullScreen) {
+        setIsFullScreen(false);
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFsChange);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFsChange);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullScreen]);
+
   const handleZoomIn = () => mapInstanceRef.current?.zoomIn();
   const handleZoomOut = () => mapInstanceRef.current?.zoomOut();
   const handleResetCenter = () => mapInstanceRef.current?.setView([26.15, 92.85], 7);
-  const handleToggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      mapContainerRef.current?.parentElement?.requestFullscreen().catch(() => {});
+  
+  const handleToggleFullscreen = async () => {
+    const container = mapContainerRef.current?.parentElement;
+    if (!isFullScreen) {
+      setIsFullScreen(true);
+      if (container && container.requestFullscreen) {
+        try {
+          await container.requestFullscreen();
+        } catch {
+          // fallback to CSS fixed full-screen
+        }
+      }
+      setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 200);
     } else {
-      document.exitFullscreen().catch(() => {});
+      setIsFullScreen(false);
+      if (document.fullscreenElement) {
+        try {
+          await document.exitFullscreen();
+        } catch {}
+      }
+      setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 200);
     }
   };
 
@@ -510,306 +557,387 @@ export const GisMap: React.FC<GisMapProps> = ({
   };
 
   const handlePillClick = (pill: string) => {
-    setActivePill(pill);
     if (pill === 'weather') {
       const next = !(layers.weather || layers.heavyRainfall);
       setLayers((prev) => ({ ...prev, weather: next, heavyRainfall: next }));
     }
+    else if (pill === 'flood') toggleLayer('floodRisk');
+    else if (pill === 'landslide') toggleLayer('landslideRisk');
     else if (pill === 'incidents') toggleLayer('fieldIncidents');
     else if (pill === 'vehicles') toggleLayer('vehicles');
     else if (pill === 'roads') toggleLayer('roads');
   };
 
+  const activeLayerCount = Object.values(layers).filter(Boolean).length;
+
   return (
-    <div className="relative w-full h-[540px] rounded-xl overflow-hidden border border-slate-300 shadow-sm bg-slate-950 font-sans">
-      
+    <div
+      className={`relative font-sans transition-all duration-200 ${
+        isFullScreen
+          ? 'fixed inset-0 z-[9999] w-screen h-screen bg-slate-950 overflow-hidden'
+          : 'w-full h-[580px] rounded-xl overflow-hidden border border-slate-700 shadow-xl bg-slate-950'
+      }`}
+    >
       {/* Real Interactive Leaflet Map Viewport */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-      {/* 1. TOP BAR OVERLAY: Search + Filter Pills + Satellite/Terrain Toggle */}
-      <div className="absolute top-3 left-4 right-4 z-20 flex items-center justify-between pointer-events-none gap-2">
+      {/* 1. TOP HEADER DOCK: Search + Layers Dropdown Button (Left) & Telemetry + BaseMap + FullScreen (Right) */}
+      <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none gap-2">
         
-        {/* Search Field */}
-        <div className="pointer-events-auto w-72">
-          <form onSubmit={handleSearch} className="relative shadow-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search location, district, road..."
-              className="w-full h-8.5 pl-9 pr-3 bg-white/95 backdrop-blur-xs border border-slate-200 rounded-md text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1.5 focus:ring-blue-600 shadow-sm font-sans"
-            />
-          </form>
-        </div>
+        {/* Left Controls: Search Bar & Layers Dropdown Button */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          {/* Search Box */}
+          <div className="w-48 sm:w-64">
+            <form onSubmit={handleSearch} className="relative shadow-lg">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search location, district, road..."
+                className="w-full h-8 pl-8 pr-7 bg-slate-900/90 hover:bg-slate-900 backdrop-blur-md border border-slate-700/80 rounded-lg text-xs text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </form>
+          </div>
 
-        {/* Filter Pills */}
-        <div className="pointer-events-auto hidden md:flex items-center gap-1.5 bg-white/95 backdrop-blur-xs p-1 rounded-md border border-slate-200 shadow-sm">
-          <button
-            onClick={() => handlePillClick('weather')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold transition-colors cursor-pointer ${
-              layers.weather || layers.heavyRainfall ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <CloudRain className="w-3.5 h-3.5" />
-            <span>🌧️ Rainfall Radar</span>
-          </button>
-          <button
-            onClick={() => handlePillClick('flood')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              activePill === 'flood' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Waves className="w-3.5 h-3.5 text-cyan-600" />
-            <span>Flood</span>
-          </button>
-          <button
-            onClick={() => handlePillClick('landslide')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              activePill === 'landslide' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Mountain className="w-3.5 h-3.5 text-amber-600" />
-            <span>Landslide</span>
-          </button>
-          <button
-            onClick={() => handlePillClick('incidents')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              layers.fieldIncidents ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-            <span>Incidents</span>
-          </button>
-          <button
-            onClick={() => handlePillClick('vehicles')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              layers.vehicles ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Truck className="w-3.5 h-3.5 text-sky-600" />
-            <span>Vehicles</span>
-          </button>
-          <button
-            onClick={() => handlePillClick('roads')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              layers.roads ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Route className="w-3.5 h-3.5 text-slate-600" />
-            <span>Roads</span>
-          </button>
-        </div>
-
-        {/* Live Telemetry Attribution Pill */}
-        <div className="pointer-events-auto flex items-center gap-2 bg-[#0b1a30]/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/80 shadow-md text-xs text-white">
-          {dataMode === 'LIVE' ? (
-            <>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-semibold text-emerald-300">ISRO-NESAC NERDRR &amp; NCS Seismology</span>
-              <span className="text-slate-400 text-[10px] hidden sm:inline">
-                ({liveEarthquakes.length} Quakes | {liveRainPoints.length} Rain Cells)
+          {/* Layers Toggle Button & Dropdown Container */}
+          <div className="relative">
+            <button
+              onClick={() => setLayersOpen(!layersOpen)}
+              className={`flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium border shadow-lg backdrop-blur-md transition-all cursor-pointer ${
+                layersOpen
+                  ? 'bg-blue-600 text-white border-blue-500 ring-2 ring-blue-400/40'
+                  : 'bg-slate-900/90 text-slate-200 hover:text-white hover:bg-slate-800 border-slate-700/80'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-blue-400" />
+              <span className="font-semibold">Layers</span>
+              <span className="px-1.5 py-0.2 text-[10px] rounded-full bg-slate-800 text-blue-300 border border-slate-600 font-mono">
+                {activeLayerCount}
               </span>
-            </>
-          ) : (
-            <>
-              <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
-              <span className="font-semibold text-indigo-300">Simulation Scenario</span>
-              <span className="text-slate-400 text-[10px] hidden sm:inline">(Curated Test Matrix)</span>
-            </>
-          )}
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${layersOpen ? 'rotate-180 text-white' : ''}`} />
+            </button>
+
+            {/* Floating Popover Panel */}
+            {layersOpen && (
+              <div className="absolute top-10 left-0 w-72 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-xl shadow-2xl z-40 overflow-hidden text-xs text-slate-200 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-800/80 border-b border-slate-700/70">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-blue-400" />
+                    <span className="font-bold text-slate-100 text-xs">Layers &amp; Map Legend</span>
+                  </div>
+                  <button
+                    onClick={() => setLayersOpen(false)}
+                    className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-700/60 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="px-3 py-2.5 max-h-[380px] overflow-y-auto space-y-3.5 divide-y divide-slate-800">
+                  {/* Layer Toggles */}
+                  <div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      Active GIS Layers ({activeLayerCount}/14)
+                    </div>
+                    <div className="grid grid-cols-1 gap-1">
+                      {[
+                        { id: 'districtBoundaries', label: 'District Boundaries' },
+                        { id: 'roads', label: 'Strategic Corridors' },
+                        { id: 'bridges', label: 'Critical Bridges' },
+                        { id: 'roadAccessibility', label: 'Road Accessibility' },
+                        { id: 'traffic', label: 'Live Traffic Flow' },
+                        { id: 'fieldIncidents', label: 'Field Incidents' },
+                        { id: 'earthquakes', label: 'Earthquakes (NCS Live)' },
+                        { id: 'floodRisk', label: 'Flood Hazard Zones' },
+                        { id: 'landslideRisk', label: 'Landslide Hazard Zones' },
+                        { id: 'heavyRainfall', label: 'Heavy Rainfall Warning' },
+                        { id: 'weather', label: 'Doppler Weather Radar' },
+                        { id: 'vehicles', label: 'Fleet / Relief Vehicles' },
+                        { id: 'emergencyRoutes', label: 'Emergency Evacuation Routes' },
+                        { id: 'satelliteImagery', label: 'Satellite Layer' },
+                      ].map((item) => {
+                        const isChecked = layers[item.id as keyof typeof layers];
+                        return (
+                          <label
+                            key={item.id}
+                            className="flex items-center justify-between px-2 py-1 rounded hover:bg-slate-800/60 cursor-pointer select-none text-[11.5px] transition-colors"
+                          >
+                            <span className={isChecked ? 'text-slate-100 font-medium' : 'text-slate-400'}>
+                              {item.label}
+                            </span>
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => toggleLayer(item.id as keyof typeof layers)}
+                              className="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                            />
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Road Corridor Status Legend */}
+                  <div className="pt-2.5">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      Corridor Status Legend
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+                      <div className="flex items-center gap-2 bg-slate-800/40 px-2 py-1 rounded">
+                        <span className="w-3 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span className="text-slate-200">Open Pass</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-800/40 px-2 py-1 rounded">
+                        <span className="w-3 h-1.5 rounded-full bg-amber-500"></span>
+                        <span className="text-slate-200">Restricted</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-800/40 px-2 py-1 rounded">
+                        <span className="w-3 h-1.5 rounded-full bg-orange-400"></span>
+                        <span className="text-slate-200">Delayed</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-800/40 px-2 py-1 rounded">
+                        <span className="w-3 h-1.5 rounded-full bg-red-500"></span>
+                        <span className="text-slate-200">Blocked</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Base Map Switcher: Satellite vs Terrain */}
-        <div className="pointer-events-auto flex items-center bg-white/95 backdrop-blur-xs p-0.5 rounded-md border border-slate-200 shadow-sm text-xs font-medium">
-          <button
-            onClick={() => handleBaseMapChange('satellite')}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              activeBaseMap === 'satellite' ? 'bg-[#1a365d] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Satellite
-          </button>
-          <button
-            onClick={() => handleBaseMapChange('terrain')}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-              activeBaseMap === 'terrain' ? 'bg-[#1a365d] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Terrain
-          </button>
-        </div>
-
-      </div>
-
-      {/* 2. FLOATING LAYERS & LEGEND PANEL */}
-      <div className="absolute top-14 left-4 z-20 pointer-events-auto">
-        <div className="bg-white/95 backdrop-blur-xs border border-slate-200 rounded-lg shadow-lg overflow-hidden text-xs w-[190px]">
+        {/* Right Controls: Telemetry + Base Map Switcher + Fullscreen */}
+        <div className="flex items-center gap-2 pointer-events-auto">
           
+          {/* Telemetry Indicator */}
+          <div className="hidden lg:flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 h-8 rounded-lg border border-slate-700/80 shadow-lg text-xs text-white">
+            {dataMode === 'LIVE' ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="font-medium text-emerald-300">ISRO-NESAC Live</span>
+                <span className="text-slate-400 text-[10px] border-l border-slate-700 pl-1.5">
+                  {liveEarthquakes.length} Quakes | {liveRainPoints.length} Rain Cells
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
+                <span className="font-medium text-indigo-300">Simulation Scenario</span>
+              </>
+            )}
+          </div>
+
+          {/* Base Map Switcher: Satellite vs Terrain */}
+          <div className="flex items-center bg-slate-900/90 backdrop-blur-md p-0.5 h-8 rounded-lg border border-slate-700/80 shadow-lg text-xs font-medium">
+            <button
+              onClick={() => handleBaseMapChange('satellite')}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                activeBaseMap === 'satellite' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-100'
+              }`}
+            >
+              Satellite
+            </button>
+            <button
+              onClick={() => handleBaseMapChange('terrain')}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                activeBaseMap === 'terrain' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-100'
+              }`}
+            >
+              Terrain
+            </button>
+          </div>
+
+          {/* Fullscreen Button */}
           <button
-            onClick={() => setLayersOpen(!layersOpen)}
-            className="flex items-center justify-between px-3 py-2 text-slate-800 font-semibold hover:bg-slate-50 transition-colors w-full cursor-pointer select-none"
+            onClick={handleToggleFullscreen}
+            className="flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-lg border border-blue-400/40 transition-colors cursor-pointer"
+            title={isFullScreen ? 'Exit Fullscreen (Esc)' : 'Expand Map to Fullscreen'}
           >
-            <div className="flex items-center gap-2">
-              <Layers className="w-3.5 h-3.5 text-blue-600" />
-              <span className="text-[12px] font-bold">Layers</span>
-            </div>
-            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${layersOpen ? 'rotate-180' : ''}`} />
+            {isFullScreen ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Exit Fullscreen</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Fullscreen</span>
+              </>
+            )}
           </button>
-
-          {layersOpen && (
-            <div className="px-3 pb-3 pt-1 border-t border-slate-100 max-h-[380px] overflow-y-auto text-slate-700 space-y-2">
-              <div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                  Map Layers
-                </div>
-                <div className="space-y-1">
-                  {[
-                    { id: 'districtBoundaries', label: 'District Boundaries' },
-                    { id: 'roads', label: 'Roads' },
-                    { id: 'bridges', label: 'Bridges' },
-                    { id: 'roadAccessibility', label: 'Road Accessibility' },
-                    { id: 'traffic', label: 'Traffic' },
-                    { id: 'fieldIncidents', label: 'Field Incidents' },
-                    { id: 'earthquakes', label: 'Earthquakes (NCS Live)' },
-                    { id: 'floodRisk', label: 'Flood Risk' },
-                    { id: 'landslideRisk', label: 'Landslide Risk' },
-                    { id: 'heavyRainfall', label: 'Heavy Rainfall' },
-                    { id: 'weather', label: 'Weather' },
-                    { id: 'vehicles', label: 'Vehicles' },
-                    { id: 'emergencyRoutes', label: 'Emergency Routes' },
-                    { id: 'satelliteImagery', label: 'Satellite Imagery' },
-                  ].map((item) => (
-                    <label key={item.id} className="flex items-center gap-2 cursor-pointer select-none text-[11px] hover:text-blue-600 py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={layers[item.id as keyof typeof layers]}
-                        onChange={() => toggleLayer(item.id as keyof typeof layers)}
-                        className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                      />
-                      <span>{item.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Road Status Legend */}
-              <div className="pt-2 border-t border-slate-200">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                  Road Status
-                </div>
-                <div className="space-y-1 text-[11px]">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3.5 h-1 rounded bg-emerald-500"></span>
-                    <span>Open</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3.5 h-1 rounded bg-amber-500"></span>
-                    <span>Restricted</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3.5 h-1 rounded bg-orange-400"></span>
-                    <span>Delayed</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3.5 h-1 rounded bg-red-500"></span>
-                    <span>Blocked</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3.5 h-1 rounded bg-slate-300"></span>
-                    <span>Unknown</span>
-                  </div>
-                </div>
-
-                <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center gap-1 text-[10.5px] text-blue-600 font-medium hover:underline cursor-pointer">
-                  <Info className="w-3 h-3" />
-                  <span>View Legend</span>
-                </div>
-              </div>
-            </div>
-          )}
 
         </div>
       </div>
 
-      {/* 3. MAP NAVIGATION TOOLS */}
-      <div className="absolute left-4 z-20 flex flex-col gap-1 shadow-md pointer-events-auto" style={{ top: layersOpen ? '390px' : '70px' }}>
+      {/* 2. SECOND ROW: Quick Filter Pills Ribbon */}
+      <div className="absolute top-13 sm:top-14 left-3 z-20 pointer-events-auto flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1 rounded-lg border border-slate-700/80 shadow-lg overflow-x-auto max-w-[calc(100vw-80px)] sm:max-w-[calc(100vw-360px)]">
         <button
-          onClick={handleZoomIn}
-          className="w-7.5 h-7.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-t-md flex items-center justify-center transition-colors cursor-pointer"
-          title="Zoom In"
+          onClick={() => handlePillClick('weather')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+            layers.weather || layers.heavyRainfall
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800'
+          }`}
         >
-          <Plus className="w-4 h-4" />
+          <CloudRain className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Rainfall Radar</span>
         </button>
+
         <button
-          onClick={handleZoomOut}
-          className="w-7.5 h-7.5 bg-white hover:bg-slate-50 text-slate-700 border-x border-b border-slate-200 rounded-b-md flex items-center justify-center transition-colors cursor-pointer"
-          title="Zoom Out"
+          onClick={() => handlePillClick('flood')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+            layers.floodRisk
+              ? 'bg-cyan-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800'
+          }`}
         >
-          <Minus className="w-4 h-4" />
+          <Waves className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Flood Hazard</span>
         </button>
+
+        <button
+          onClick={() => handlePillClick('landslide')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+            layers.landslideRisk
+              ? 'bg-amber-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800'
+          }`}
+        >
+          <Mountain className="w-3.5 h-3.5 text-amber-400" />
+          <span>Landslide Hazard</span>
+        </button>
+
+        <button
+          onClick={() => handlePillClick('incidents')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+            layers.fieldIncidents
+              ? 'bg-red-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800'
+          }`}
+        >
+          <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+          <span>Incidents</span>
+        </button>
+
+        <button
+          onClick={() => handlePillClick('vehicles')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+            layers.vehicles
+              ? 'bg-sky-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800'
+          }`}
+        >
+          <Truck className="w-3.5 h-3.5 text-sky-400" />
+          <span>Relief Vehicles</span>
+        </button>
+
+        <button
+          onClick={() => handlePillClick('roads')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+            layers.roads
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800'
+          }`}
+        >
+          <Route className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Corridors</span>
+        </button>
+      </div>
+
+      {/* 3. RIGHT NAVIGATION CONTROLS DOCK (Right side, non-overlapping) */}
+      <div className="absolute top-26 right-3 z-20 flex flex-col gap-1.5 pointer-events-auto">
+        <div className="flex flex-col bg-slate-900/90 backdrop-blur-md rounded-lg border border-slate-700/80 shadow-xl overflow-hidden">
+          <button
+            onClick={handleZoomIn}
+            className="w-8 h-8 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors cursor-pointer border-b border-slate-800"
+            title="Zoom In"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleZoomOut}
+            className="w-8 h-8 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors cursor-pointer"
+            title="Zoom Out"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        </div>
+
         <button
           onClick={handleResetCenter}
-          className="w-7.5 h-7.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md flex items-center justify-center transition-colors cursor-pointer mt-1"
+          className="w-8 h-8 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md text-blue-400 hover:text-blue-300 border border-slate-700/80 rounded-lg flex items-center justify-center transition-colors shadow-xl cursor-pointer"
           title="Recenter NER Region"
         >
-          <Crosshair className="w-4 h-4 text-blue-600" />
+          <Crosshair className="w-4 h-4" />
         </button>
+
         <button
           onClick={handleToggleFullscreen}
-          className="w-7.5 h-7.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md flex items-center justify-center transition-colors cursor-pointer"
-          title="Toggle Fullscreen"
+          className="w-8 h-8 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md text-slate-300 hover:text-white border border-slate-700/80 rounded-lg flex items-center justify-center transition-colors shadow-xl cursor-pointer"
+          title={isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
         >
-          <Maximize className="w-3.5 h-3.5 text-slate-600" />
+          {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* 3.5 RAINFALL DOPPLER INTENSITY SCALE */}
-      {(layers.weather || layers.heavyRainfall) && (
-        <div className="absolute bottom-11 left-4 z-20 bg-slate-950/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-[10px] border border-blue-500/40 shadow-lg select-none">
-          <div className="flex items-center gap-1.5 font-bold text-blue-400 mb-1">
-            <span>🌧️</span>
-            <span>IMD Doppler Rainfall Radar (mm/hr)</span>
+      {/* 4. BOTTOM LEFT: Doppler Radar Legend & Map Scale */}
+      <div className="absolute bottom-3 left-3 z-20 flex flex-col gap-2 pointer-events-auto select-none">
+        {(layers.weather || layers.heavyRainfall) && (
+          <div className="bg-slate-900/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-[10px] border border-blue-500/40 shadow-xl">
+            <div className="flex items-center gap-1.5 font-bold text-blue-400 mb-1">
+              <span>🌧️</span>
+              <span>IMD Doppler Rainfall Radar (mm/hr)</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="flex flex-col items-center">
+                <span className="w-5 h-2 rounded-xs bg-cyan-400"></span>
+                <span className="text-[8px] text-slate-300 mt-0.5">&lt;2.5</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="w-5 h-2 rounded-xs bg-emerald-400"></span>
+                <span className="text-[8px] text-slate-300 mt-0.5">5.0</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="w-5 h-2 rounded-xs bg-yellow-400"></span>
+                <span className="text-[8px] text-slate-300 mt-0.5">15.0</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="w-5 h-2 rounded-xs bg-orange-500"></span>
+                <span className="text-[8px] text-slate-300 mt-0.5">35.0</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="w-5 h-2 rounded-xs bg-red-600"></span>
+                <span className="text-[8px] text-slate-300 mt-0.5">&gt;50</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="flex flex-col items-center">
-              <span className="w-5 h-2 rounded-xs bg-cyan-400"></span>
-              <span className="text-[8px] text-slate-300 mt-0.5">&lt;2.5</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="w-5 h-2 rounded-xs bg-emerald-400"></span>
-              <span className="text-[8px] text-slate-300 mt-0.5">5.0</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="w-5 h-2 rounded-xs bg-yellow-400"></span>
-              <span className="text-[8px] text-slate-300 mt-0.5">15.0</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="w-5 h-2 rounded-xs bg-orange-500"></span>
-              <span className="text-[8px] text-slate-300 mt-0.5">35.0</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="w-5 h-2 rounded-xs bg-red-600"></span>
-              <span className="text-[8px] text-slate-300 mt-0.5">&gt;50</span>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* 4. MAP SCALE INDICATOR */}
-      <div className="absolute bottom-3 left-4 z-20 bg-white/90 backdrop-blur-xs text-slate-800 px-2.5 py-1 rounded text-[10px] font-mono border border-slate-300 shadow-xs flex items-center gap-2 select-none">
-        <div className="h-1.5 w-16 border-b-2 border-l-2 border-r-2 border-slate-800"></div>
-        <span>0  50  100  150 km</span>
+        <div className="bg-slate-900/90 backdrop-blur-md text-slate-300 px-2.5 py-1 rounded-md text-[10px] font-mono border border-slate-700/80 shadow-md flex items-center gap-2">
+          <div className="h-1.5 w-16 border-b-2 border-l-2 border-r-2 border-slate-300"></div>
+          <span>0  50  100  150 km</span>
+        </div>
       </div>
 
-      {/* 5. INDIA OVERVIEW INSET MAP */}
-      <div className="absolute bottom-3 right-4 z-20 bg-white/95 backdrop-blur-xs border border-slate-300 p-2 rounded-lg shadow-lg select-none flex items-center gap-2">
+      {/* 5. BOTTOM RIGHT: India Overview Inset Map */}
+      <div className="absolute bottom-3 right-3 z-20 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-2 rounded-xl shadow-xl select-none flex items-center gap-2 pointer-events-auto">
         <div className="relative">
-          <svg viewBox="0 0 95 95" className="w-20 h-20">
+          <svg viewBox="0 0 95 95" className="w-18 h-18 sm:w-20 sm:h-20">
             <path
               d="M42 6 L48 9 L54 16 L50 24 L58 26 L55 32 L48 37 L51 47 L45 62 L48 76 L40 88 L34 76 L30 63 L24 46 L16 36 L24 26 L34 21 Z"
-              fill="#cbd5e1"
-              stroke="#94a3b8"
+              fill="#334155"
+              stroke="#64748b"
               strokeWidth="0.8"
             />
             <path
@@ -823,7 +951,7 @@ export const GisMap: React.FC<GisMapProps> = ({
         </div>
 
         <div className="flex flex-col items-center justify-center pr-1">
-          <div className="text-[10px] font-bold text-slate-700">N</div>
+          <div className="text-[10px] font-bold text-slate-400">N</div>
           <svg width="12" height="24" viewBox="0 0 12 24">
             <polygon points="6,2 11,12 6,9" fill="#ef4444" />
             <polygon points="6,2 1,12 6,9" fill="#dc2626" />
