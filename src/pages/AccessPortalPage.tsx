@@ -164,13 +164,15 @@ export const AccessPortalPage: React.FC = () => {
             </div>
 
             {/* Action Button */}
-            <button
-              onClick={() => navigate('/field')}
+            <a
+              href="https://ner-logix-field-operation-app.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full py-3 px-4 rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer group-hover:shadow-sm"
             >
               <span>Continue as Field User</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
+            </a>
           </div>
 
           {/* CARD 3: Traveler & Public Access */}
