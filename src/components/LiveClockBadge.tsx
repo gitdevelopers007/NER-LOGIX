@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, RefreshCw } from 'lucide-react';
+import { Clock, RefreshCw } from 'lucide-react';
 
 interface LiveClockBadgeProps {
   className?: string;
@@ -12,7 +12,7 @@ export const LiveClockBadge: React.FC<LiveClockBadgeProps> = ({ className = '', 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    // Tick every second so the jury can see the clock actively running live
+    // Tick every second so viewers can see the clock actively running live
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -32,30 +32,20 @@ export const LiveClockBadge: React.FC<LiveClockBadgeProps> = ({ className = '', 
     }, 800);
   };
 
-  // Format date: "10 Sep 2026" (Target Hackathon Day / Current live date)
-  // Let's compute date formatted as 10 Sep 2026 or today's date
   const pad = (n: number) => n.toString().padStart(2, '0');
   const hours = pad(currentTime.getHours());
   const minutes = pad(currentTime.getMinutes());
   const seconds = pad(currentTime.getSeconds());
   const timeString = `${hours}:${minutes}:${seconds} IST`;
 
-  // Date format: 10 Sep 2026
-  const dateString = '10 Sep 2026';
-
   return (
     <div className={`flex items-center gap-2.5 text-xs text-slate-500 flex-wrap ${className}`}>
-      {/* Live Date & Ticking Time Badge */}
+      {/* Live Ticking Time Badge */}
       <div className="flex items-center gap-2 font-medium text-slate-700 bg-white border border-slate-200/90 px-3 py-1.5 rounded-lg shadow-2xs hover:border-slate-300 transition-colors">
-        <div className="flex items-center gap-1.5 text-blue-600 font-semibold">
-          <Calendar className="w-3.5 h-3.5" />
-          <span>{dateString}</span>
-        </div>
-        <span className="text-slate-300">|</span>
-        <div className="flex items-center gap-1.5 font-mono text-slate-800 text-[11.5px]">
-          <Clock className="w-3 h-3 text-slate-400" />
+        <div className="flex items-center gap-1.5 font-mono text-slate-800 text-xs">
+          <Clock className="w-3.5 h-3.5 text-blue-600" />
           <span className="font-bold tracking-tight text-slate-900">{timeString}</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5"></span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-0.5"></span>
         </div>
       </div>
 
