@@ -33,6 +33,12 @@ export interface Vehicle {
   current_mission_id?: string | null;
   last_updated: string;
   location_source: LocationSource;
+  cargo_category?: string;
+  cargo_item?: string;
+  cargo_quantity?: number;
+  cargo_unit?: string;
+  origin_hub?: string;
+  destination_hub?: string;
 }
 
 export type CargoType =

@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 import { 
   Bell, User, MapPin, AlertTriangle, Route, ShieldAlert, Truck, ChevronDown, 
   Search, Sparkles, Clock, ShieldCheck, Layers, X, Info,
-  Compass, Mountain, Loader2, Share2
+  Compass, Mountain, Loader2, Share2, Cpu, Activity, Zap
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { RouteMap } from '../components/RouteMap';
+import { routingEngine, type OptimizationResult } from '../services/routingAlgorithms';
 
 export const RouteIntelligencePage: React.FC = () => {
   
@@ -17,7 +18,13 @@ export const RouteIntelligencePage: React.FC = () => {
   const [destination, setDestination] = useState('Itanagar');
   const [missionType, setMissionType] = useState('Essential Supplies');
   const [priority, setPriority] = useState('High');
-  const [departure, setDeparture] = useState('Now');
+
+  // Algorithm Engine & Simulation Inputs
+  const [algorithm, setAlgorithm] = useState<'Quantum PSO' | 'Dijkstra' | 'Disaster-Resilient A*'>('Quantum PSO');
+  const [simulateDisruption, setSimulateDisruption] = useState<boolean>(true);
+  const [optResult, setOptResult] = useState<OptimizationResult>(
+    routingEngine.solveQuantumPSO('Guwahati', 'Itanagar', true)
+  );
 
   // Selected Route state
   const [selectedRoute, setSelectedRoute] = useState<'current' | 'alt1' | 'alt2'>('alt1');
@@ -31,10 +38,19 @@ export const RouteIntelligencePage: React.FC = () => {
   const handleAnalyzeRoute = () => {
     setIsAnalyzing(true);
     setTimeout(() => {
+      let res: OptimizationResult;
+      if (algorithm === 'Quantum PSO') {
+        res = routingEngine.solveQuantumPSO(origin, destination, simulateDisruption);
+      } else if (algorithm === 'Disaster-Resilient A*') {
+        res = routingEngine.solveDisasterResilientAStar(origin, destination, simulateDisruption);
+      } else {
+        res = routingEngine.solveDijkstra(origin, destination, simulateDisruption);
+      }
+      setOptResult(res);
       setIsAnalyzing(false);
       setAnalysisToast(true);
       setTimeout(() => setAnalysisToast(false), 3000);
-    }, 900);
+    }, 750);
   };
 
   return (
@@ -109,14 +125,14 @@ export const RouteIntelligencePage: React.FC = () => {
             </div>
           </div>
 
-          {/* B. ROUTE INPUT FORM STRIP (Exact from Screenshot) */}
-          <div className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          {/* B. ROUTE INPUT FORM STRIP */}
+          <div className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
               
               {/* Origin */}
               <div className="md:col-span-3">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Origin
+                  Origin (NER Hub)
                 </label>
                 <div className="relative">
                   <MapPin className="w-3.5 h-3.5 text-blue-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -133,7 +149,7 @@ export const RouteIntelligencePage: React.FC = () => {
               {/* Destination */}
               <div className="md:col-span-3">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Destination
+                  Destination (NER Hub)
                 </label>
                 <div className="relative">
                   <MapPin className="w-3.5 h-3.5 text-emerald-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -166,7 +182,7 @@ export const RouteIntelligencePage: React.FC = () => {
               </div>
 
               {/* Priority */}
-              <div className="md:col-span-1">
+              <div className="md:col-span-2">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                   Priority
                 </label>
@@ -181,23 +197,6 @@ export const RouteIntelligencePage: React.FC = () => {
                 </select>
               </div>
 
-              {/* Departure */}
-              <div className="md:col-span-1">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Departure
-                </label>
-                <select
-                  value={departure}
-                  onChange={(e) => setDeparture(e.target.value)}
-                  className="w-full h-8.5 px-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-1.5 focus:ring-blue-600"
-                >
-                  <option>Now</option>
-                  <option>+1 Hour</option>
-                  <option>+3 Hours</option>
-                  <option>Tomorrow 06:00</option>
-                </select>
-              </div>
-
               {/* ANALYZE ROUTE Button */}
               <div className="md:col-span-2">
                 <button
@@ -208,18 +207,64 @@ export const RouteIntelligencePage: React.FC = () => {
                   {isAnalyzing ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>ANALYZING...</span>
+                      <span>OPTIMIZING...</span>
                     </>
                   ) : (
                     <>
                       <Route className="w-3.5 h-3.5" />
-                      <span>ANALYZE ROUTE</span>
+                      <span>OPTIMIZE ROUTE</span>
                     </>
                   )}
                 </button>
               </div>
 
             </div>
+
+            {/* ROW 2: ALGORITHM SELECTOR & DYNAMIC TERRAIN SIMULATION */}
+            <div className="pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex flex-wrap items-center gap-4">
+                
+                {/* Algorithm Engine Selector */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-slate-600">
+                    <Cpu className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Optimization Engine:</span>
+                  </div>
+                  <select
+                    value={algorithm}
+                    onChange={(e) => setAlgorithm(e.target.value as any)}
+                    className="h-7.5 px-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-blue-900 focus:outline-none focus:ring-1.5 focus:ring-blue-600"
+                  >
+                    <option value="Quantum PSO">Quantum-Inspired PSO (Q-PSO Probabilistic Search)</option>
+                    <option value="Dijkstra">Classical Dijkstra (Minimum Distance)</option>
+                    <option value="Disaster-Resilient A*">Disaster-Resilient A* (ISRO + IMD Terrain Risk)</option>
+                  </select>
+                </div>
+
+                {/* Dynamic Traffic / Landslide Toggle */}
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={simulateDisruption}
+                    onChange={(e) => setSimulateDisruption(e.target.checked)}
+                    className="w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                  />
+                  <span className="text-xs font-medium text-slate-700">
+                    Dynamic Monsoon &amp; Landslide Perturbation
+                  </span>
+                  <span className="text-[9.5px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">
+                    LIVE SIMULATION
+                  </span>
+                </label>
+
+              </div>
+
+              <div className="text-[11px] text-slate-500 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Algorithm Convergence: <strong>Active</strong></span>
+              </div>
+            </div>
+
           </div>
 
           {/* Analysis Notification Toast */}
@@ -470,7 +515,182 @@ export const RouteIntelligencePage: React.FC = () => {
 
           </div>
 
-          {/* E. BOTTOM CARD: ASSESSMENT DATA SOURCES (Exact from Screenshot) */}
+          {/* E. ADVANCED ALGORITHM OUTPUT & CONVERGENCE METRICS */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-4">
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-blue-600" />
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Multi-Algorithm Path Solution: <span className="text-blue-600 font-extrabold">{optResult.algorithm}</span>
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-slate-500">Selected Path:</span>
+                <span className="text-xs font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200 font-mono">
+                  {optResult.route.length > 0 ? optResult.route.join(' → ') : `${origin} → ${destination}`}
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Metrics Strip */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                <div className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Effective Travel Distance</div>
+                <div className="text-lg font-black text-slate-900 mt-0.5">{optResult.distanceKm} km</div>
+                <div className="text-[9.5px] text-slate-400">Terrain &amp; traffic weighted</div>
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                <div className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Projected Fleet ETA</div>
+                <div className="text-lg font-black text-blue-600 mt-0.5">{optResult.etaHours} hrs</div>
+                <div className="text-[9.5px] text-slate-400">Avg speed 35 km/h in hills</div>
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                <div className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Corridor Risk Index</div>
+                <div className={`text-lg font-black mt-0.5 ${
+                  optResult.riskLevel === 'Critical' ? 'text-rose-600' :
+                  optResult.riskLevel === 'High' ? 'text-amber-600' : 'text-emerald-600'
+                }`}>
+                  {optResult.riskScore}%
+                </div>
+                <div className="text-[9.5px] text-slate-400">{optResult.riskLevel} Disruption Likelihood</div>
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                <div className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Algorithm Heuristic</div>
+                <div className="text-sm font-bold text-indigo-700 mt-1 flex items-center gap-1">
+                  <Zap className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>{optResult.algorithm === 'Quantum PSO' ? '30 Particles / 25 Iter' : 'A* Geo-Heuristic'}</span>
+                </div>
+                <div className="text-[9.5px] text-slate-400">Probabilistic perturbation active</div>
+              </div>
+            </div>
+
+            {/* QUANTUM CONVERGENCE CHART (Renders when Quantum PSO is selected) */}
+            {optResult.algorithm === 'Quantum PSO' && optResult.convergence.length > 0 && (
+              <div className="bg-gradient-to-r from-slate-900 to-[#0b1a30] text-white p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+                    <span className="text-xs font-bold text-slate-100">Quantum-Inspired PSO Convergence Curve</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+                    Swarm Optimality: 100% Converged
+                  </span>
+                </div>
+
+                <div className="text-[11px] text-slate-300 font-sans">
+                  The heuristic simulates a 30-particle quantum probability wave packet across 25 iterative generations, perturbing road impedances ($\beta \in [0.75, 1.25]$) to escape local minima in mountainous multi-path topologies.
+                </div>
+
+                {/* SVG Convergence Curve */}
+                <div className="pt-2">
+                  <div className="h-16 w-full flex items-end">
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 500 60" preserveAspectRatio="none">
+                      {/* Grid lines */}
+                      <line x1="0" y1="15" x2="500" y2="15" stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
+                      <line x1="0" y1="45" x2="500" y2="45" stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
+                      
+                      {/* Polyline of convergence */}
+                      {(() => {
+                        const min = Math.min(...optResult.convergence);
+                        const max = Math.max(...optResult.convergence) || min + 1;
+                        const points = optResult.convergence.map((val, idx) => {
+                          const x = (idx / (optResult.convergence.length - 1)) * 500;
+                          const y = 50 - ((val - min) / (max - min || 1)) * 40;
+                          return `${x},${y}`;
+                        }).join(' ');
+                        return (
+                          <>
+                            <polyline
+                              fill="none"
+                              stroke="#34d399"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              points={points}
+                            />
+                            {optResult.convergence.map((val, idx) => {
+                              const x = (idx / (optResult.convergence.length - 1)) * 500;
+                              const y = 50 - ((val - min) / (max - min || 1)) * 40;
+                              if (idx === 0 || idx === optResult.convergence.length - 1 || idx === 12) {
+                                return (
+                                  <circle key={idx} cx={x} cy={y} r="3.5" fill="#10b981" stroke="#ffffff" strokeWidth="1" />
+                                );
+                              }
+                              return null;
+                            })}
+                          </>
+                        );
+                      })()}
+                    </svg>
+                  </div>
+                  <div className="flex justify-between text-[9.5px] font-mono text-slate-400 mt-1">
+                    <span>Gen 1 (Initial Swarm)</span>
+                    <span>Gen 12 (Quantum Perturbation)</span>
+                    <span>Gen 25 (Global Minimum: {optResult.distanceKm} km)</span>
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* CORRIDOR SEGMENT HEALTH TABLE */}
+            {optResult.segments && optResult.segments.length > 0 && (
+              <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="bg-slate-50 px-3 py-2 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
+                  <span>Segment-by-Segment Corridor Health Manifest</span>
+                  <span className="text-[10px] text-slate-500 font-normal">{optResult.segments.length} highway sections evaluated</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-slate-100/70 border-b border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                        <th className="py-2 px-3">From</th>
+                        <th className="py-2 px-3">To</th>
+                        <th className="py-2 px-3">Distance</th>
+                        <th className="py-2 px-3">Traffic State</th>
+                        <th className="py-2 px-3">Segment Risk</th>
+                        <th className="py-2 px-3 text-right">Highway Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                      {optResult.segments.map((seg, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/60">
+                          <td className="py-2 px-3 font-semibold text-slate-900">{seg.from}</td>
+                          <td className="py-2 px-3 font-semibold text-slate-900">{seg.to}</td>
+                          <td className="py-2 px-3 font-mono">{seg.distanceKm} km</td>
+                          <td className="py-2 px-3">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              seg.traffic === 'High' ? 'bg-rose-100 text-rose-700' :
+                              seg.traffic === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
+                            }`}>
+                              {seg.traffic}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 font-mono text-slate-800">{seg.segmentRisk}%</td>
+                          <td className="py-2 px-3 text-right">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              seg.status === 'RESTRICTED' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                              seg.status === 'CAUTION' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                              'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            }`}>
+                              {seg.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* F. BOTTOM CARD: ASSESSMENT DATA SOURCES (Exact from Screenshot) */}
           <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
               <Layers className="w-4 h-4 text-blue-600" />

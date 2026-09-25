@@ -15,6 +15,7 @@ import { SupplyMissionsPage } from './pages/logistics/SupplyMissionsPage';
 import { MissionDetailPage } from './pages/logistics/MissionDetailPage';
 import { FleetVehiclesPage } from './pages/logistics/FleetVehiclesPage';
 import { VehicleDetailPage } from './pages/logistics/VehicleDetailPage';
+import { StockDepletionPage } from './pages/logistics/StockDepletionPage';
 import { LanguageProvider } from './field-ops/features/language/LanguageContext';
 import { Layout as FieldLayout } from './field-ops/app/Layout';
 import { FieldHome } from './field-ops/pages/FieldHome';
@@ -47,6 +48,7 @@ function App() {
         <Route path="/logistics/missions/:missionId" element={<MissionDetailPage />} />
         <Route path="/logistics/vehicles" element={<FleetVehiclesPage />} />
         <Route path="/logistics/vehicles/:vehicleId" element={<VehicleDetailPage />} />
+        <Route path="/logistics/stock" element={<StockDepletionPage />} />
 
         {/* Field Operations Mobile-First Module */}
         <Route

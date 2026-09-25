@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BarChart3, Package, Truck } from 'lucide-react';
+import { BarChart3, Package, Truck, Flame } from 'lucide-react';
 
 export const LogisticsNavigationTabs: React.FC = () => {
   const navigate = useNavigate();
@@ -51,6 +51,21 @@ export const LogisticsNavigationTabs: React.FC = () => {
         <span>Fleet Registry & Tracking</span>
         <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 font-bold">
           5
+        </span>
+      </button>
+
+      <button
+        onClick={() => navigate('/logistics/stock')}
+        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+          location.pathname.startsWith('/logistics/stock')
+            ? 'bg-white text-[#1a56db] shadow-xs border border-slate-200/80'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+        }`}
+      >
+        <Flame className="w-3.5 h-3.5 text-rose-500" />
+        <span>Essential Goods &amp; Stock Alerts</span>
+        <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 font-bold animate-pulse">
+          2
         </span>
       </button>
     </div>

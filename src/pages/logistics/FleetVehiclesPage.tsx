@@ -122,8 +122,9 @@ export const FleetVehiclesPage: React.FC = () => {
                     <th className="px-4 py-3">Reg Number</th>
                     <th className="px-4 py-3">Vehicle Type</th>
                     <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Cargo Manifest &amp; Resupply Target</th>
                     <th className="px-4 py-3">Current Mission</th>
-                    <th className="px-4 py-3">Speed & Heading</th>
+                    <th className="px-4 py-3">Speed &amp; Heading</th>
                     <th className="px-4 py-3">Data Source</th>
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
@@ -151,6 +152,21 @@ export const FleetVehiclesPage: React.FC = () => {
                           }`}>
                             {v.status}
                           </span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          {v.cargo_item ? (
+                            <div className="space-y-0.5">
+                              <div className="font-semibold text-slate-800 text-[11.5px]">
+                                {v.cargo_item} ({v.cargo_quantity} {v.cargo_unit})
+                              </div>
+                              <div className="text-[10.5px] text-slate-500 flex items-center gap-1.5">
+                                <span className="text-blue-600 font-medium">Target:</span>
+                                <span>{v.destination_hub}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic text-[11px]">No Cargo Manifest</span>
+                          )}
                         </td>
                         <td className="px-4 py-3.5 font-mono">
                           {v.current_mission_id ? (
