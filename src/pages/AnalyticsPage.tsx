@@ -6,11 +6,13 @@ import {
   Search, Download, TrendingUp, TrendingDown, Minus,
   FileText, CheckCircle2, Layers, RefreshCw, X, ArrowUpRight,
   Hammer, Sliders, ShieldAlert, MapPin, Building2,
-  Navigation, Share2
+  Navigation, Share2, Activity, Clock, ShieldCheck,
+  Radio, PhoneForwarded, AlertOctagon
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { ConnectivityTrendChart } from '../components/ConnectivityTrendChart';
 import { analyticsService } from '../services/analyticsService';
+import { slaTelemetryService, type ActiveIncidentSlaItem } from '../services/slaTelemetryService';
 import type { 
   TimeRange, 
   AnalyticsReportTemplate
@@ -20,9 +22,14 @@ export const AnalyticsPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Primary Workspace Tabs
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'INFRASTRUCTURE' | 'SCENARIO'>('OVERVIEW');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'INFRASTRUCTURE' | 'SCENARIO' | 'FIELD_SLA'>('OVERVIEW');
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('SCEN-01');
   const [priorityFilter, setPriorityFilter] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'MEDIUM'>('ALL');
+
+  // SLA Telemetry State
+  const [slaAgencyFilter, setSlaAgencyFilter] = useState<string>('ALL');
+  const [slaStatusFilter, setSlaStatusFilter] = useState<string>('ALL');
+  const [activeIncidents, setActiveIncidents] = useState<ActiveIncidentSlaItem[]>(slaTelemetryService.getActiveIncidents());
 
   // Filters & State
   const [timeRange, setTimeRange] = useState<TimeRange>('7D');
@@ -46,6 +53,35 @@ export const AnalyticsPage: React.FC = () => {
   const reportTemplates = analyticsService.getReportTemplates();
   const infraDeficits = analyticsService.getInfrastructureDeficits();
   const scenarioPresets = analyticsService.getScenarioPresets();
+
+  // SLA Telemetry Data
+  const userCensus = slaTelemetryService.getUserCensus();
+  const lifecycleStages = slaTelemetryService.getLifecycleStages();
+  const agencyScorecards = slaTelemetryService.getAgencyScorecards();
+
+  const handleEscalateIncident = (id: string) => {
+    const res = slaTelemetryService.escalateIncident(id);
+    if (res.success) {
+      setActiveIncidents([...slaTelemetryService.getActiveIncidents()]);
+      setToastMessage(res.message);
+      setTimeout(() => setToastMessage(null), 4500);
+    }
+  };
+
+  const handleAdvanceStage = (id: string) => {
+    const res = slaTelemetryService.advanceStage(id);
+    if (res.success) {
+      setActiveIncidents([...slaTelemetryService.getActiveIncidents()]);
+      setToastMessage(res.message);
+      setTimeout(() => setToastMessage(null), 3500);
+    }
+  };
+
+  const filteredIncidents = activeIncidents.filter(inc => {
+    const matchesAgency = slaAgencyFilter === 'ALL' || inc.assignedAgency.toLowerCase().includes(slaAgencyFilter.toLowerCase());
+    const matchesStatus = slaStatusFilter === 'ALL' || inc.slaStatus === slaStatusFilter;
+    return matchesAgency && matchesStatus;
+  });
 
   const activeScenario = scenarioPresets.find(s => s.id === selectedScenarioId) || scenarioPresets[0];
 
@@ -330,6 +366,22 @@ export const AnalyticsPage: React.FC = () => {
               <span>What-If Scenario Simulation Engine</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-700 font-bold">
                 Live Model
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('FIELD_SLA')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'FIELD_SLA'
+                  ? 'bg-white text-[#1a56db] shadow-xs border border-slate-200/80'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Field SLAs &amp; Action-Reaction Telemetry</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>{userCensus.concurrentActiveUsers.toLocaleString()} Active</span>
               </span>
             </button>
           </div>
@@ -1280,6 +1332,471 @@ export const AnalyticsPage: React.FC = () => {
                   Execute Strategic Reroute to Active Fleets
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. GOVERNMENT FIELD SLA & ACTION-REACTION TELEMETRY TAB */}
+      {activeTab === 'FIELD_SLA' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* 1. TOP HEADER & CENSUS OVERVIEW */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800">
+                    <Activity className="w-5 h-5 text-emerald-600" />
+                  </span>
+                  <div>
+                    <h2 className="text-base font-bold text-slate-900">
+                      Government Field SLA &amp; Action-Reaction Telemetry
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Ground truth monitoring of response turnaround time (TAT), field lab acknowledgment latency, inter-agency accountability, and real-time user adoption.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Active Census Badge */}
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3.5 py-1.5 flex items-center gap-2.5">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <div className="text-left">
+                    <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider block leading-tight">
+                      Concurrent Platform Users
+                    </span>
+                    <span className="text-sm font-black text-emerald-950 font-mono leading-tight">
+                      {userCensus.concurrentActiveUsers.toLocaleString()} Online Now
+                    </span>
+                  </div>
+                </div>
+
+                <div className="hidden sm:block text-right">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Registered</span>
+                  <span className="text-sm font-black text-slate-800 font-mono">
+                    {userCensus.totalRegisteredUsers.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 4 PERSONA ADOPTION CARDS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-5 pt-4 border-t border-slate-100">
+              {/* Persona 1: Command & Ministry Officials */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/90 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">
+                      Command Officers
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                      {userCensus.personas.commandOfficers.active} Active
+                    </span>
+                  </div>
+                  <div className="text-xl font-black text-slate-900 font-mono mt-1">
+                    {userCensus.personas.commandOfficers.active} / {userCensus.personas.commandOfficers.total}
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+                    Across <strong>{userCensus.personas.commandOfficers.connectedEOCs} EOCs</strong> including MDoNER, Assam SDMA &amp; NDMA Liaison.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-200/60 text-[10px] text-slate-500 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Authenticated Secretariats</span>
+                </div>
+              </div>
+
+              {/* Persona 2: Field Staff & Ground Inspectors */}
+              <div className="p-3.5 bg-emerald-50/50 rounded-xl border border-emerald-200/80 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10.5px] font-bold text-emerald-700 uppercase tracking-wider">
+                      Field Patrol &amp; Ops
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 animate-pulse">
+                      Live Patrol
+                    </span>
+                  </div>
+                  <div className="text-xl font-black text-emerald-950 font-mono mt-1">
+                    {userCensus.personas.fieldWorkers.onDutyNow} On Duty
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+                    {userCensus.personas.fieldWorkers.registeredTotal} registered. <strong>{userCensus.personas.fieldWorkers.offlineModeUnits}</strong> currently in offline mountain sync mode.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-emerald-200/60 text-[10px] text-emerald-800 font-medium flex items-center justify-between">
+                  <span>Sync Rate: <strong>{userCensus.personas.fieldWorkers.syncSuccessRatePct}%</strong></span>
+                  <span><strong>{userCensus.personas.fieldWorkers.reportsFiledToday}</strong> Reports Today</span>
+                </div>
+              </div>
+
+              {/* Persona 3: Freight Transporters & Convoys */}
+              <div className="p-3.5 bg-amber-50/50 rounded-xl border border-amber-200/80 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10.5px] font-bold text-amber-700 uppercase tracking-wider">
+                      Freight Convoys
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                      GPS Monitored
+                    </span>
+                  </div>
+                  <div className="text-xl font-black text-amber-950 font-mono mt-1">
+                    {userCensus.personas.freightDrivers.activelyTracked} Trucks
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+                    Relief and commercial freights. <strong>{userCensus.personas.freightDrivers.advisoriesDispatchedToday.toLocaleString()}</strong> push route warnings broadcast today.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-amber-200/60 text-[10px] text-amber-900 font-medium flex items-center gap-1">
+                  <Radio className="w-3.5 h-3.5 text-amber-600" />
+                  <span><strong>{userCensus.personas.freightDrivers.convoysRerouted}</strong> Convoys Rerouted Safely</span>
+                </div>
+              </div>
+
+              {/* Persona 4: Citizens & Public Travel Lookups */}
+              <div className="p-3.5 bg-purple-50/50 rounded-xl border border-purple-200/80 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10.5px] font-bold text-purple-700 uppercase tracking-wider">
+                      Public Lookups
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800">
+                      High Velocity
+                    </span>
+                  </div>
+                  <div className="text-xl font-black text-purple-950 font-mono mt-1">
+                    {userCensus.personas.citizensTravelers.dailyQueries.toLocaleString()}
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+                    Daily public requests checking road status, landslide hazards &amp; weather safety corridors.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-purple-200/60 text-[10px] text-purple-800 font-medium flex items-center justify-between">
+                  <span><strong>~{userCensus.personas.citizensTravelers.safetyLookupsPerMin}</strong> queries/min</span>
+                  <span><strong>{userCensus.personas.citizensTravelers.activeCorridorAlertsServed.toLocaleString()}</strong> alerts</span>
+                </div>
+              </div>
+            </div>
+
+            {/* State-Wise Adoption Progress Strip */}
+            <div className="mt-5 pt-4 border-t border-slate-100">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2.5">
+                State-Level Adoption &amp; Field Penetration Index (8 NE States)
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+                {userCensus.stateAdoption.map((st) => (
+                  <div key={st.state} className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <div className="text-xs font-bold text-slate-800 truncate" title={st.state}>
+                      {st.state}
+                    </div>
+                    <div className="text-sm font-black text-blue-700 font-mono mt-0.5">
+                      {st.adoptionIndex}%
+                    </div>
+                    <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden my-1.5">
+                      <div className="bg-blue-600 h-full rounded-full" style={{ width: `${st.adoptionIndex}%` }}></div>
+                    </div>
+                    <div className="text-[9.5px] text-slate-500 font-medium">
+                      {st.fieldPersonnel} field • {st.commandUsers} cmd
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 2. ACTION-REACTION LIFECYCLE TIMELINE (T1 to T6) */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  End-to-End Action-Reaction Lifecycle &amp; Turnaround Time (TAT)
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Benchmarked against NDMA Golden Hour protocols and MHA-ERSS 112 emergency dispatch standards.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs">
+                <span className="font-semibold text-slate-600">Overall SLA Compliance:</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-black font-mono">
+                  91.4%
+                </span>
+              </div>
+            </div>
+
+            {/* 6 Stage Timeline Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+              {lifecycleStages.map((stage) => (
+                <div 
+                  key={stage.code}
+                  className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col justify-between relative group hover:border-blue-300 transition-colors"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-mono">
+                        {stage.code.split('_')[0]}
+                      </span>
+                      <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-1 rounded">
+                        {stage.complianceRatePct}% SLA
+                      </span>
+                    </div>
+
+                    <h4 className="text-xs font-bold text-slate-800 leading-snug">
+                      {stage.name}
+                    </h4>
+
+                    <p className="text-[10.5px] text-slate-500 mt-1 line-clamp-2 leading-tight">
+                      {stage.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 pt-2.5 border-t border-slate-200/70">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold">Average:</span>
+                      <span className="text-xs font-black text-slate-900 font-mono">
+                        {stage.avgTimeMinutes >= 60 
+                          ? `${(stage.avgTimeMinutes / 60).toFixed(1)} hrs` 
+                          : `${stage.avgTimeMinutes} mins`}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline justify-between text-[10px] text-slate-400 mt-0.5">
+                      <span>Target SLA:</span>
+                      <span className="text-slate-600 font-semibold font-mono">
+                        {stage.targetSlaMinutes >= 60 
+                          ? `${stage.targetSlaMinutes / 60} hrs` 
+                          : `${stage.targetSlaMinutes} mins`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. INTER-AGENCY & FIELD LAB PERFORMANCE SCORECARD */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  Inter-Agency Field Lab &amp; Engineering Scorecard
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Direct operational accountability of central and state response entities operating across the North Eastern Region.
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-600">
+                <thead className="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th className="py-2.5 px-3">Agency &amp; Project</th>
+                    <th className="py-2.5 px-3">Operational Scope</th>
+                    <th className="py-2.5 px-3 text-center">Active Teams</th>
+                    <th className="py-2.5 px-3 text-center">Heavy Equipment</th>
+                    <th className="py-2.5 px-3 text-center">Avg Reaction Time</th>
+                    <th className="py-2.5 px-3 text-center">Avg Resolution</th>
+                    <th className="py-2.5 px-3 text-center">SLA Compliance</th>
+                    <th className="py-2.5 px-3 text-right">Rating</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {agencyScorecards.map((agy) => (
+                    <tr key={agy.id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-3 font-semibold text-slate-900">
+                        <div>{agy.agencyName}</div>
+                        <div className="text-[10px] text-slate-400 font-mono font-normal">{agy.shortCode}</div>
+                      </td>
+                      <td className="py-3 px-3 text-slate-600 max-w-xs">
+                        <div className="truncate" title={agy.primaryMandate}>{agy.primaryMandate}</div>
+                        <div className="text-[10px] text-slate-400">{agy.jurisdiction}</div>
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono font-bold text-slate-800">
+                        {agy.activeGroundTeams} teams
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono text-slate-700">
+                        {agy.heavyMachineryCount} units
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono font-bold text-blue-700">
+                        {agy.avgReactionTimeMins} mins
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono text-slate-700">
+                        {agy.resolutionTimeHoursAvg} hrs
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-bold font-mono bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          {agy.slaCompliancePct}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="px-2 py-1 rounded text-xs font-black bg-blue-100 text-blue-800 border border-blue-200">
+                          {agy.ratingGrade}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 4. LIVE ACTIVE INCIDENTS SLA MONITOR & ESCALATION TABLE */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <AlertOctagon className="w-4 h-4 text-amber-500" />
+                  Live Field Reaction SLA &amp; District Magistrate Escalation Table
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Real-time monitor tracking on-ground field units. Officials can advance stages or trigger formal DM Escalation Overrides.
+                </p>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {/* Agency Filter */}
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                  <span className="text-[10px] text-slate-400 font-bold px-1 uppercase">Agency:</span>
+                  <select
+                    value={slaAgencyFilter}
+                    onChange={(e) => setSlaAgencyFilter(e.target.value)}
+                    className="bg-white border border-slate-200 text-xs font-medium text-slate-700 py-0.5 px-2 rounded shadow-xs cursor-pointer focus:outline-hidden"
+                  >
+                    <option value="ALL">All Agencies</option>
+                    <option value="BRO">BRO (Border Roads)</option>
+                    <option value="SDRF">SDRF (Disaster Force)</option>
+                    <option value="NHIDCL">NHIDCL</option>
+                    <option value="PWD">State PWD</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                  <span className="text-[10px] text-slate-400 font-bold px-1 uppercase">Status:</span>
+                  {(['ALL', 'ON_SCHEDULE', 'WARNING', 'BREACHED'] as const).map((st) => (
+                    <button
+                      key={st}
+                      onClick={() => setSlaStatusFilter(st)}
+                      className={`px-2 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                        slaStatusFilter === st
+                          ? 'bg-white text-blue-700 shadow-xs border border-slate-200'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Incidents Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-600">
+                <thead className="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th className="py-2.5 px-3">Incident &amp; Location</th>
+                    <th className="py-2.5 px-3">Assigned Field Unit</th>
+                    <th className="py-2.5 px-3 text-center">Elapsed / Target</th>
+                    <th className="py-2.5 px-3">Current Operational Stage</th>
+                    <th className="py-2.5 px-3 text-center">SLA Status</th>
+                    <th className="py-2.5 px-3 text-right">Administrative Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredIncidents.map((inc) => (
+                    <tr key={inc.id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-3">
+                        <div className="font-bold text-slate-900">{inc.title}</div>
+                        <div className="text-[11px] text-slate-500">{inc.corridor} • {inc.district}, {inc.state}</div>
+                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">Reported: {inc.reportedAt}</div>
+                      </td>
+
+                      <td className="py-3 px-3">
+                        <div className="font-semibold text-slate-800">{inc.assignedAgency}</div>
+                        <div className="text-[10.5px] text-slate-500 font-mono">Lead: {inc.leadOfficer} ({inc.fieldUnitCallsign})</div>
+                      </td>
+
+                      <td className="py-3 px-3 text-center font-mono">
+                        <div className={`font-black text-sm ${
+                          inc.elapsedMinutes > inc.targetMaxMinutes ? 'text-red-600' : 'text-slate-800'
+                        }`}>
+                          {inc.elapsedMinutes}m / {inc.targetMaxMinutes}m
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          {inc.elapsedMinutes > inc.targetMaxMinutes ? `+${inc.elapsedMinutes - inc.targetMaxMinutes}m over target` : `${inc.targetMaxMinutes - inc.elapsedMinutes}m buffer`}
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-3">
+                        <div className="font-medium text-slate-800 bg-slate-50 p-1.5 rounded border border-slate-200/70 text-[11px]">
+                          {inc.currentStage}
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-1 italic">
+                          {inc.notes}
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-3 text-center">
+                        {inc.slaStatus === 'ESCALATED' ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 border border-purple-300 animate-pulse">
+                            ESCALATED TO DM
+                          </span>
+                        ) : inc.slaStatus === 'BREACHED' ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-red-800 border border-red-300">
+                            SLA BREACHED
+                          </span>
+                        ) : inc.slaStatus === 'WARNING' ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">
+                            WARNING
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            ON SCHEDULE
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {inc.currentStageIndex < 6 && (
+                            <button
+                              onClick={() => handleAdvanceStage(inc.id)}
+                              className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] transition-colors cursor-pointer border border-slate-200"
+                              title="Advance to next lifecycle stage"
+                            >
+                              Advance Stage
+                            </button>
+                          )}
+
+                          {!inc.escalatedToDm ? (
+                            <button
+                              onClick={() => handleEscalateIncident(inc.id)}
+                              className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-700 font-bold text-[11px] border border-red-200 transition-colors cursor-pointer flex items-center gap-1"
+                              title="Trigger immediate District Magistrate Flash Escalation"
+                            >
+                              <PhoneForwarded className="w-3 h-3" />
+                              <span>Escalate to DM</span>
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-purple-700 font-bold font-mono">
+                              DM Notified ({inc.escalationTimestamp})
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
