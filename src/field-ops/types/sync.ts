@@ -12,3 +12,29 @@ export interface SyncQueueItem {
   error_message?: string;
   created_at: string;
 }
+
+export type PhotoTransferStatus = 
+  | 'PENDING'
+  | 'COMPRESSING'
+  | 'QUEUED'
+  | 'UPLOADING'
+  | 'PAUSED'
+  | 'RETRYING'
+  | 'UPLOADED'
+  | 'FAILED';
+
+export interface PhotoQueueItem {
+  incidentId: string;
+  imageId: string;
+  originalSize: number;
+  compressedSize: number;
+  compressionMode: 'EMERGENCY' | 'LOW' | 'NORMAL' | 'ORIGINAL';
+  status: PhotoTransferStatus;
+  retryCount: number;
+  createdAt: string;
+  latitude: number;
+  longitude: number;
+  base64Data?: string;
+  filename: string;
+  estimatedTransferSecs: number;
+}

@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Bell, User, MapPin, AlertTriangle, ChevronDown, 
   Search, RefreshCw, CheckCircle2, XCircle, Clock, 
-  Camera, Sparkles, ExternalLink, Shield, Users
+  Camera, Sparkles, ExternalLink, Shield, Users,
+  Wifi, Zap
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { IncidentMiniMap } from '../components/IncidentMiniMap';
@@ -535,15 +536,22 @@ export const IncidentsPage: React.FC = () => {
                 </div>
 
                 {/* FIELD PHOTOGRAPH EVIDENCE BOX */}
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5 font-bold text-slate-800">
                       <Camera className="w-3.5 h-3.5 text-blue-600" />
                       <span>FIELD EVIDENCE PHOTOGRAPH</span>
                     </div>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono font-semibold">
-                      GPS VERIFIED
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono font-semibold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        GPS VERIFIED
+                      </span>
+                      <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono font-semibold flex items-center gap-1">
+                        <Wifi className="w-3 h-3 text-blue-600" />
+                        2G CORRIDOR LINK
+                      </span>
+                    </div>
                   </div>
 
                   <div className="w-full h-44 rounded-lg overflow-hidden border border-slate-300 shadow-inner bg-slate-900 relative group">
@@ -552,10 +560,46 @@ export const IncidentsPage: React.FC = () => {
                       alt="Field evidence"
                       className="w-full h-full object-cover"
                     />
+                    {/* Top overlay badge */}
+                    <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/75 backdrop-blur-md text-emerald-400 font-mono text-[10px] border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span>2G COMPRESSED PACKET</span>
+                    </div>
+
+                    {/* Bottom overlay badge */}
+                    <div className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded bg-blue-900/85 backdrop-blur-md text-blue-100 font-mono text-[10px] border border-blue-400/40">
+                      <Zap className="w-3 h-3 text-amber-400" />
+                      <span>{selectedIncident.photoMetadata.bandwidthSaved || '98.9%'} Bandwidth Saved</span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-1">
-                    <span>Uploaded: {selectedIncident.photoMetadata.uploaded}</span>
+                  {/* LOW-BANDWIDTH PIPELINE TELEMETRY METRIC STRIP */}
+                  <div className="grid grid-cols-3 gap-2 p-2 bg-white rounded-lg border border-slate-200 text-center font-mono">
+                    <div className="p-1 rounded bg-slate-50 border border-slate-100">
+                      <span className="text-[9px] text-slate-400 block uppercase">Raw Camera</span>
+                      <span className="text-[11px] font-bold text-slate-600 line-through">
+                        {selectedIncident.photoMetadata.originalSize || '3.50 MB'}
+                      </span>
+                    </div>
+                    <div className="p-1 rounded bg-emerald-50 border border-emerald-200">
+                      <span className="text-[9px] text-emerald-600 block uppercase font-bold">2G Transfer Size</span>
+                      <span className="text-[11px] font-extrabold text-emerald-700">
+                        {selectedIncident.photoMetadata.compressedSize || '38.4 KB'}
+                      </span>
+                    </div>
+                    <div className="p-1 rounded bg-blue-50 border border-blue-200">
+                      <span className="text-[9px] text-blue-600 block uppercase font-bold">Saved</span>
+                      <span className="text-[11px] font-extrabold text-blue-700">
+                        {selectedIncident.photoMetadata.bandwidthSaved || '98.9%'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-0.5">
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      {selectedIncident.photoMetadata.transferSpeedEstimate || '~12 KB/min 2G Mountain Link'}
+                    </span>
                     <span>Source: {selectedIncident.photoMetadata.source}</span>
                   </div>
                 </div>

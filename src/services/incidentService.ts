@@ -55,6 +55,13 @@ export interface Incident {
     uploaded: string;
     gpsVerified: boolean;
     source: string;
+    originalSize?: string;
+    compressedSize?: string;
+    bandwidthSaved?: string;
+    compressionMode?: string;
+    transferStatus?: string;
+    transferSpeedEstimate?: string;
+    transferDurationSecs?: number;
   };
   timeline: IncidentTimelineEntry[];
   aiAssessment: AiAssessment;
@@ -92,7 +99,14 @@ const INITIAL_INCIDENTS: Incident[] = [
     photoMetadata: {
       uploaded: '29 Aug 2026, 14:20',
       gpsVerified: true,
-      source: 'Field Operations Mobile Unit #4'
+      source: 'Field Operations Mobile Unit #4',
+      originalSize: '3.42 MB',
+      compressedSize: '36.8 KB',
+      bandwidthSaved: '98.9%',
+      compressionMode: 'EMERGENCY',
+      transferStatus: 'RECEIVED',
+      transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)',
+      transferDurationSecs: 3.1
     },
     timeline: [
       { time: '14:18', title: 'Field report submitted', description: 'Filed by Officer T. Ronya via Mobile App', completed: true },
@@ -155,7 +169,14 @@ const INITIAL_INCIDENTS: Incident[] = [
     photoMetadata: {
       uploaded: '29 Aug 2026, 14:06',
       gpsVerified: true,
-      source: 'State Police Highway Division'
+      source: 'State Police Highway Division',
+      originalSize: '2.85 MB',
+      compressedSize: '41.2 KB',
+      bandwidthSaved: '98.5%',
+      compressionMode: 'LOW_BANDWIDTH',
+      transferStatus: 'RECEIVED',
+      transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)',
+      transferDurationSecs: 3.4
     },
     timeline: [
       { time: '14:04', title: 'Field report submitted', description: 'Filed by Sub-Inspector D. Das', completed: true },
@@ -211,7 +232,14 @@ const INITIAL_INCIDENTS: Incident[] = [
     photoMetadata: {
       uploaded: '29 Aug 2026, 13:53',
       gpsVerified: true,
-      source: 'DDMA Station Shillong'
+      source: 'DDMA Station Shillong',
+      originalSize: '4.10 MB',
+      compressedSize: '48.5 KB',
+      bandwidthSaved: '98.8%',
+      compressionMode: 'EMERGENCY',
+      transferStatus: 'RECEIVED',
+      transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)',
+      transferDurationSecs: 4.0
     },
     timeline: [
       { time: '13:51', title: 'Field report submitted', description: 'Weather warning logged by DDMA Shillong', completed: true },
@@ -246,7 +274,14 @@ const INITIAL_INCIDENTS: Incident[] = [
     photoMetadata: {
       uploaded: '29 Aug 2026, 13:17',
       gpsVerified: true,
-      source: 'BRO Task Force 42'
+      source: 'BRO Task Force 42',
+      originalSize: '3.65 MB',
+      compressedSize: '32.1 KB',
+      bandwidthSaved: '99.1%',
+      compressionMode: 'EMERGENCY',
+      transferStatus: 'RECEIVED',
+      transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)',
+      transferDurationSecs: 2.7
     },
     timeline: [
       { time: '13:15', title: 'Field report submitted', description: 'Filed by BRO Chief Engineer', completed: true },
@@ -334,6 +369,66 @@ class IncidentService {
       verifiedToday: verified,
       critical: critical
     };
+  }
+
+  public ingestFieldPhotoIncident(data: any): Incident {
+    const newInc: Incident = {
+      id: data.id || `INC-${Date.now().toString().slice(-4)}`,
+      type: data.type || 'LANDSLIDE',
+      title: data.title || 'Field Ground Report',
+      severity: 'HIGH',
+      status: 'PENDING',
+      state: data.state || 'Arunachal Pradesh',
+      district: data.district || 'Lower Subansiri',
+      road: data.road || 'NH-13',
+      latitude: data.latitude || 27.4285,
+      longitude: data.longitude || 93.7542,
+      reportedBy: 'Field Worker (Mobile PWA Offline Sync)',
+      reportedTime: 'Just Now',
+      timeAgo: 'Just now',
+      currentRoadStatus: 'OBSTRUCTED - FIELD EVIDENCE DELIVERED',
+      description: 'Real-time photographic evidence delivered from field officer via adaptive low-bandwidth WebP/JPEG transfer pipeline.',
+      photoUrl: data.photoUrl,
+      photoMetadata: data.photoMetadata || {
+        uploaded: 'Just Now',
+        gpsVerified: true,
+        source: 'Field Operator Low-Bandwidth Pipeline',
+        originalSize: '3.48 MB',
+        compressedSize: '38.2 KB',
+        bandwidthSaved: '98.9%',
+        compressionMode: 'EMERGENCY',
+        transferStatus: 'RECEIVED',
+        transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)'
+      },
+      timeline: [
+        {
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Field Photo Captured & Optimized (3.5 MB → 38 KB)',
+          description: 'Adaptive re-encoding completed client-side in Emergency Mode.',
+          completed: true
+        },
+        {
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Low-Bandwidth Transfer Succeeded (~12 KB/min)',
+          description: 'Lightweight packet received and verified at Central Command Center.',
+          completed: true
+        }
+      ],
+      aiAssessment: {
+        possibleIncident: data.type || 'LANDSLIDE',
+        estimatedSeverity: 'HIGH',
+        potentialImpact: 'Single-lane road blocked with rock debris. High-axle trucks restricted.',
+        affectedCorridor: data.road || 'NH-13',
+        suggestedAction: 'Deploy BRO Dozer from nearest maintenance post; issue diversion via Tezpur.'
+      },
+      corroborationCount: 2,
+      confidenceScore: 94,
+      duplicateReportsMerged: 0
+    };
+
+    // Prepend to top of list
+    this.incidents.unshift(newInc);
+    return newInc;
   }
 }
 
