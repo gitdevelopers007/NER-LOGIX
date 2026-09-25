@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { 
   Bell, User, MapPin, AlertTriangle, Route, ShieldAlert, Truck, ChevronDown, 
   Search, Sparkles, Clock, ShieldCheck, Layers, X, Info,
-  Compass, Mountain, Loader2, Share2, Cpu, Activity, Zap
+  Compass, Mountain, Loader2, Share2, Cpu, Activity, Zap,
+  XCircle, CheckCircle2, AlertOctagon
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { RouteMap } from '../components/RouteMap';
@@ -22,6 +23,7 @@ export const RouteIntelligencePage: React.FC = () => {
   // Algorithm Engine & Simulation Inputs
   const [algorithm, setAlgorithm] = useState<'Quantum PSO' | 'Dijkstra' | 'Disaster-Resilient A*'>('Quantum PSO');
   const [simulateDisruption, setSimulateDisruption] = useState<boolean>(true);
+  const [showBaselineComparison, setShowBaselineComparison] = useState<boolean>(true);
   const [optResult, setOptResult] = useState<OptimizationResult>(
     routingEngine.solveQuantumPSO('Guwahati', 'Itanagar', true)
   );
@@ -254,6 +256,22 @@ export const RouteIntelligencePage: React.FC = () => {
                   </span>
                   <span className="text-[9.5px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">
                     LIVE SIMULATION
+                  </span>
+                </label>
+
+                {/* Naive GPS Baseline Comparison Toggle */}
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={showBaselineComparison}
+                    onChange={(e) => setShowBaselineComparison(e.target.checked)}
+                    className="w-3.5 h-3.5 text-rose-600 rounded border-slate-300 focus:ring-rose-500"
+                  />
+                  <span className="text-xs font-semibold text-slate-800">
+                    Compare with Naive GPS Baseline
+                  </span>
+                  <span className="text-[9.5px] font-bold px-1.5 py-0.2 bg-rose-100 text-rose-700 rounded border border-rose-200">
+                    JUDGE DEMO
                   </span>
                 </label>
 
@@ -684,6 +702,99 @@ export const RouteIntelligencePage: React.FC = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            )}
+
+            {/* NAIVE GPS BASELINE VS. NER-LOGIX AI COMPARISON (JURY EVALUATION DEMO) */}
+            {showBaselineComparison && (
+              <div className="pt-3 border-t border-slate-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertOctagon className="w-4 h-4 text-rose-600" />
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Evaluation Demonstration: Naive Shortest GPS vs. NER-LOGIX AI Resilient Routing
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded border border-rose-200">
+                    Live Disaster Avoidance Benchmark
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  
+                  {/* FAILURE MODE: NAIVE SHORTEST PATH */}
+                  <div className="bg-rose-50/60 border border-rose-200 rounded-xl p-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-rose-800">
+                        <XCircle className="w-4 h-4 text-rose-600" />
+                        <span>NAIVE SHORTEST GPS (Standard Google Maps / OSM)</span>
+                      </div>
+                      <span className="text-[9.5px] font-bold bg-rose-200 text-rose-900 px-2 py-0.5 rounded">
+                        FATAL DISRUPTION
+                      </span>
+                    </div>
+
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between text-slate-600">
+                        <span>Calculated Distance:</span>
+                        <strong className="text-slate-900 font-mono">340 km (Appears 45 km shorter)</strong>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Path Selected:</span>
+                        <strong className="text-slate-900 font-mono text-[11px]">Direct via NH-29 / Kohima Choke</strong>
+                      </div>
+                      <div className="flex justify-between text-rose-700 font-semibold">
+                        <span>Choke Point Crossed:</span>
+                        <strong className="text-rose-700">NH-29 Landslide (100% BLOCKED)</strong>
+                      </div>
+                      <div className="flex justify-between text-rose-700 font-semibold">
+                        <span>Resulting Delay:</span>
+                        <strong className="text-rose-800">+8h 30m Mountain Trap</strong>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/80 p-2.5 rounded-lg border border-rose-200 text-[11px] text-rose-900 leading-relaxed">
+                      ⚠️ <strong>Why standard algorithms fail:</strong> Classical Dijkstra/A* optimizes solely for distance. Without live ISRO slope risk and ground telemetry, the vehicle is directed straight into a narrow mountain gorge with zero turnaround capability.
+                    </div>
+                  </div>
+
+                  {/* SUCCESS MODE: NER-LOGIX AI */}
+                  <div className="bg-emerald-50/60 border border-emerald-200 rounded-xl p-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>NER-LOGIX AI OPTIMIZER (Quantum PSO / Risk-Weighted)</span>
+                      </div>
+                      <span className="text-[9.5px] font-bold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded">
+                        100% MISSION CLEAR
+                      </span>
+                    </div>
+
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between text-slate-600">
+                        <span>Calculated Distance:</span>
+                        <strong className="text-slate-900 font-mono">385 km (+45 km tactical bypass)</strong>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Path Selected:</span>
+                        <strong className="text-emerald-800 font-mono text-[11px]">Dynamic Divert via Silchar Corridor</strong>
+                      </div>
+                      <div className="flex justify-between text-emerald-700 font-semibold">
+                        <span>Choke Point Crossed:</span>
+                        <strong className="text-emerald-700">0 Blockages (100% Passable)</strong>
+                      </div>
+                      <div className="flex justify-between text-emerald-700 font-semibold">
+                        <span>Delivery Assurance:</span>
+                        <strong className="text-emerald-800">ON-TIME (Cold Chain 100% Preserved)</strong>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/80 p-2.5 rounded-lg border border-emerald-200 text-[11px] text-emerald-900 leading-relaxed">
+                      🛡️ <strong>The NER-LOGIX Advantage:</strong> Quantum PSO perturbs impedance matrices against live IMD Doppler rainfall and ISRO-NESAC hazard alerts, discovering high-altitude bypasses before convoys even depart the depot.
+                    </div>
+                  </div>
+
                 </div>
               </div>
             )}

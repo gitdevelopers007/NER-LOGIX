@@ -26,6 +26,14 @@ export interface AiAssessment {
   suggestedAction: string;
 }
 
+export interface CorroboratingReport {
+  id: string;
+  reportedBy: string;
+  sourceType: 'MOBILE_PWA' | 'BRO_RADIO' | 'CITIZEN_APP' | 'POLICE_VHF';
+  timeAgo: string;
+  notes: string;
+}
+
 export interface Incident {
   id: string;
   type: IncidentType;
@@ -50,6 +58,10 @@ export interface Incident {
   };
   timeline: IncidentTimelineEntry[];
   aiAssessment: AiAssessment;
+  corroborationCount?: number;
+  confidenceScore?: number;
+  duplicateReportsMerged?: number;
+  corroboratingReports?: CorroboratingReport[];
 }
 
 // Inline SVGs for authentic field evidence photos
@@ -95,7 +107,33 @@ const INITIAL_INCIDENTS: Incident[] = [
       potentialImpact: 'Road accessibility severely affected',
       affectedCorridor: 'NH-13',
       suggestedAction: 'Review alternate routes via Tezpur bypass'
-    }
+    },
+    corroborationCount: 3,
+    confidenceScore: 98,
+    duplicateReportsMerged: 2,
+    corroboratingReports: [
+      {
+        id: 'CR-001',
+        reportedBy: 'BRO Detachment 753 (Radio Dispatch)',
+        sourceType: 'BRO_RADIO',
+        timeAgo: '9 min ago',
+        notes: 'Boulders & debris confirmed at KM-142. Heavy earthmover dispatched from Ziro depot.'
+      },
+      {
+        id: 'CR-002',
+        reportedBy: 'Officer T. Ronya (Field Unit #4)',
+        sourceType: 'MOBILE_PWA',
+        timeAgo: '14 min ago',
+        notes: 'Slope failure across both lanes. 2 supply trucks stopped on north side.'
+      },
+      {
+        id: 'CR-003',
+        reportedBy: 'Civilian Driver (NER-LOGIX Citizen App)',
+        sourceType: 'CITIZEN_APP',
+        timeAgo: '3 min ago',
+        notes: 'Mud slurry spreading across culvert. Vehicles cannot cross.'
+      }
+    ]
   },
   {
     id: 'INC-2026-00481',
@@ -132,7 +170,26 @@ const INITIAL_INCIDENTS: Incident[] = [
       potentialImpact: 'Slowdown expected for commercial freight',
       affectedCorridor: 'NH-37',
       suggestedAction: 'Reroute heavy trucks to southern corridor'
-    }
+    },
+    corroborationCount: 2,
+    confidenceScore: 94,
+    duplicateReportsMerged: 1,
+    corroboratingReports: [
+      {
+        id: 'CR-004',
+        reportedBy: 'Assam Highway Patrol (Unit 12)',
+        sourceType: 'POLICE_VHF',
+        timeAgo: '28 min ago',
+        notes: 'Transverse pavement crack expanding across westbound lane near KM-68.'
+      },
+      {
+        id: 'CR-005',
+        reportedBy: 'PWD Inspector B. Gogoi',
+        sourceType: 'MOBILE_PWA',
+        timeAgo: '35 min ago',
+        notes: 'Culvert structural seepage confirmed. Sandbags deployed.'
+      }
+    ]
   },
   {
     id: 'INC-2026-00480',

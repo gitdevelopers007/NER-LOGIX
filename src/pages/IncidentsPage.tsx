@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Bell, User, MapPin, AlertTriangle, ChevronDown, 
   Search, RefreshCw, CheckCircle2, XCircle, Clock, 
-  Camera, Sparkles, ExternalLink
+  Camera, Sparkles, ExternalLink, Shield, Users
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { IncidentMiniMap } from '../components/IncidentMiniMap';
@@ -373,6 +373,23 @@ export const IncidentsPage: React.FC = () => {
                             {inc.severity}
                           </span>
                         </div>
+
+                        {inc.corroborationCount && inc.corroborationCount > 1 && (
+                          <div className="flex items-center gap-1.5 mt-2 pt-1 border-t border-slate-100/80 text-[9.5px]">
+                            <span className="bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded border border-purple-200 flex items-center gap-1">
+                              <Shield className="w-2.5 h-2.5 text-purple-700" />
+                              <span>{inc.corroborationCount} Corroborated</span>
+                            </span>
+                            <span className="text-slate-400 font-mono">
+                              ({inc.confidenceScore}% Conf.)
+                            </span>
+                            {inc.duplicateReportsMerged && (
+                              <span className="bg-slate-100 text-slate-600 font-medium px-1 py-0.2 rounded ml-auto">
+                                +{inc.duplicateReportsMerged} Merged
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })
@@ -425,6 +442,62 @@ export const IncidentsPage: React.FC = () => {
                 <div className="text-xs text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
                   {selectedIncident.description}
                 </div>
+
+                {/* AI MULTI-SOURCE CORROBORATION & DEDUPLICATION CLUSTER */}
+                {selectedIncident.corroborationCount && selectedIncident.corroborationCount > 1 && (
+                  <div className="bg-gradient-to-r from-purple-50 via-indigo-50/60 to-purple-50/40 border border-purple-200 rounded-xl p-3.5 space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
+                        <span className="text-xs font-bold text-purple-900 uppercase tracking-wide flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-purple-700" />
+                          Multi-Source Corroboration Cluster ({selectedIncident.corroborationCount} Units)
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded border border-purple-200">
+                          AI Verification Confidence: {selectedIncident.confidenceScore}%
+                        </span>
+                        {selectedIncident.duplicateReportsMerged && (
+                          <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                            +{selectedIncident.duplicateReportsMerged} Redundant Reports Merged
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                      Automated geo-temporal clustering identified <strong>{selectedIncident.corroborationCount} corroborating reports</strong> within a 2-hour window on this 10-km highway sector. Redundant submissions were merged to prevent duplicate dispatch of clearing personnel.
+                    </p>
+
+                    {/* Clustered Ground Unit Reports */}
+                    {selectedIncident.corroboratingReports && (
+                      <div className="space-y-1.5 pt-1">
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          Corroborating Ground Units:
+                        </div>
+                        <div className="grid grid-cols-1 gap-1.5">
+                          {selectedIncident.corroboratingReports.map((rep) => (
+                            <div key={rep.id} className="bg-white/90 p-2.5 rounded-lg border border-purple-100/80 flex items-start justify-between text-xs gap-3">
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-slate-800 text-[11px]">{rep.reportedBy}</span>
+                                  <span className="text-[9px] font-mono font-semibold bg-purple-50 text-purple-700 px-1.5 py-0.2 rounded border border-purple-200">
+                                    {rep.sourceType}
+                                  </span>
+                                </div>
+                                <div className="text-[10.5px] text-slate-600 italic">
+                                  "{rep.notes}"
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-mono shrink-0">{rep.timeAgo}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Key Attributes Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
