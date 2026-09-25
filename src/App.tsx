@@ -16,6 +16,8 @@ import { MissionDetailPage } from './pages/logistics/MissionDetailPage';
 import { FleetVehiclesPage } from './pages/logistics/FleetVehiclesPage';
 import { VehicleDetailPage } from './pages/logistics/VehicleDetailPage';
 import { StockDepletionPage } from './pages/logistics/StockDepletionPage';
+import { AiCopilotPage } from './pages/AiCopilotPage';
+import { DriverHudPage } from './pages/driver/DriverHudPage';
 import { LanguageProvider } from './field-ops/features/language/LanguageContext';
 import { Layout as FieldLayout } from './field-ops/app/Layout';
 import { FieldHome } from './field-ops/pages/FieldHome';
@@ -35,6 +37,8 @@ function App() {
         <Route path="/government-command-center" element={<GovernmentOverview />} />
         <Route path="/live-map" element={<GovernmentCommandCenter />} />
         <Route path="/route-intelligence" element={<RouteIntelligencePage />} />
+        <Route path="/copilot" element={<AiCopilotPage />} />
+        <Route path="/driver" element={<DriverHudPage />} />
         <Route path="/incidents" element={<IncidentsPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />

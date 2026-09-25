@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, MapPin, Share2, Truck, AlertTriangle, 
-  Bell, BarChart3, Database, Settings 
+  Bell, BarChart3, Database, Settings, Bot, Gauge 
 } from 'lucide-react';
 
 interface NavItem {
@@ -35,6 +35,18 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
       name: 'Route Intelligence',
       path: '/route-intelligence',
       icon: Share2
+    },
+    {
+      name: 'AI Logistics Copilot',
+      path: '/copilot',
+      icon: Bot,
+      badge: { count: 'AI' }
+    },
+    {
+      name: 'Driver In-Transit HUD',
+      path: '/driver',
+      icon: Gauge,
+      badge: { count: 'LIVE' }
     },
     {
       name: 'Logistics & Vehicles',

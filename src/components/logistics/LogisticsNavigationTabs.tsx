@@ -68,6 +68,26 @@ export const LogisticsNavigationTabs: React.FC = () => {
           2
         </span>
       </button>
+
+      <div className="h-5 w-[1px] bg-slate-300 mx-1 hidden lg:block" />
+
+      <button
+        onClick={() => navigate('/driver')}
+        className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-amber-700 hover:bg-amber-100/70"
+        title="Open Driver In-Transit HUD console"
+      >
+        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        <span>Driver HUD</span>
+      </button>
+
+      <button
+        onClick={() => navigate('/copilot')}
+        className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-indigo-700 hover:bg-indigo-100/70"
+        title="Open AI Logistics Copilot"
+      >
+        <span className="text-[11px] font-black bg-indigo-600 text-white px-1.5 py-0.5 rounded">AI</span>
+        <span>Copilot</span>
+      </button>
     </div>
   );
 };
