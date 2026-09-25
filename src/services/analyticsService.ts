@@ -77,6 +77,36 @@ export interface AnalyticsReportTemplate {
   size: string;
 }
 
+export interface InfrastructureDeficitItem {
+  id: string;
+  district: string;
+  state: string;
+  accessibilityScore: number;
+  gapScore: number; // 0-100
+  priority: 'CRITICAL' | 'HIGH' | 'MEDIUM';
+  primaryDeficit: string;
+  recommendedInterventions: string[];
+  estimatedCostCr: number; // in Crores INR
+  urgencyTimeline: string;
+}
+
+export interface ScenarioSimulationPreset {
+  id: string;
+  name: string;
+  targetCorridor: string;
+  hazardType: 'LANDSLIDE' | 'MONSOON_FLOOD' | 'DEMAND_SURGE' | 'BRIDGE_RESTRICTION';
+  severityLevel: number; // 0 - 100
+  description: string;
+  kpiImpact: {
+    isolatedDistricts: number;
+    delayIncreaseHours: number;
+    populationAffected: string;
+    flowCapacityLossPct: number;
+  };
+  recommendedAction: string;
+  alternateCorridor: string;
+}
+
 const DISTRICT_DATA: DistrictConnectivityItem[] = [
   { id: 'DIST-01', state: 'Assam', district: 'Dibrugarh', status: 'OPEN', accessPct: 94, primaryIssue: 'Traffic' },
   { id: 'DIST-02', state: 'Meghalaya', district: 'East Khasi Hills', status: 'RESTRICT', accessPct: 72, primaryIssue: 'Heavy Rainfall' },
@@ -308,6 +338,207 @@ export class AnalyticsService {
   getReportTemplates(): AnalyticsReportTemplate[] {
     return REPORT_TEMPLATES;
   }
+
+  getInfrastructureDeficits(): InfrastructureDeficitItem[] {
+    return INFRASTRUCTURE_GAPS;
+  }
+
+  getScenarioPresets(): ScenarioSimulationPreset[] {
+    return SCENARIO_PRESETS;
+  }
 }
+
+const INFRASTRUCTURE_GAPS: InfrastructureDeficitItem[] = [
+  {
+    id: 'GAP-01',
+    district: 'Tawang',
+    state: 'Arunachal Pradesh',
+    accessibilityScore: 38,
+    gapScore: 84,
+    priority: 'CRITICAL',
+    primaryDeficit: 'Single artery vulnerability (NH-13 Sela Pass prone to freeze/debris cutoffs)',
+    recommendedInterventions: [
+      'Establish forward cold-chain logistics staging depot at Dirang (₹120 Cr)',
+      'Construct all-weather heavy drone delivery vertiport (₹35 Cr)',
+      'Slope stabilization and snow-shed tunnels along western approach (₹380 Cr)'
+    ],
+    estimatedCostCr: 535,
+    urgencyTimeline: 'Immediate / FY2026-27'
+  },
+  {
+    id: 'GAP-02',
+    district: 'Dima Hasao (Haflong)',
+    state: 'Assam',
+    accessibilityScore: 42,
+    gapScore: 78,
+    priority: 'CRITICAL',
+    primaryDeficit: 'Extreme monsoonal mudflows and unstable cut slopes along NH-27 hill section',
+    recommendedInterventions: [
+      'Heavy geotechnical retaining soil nails & micropiles (₹240 Cr)',
+      'Rail freight siding capacity enhancement at New Haflong (₹180 Cr)',
+      'Multi-modal transshipment yard outside landslide zone (₹110 Cr)'
+    ],
+    estimatedCostCr: 530,
+    urgencyTimeline: 'High Priority (Pre-Monsoon)'
+  },
+  {
+    id: 'GAP-03',
+    district: 'Tamenglong',
+    state: 'Manipur',
+    accessibilityScore: 35,
+    gapScore: 82,
+    priority: 'CRITICAL',
+    primaryDeficit: 'Substandard single-lane culverts and unpaved feeder routes isolating valley villages',
+    recommendedInterventions: [
+      'Upgrade IT Road (Imphal-Tamenglong) to 2-lane paved national standard (₹420 Cr)',
+      'All-weather grain and emergency medical storage godown (₹65 Cr)'
+    ],
+    estimatedCostCr: 485,
+    urgencyTimeline: 'Immediate / Active Tender'
+  },
+  {
+    id: 'GAP-04',
+    district: 'Upper Subansiri (Daporijo)',
+    state: 'Arunachal Pradesh',
+    accessibilityScore: 44,
+    gapScore: 73,
+    priority: 'HIGH',
+    primaryDeficit: 'Lack of emergency airstrip and severe bridge load restrictions on Bailey bridges',
+    recommendedInterventions: [
+      'Develop regional emergency air-logistics landing strip (₹160 Cr)',
+      'Permanent steel-girder bridge replacement over Subansiri river (₹190 Cr)'
+    ],
+    estimatedCostCr: 350,
+    urgencyTimeline: 'Medium Term / 18 Months'
+  },
+  {
+    id: 'GAP-05',
+    district: 'Kiphire',
+    state: 'Nagaland',
+    accessibilityScore: 48,
+    gapScore: 69,
+    priority: 'HIGH',
+    primaryDeficit: 'Remote border district with >210 km distance from nearest major supply terminal (Dimapur)',
+    recommendedInterventions: [
+      'Establish sub-regional logistics hub with 500 MT buffer capacity (₹85 Cr)',
+      'Feeder road blacktopping and drainage culvert widening (₹145 Cr)'
+    ],
+    estimatedCostCr: 230,
+    urgencyTimeline: 'FY2026-27'
+  },
+  {
+    id: 'GAP-06',
+    district: 'Lawngtlai',
+    state: 'Mizoram',
+    accessibilityScore: 51,
+    gapScore: 66,
+    priority: 'HIGH',
+    primaryDeficit: 'Kaladan Multi-Modal project road access bottleneck during monsoonal deluges',
+    recommendedInterventions: [
+      'Reinforced concrete bridge over Chhimtuipui River (₹140 Cr)',
+      'Integrated cross-border logistics facilitation center (₹95 Cr)'
+    ],
+    estimatedCostCr: 235,
+    urgencyTimeline: 'Active Interventions'
+  },
+  {
+    id: 'GAP-07',
+    district: 'South Garo Hills (Baghmara)',
+    state: 'Meghalaya',
+    accessibilityScore: 54,
+    gapScore: 61,
+    priority: 'MEDIUM',
+    primaryDeficit: 'Frequent flooding of Simsang river approaches and lack of high-clearance bypass',
+    recommendedInterventions: [
+      'Elevated causeway over flood-prone Simsang basin (₹180 Cr)',
+      'Decentralized agricultural and relief aggregation cold-room (₹45 Cr)'
+    ],
+    estimatedCostCr: 225,
+    urgencyTimeline: 'Medium Term'
+  }
+];
+
+const SCENARIO_PRESETS: ScenarioSimulationPreset[] = [
+  {
+    id: 'SCEN-01',
+    name: 'NH-13 Sela Pass Catastrophic Landslide',
+    targetCorridor: 'NH-13 (Bhalukpong–Bomdila–Tawang)',
+    hazardType: 'LANDSLIDE',
+    severityLevel: 92,
+    description: 'Debris flow and rockslide severing 18 km of NH-13 western hill corridor near Sela Tunnel western portal under continuous 160mm precipitation.',
+    kpiImpact: {
+      isolatedDistricts: 2,
+      delayIncreaseHours: 24.5,
+      populationAffected: '115,000 citizens',
+      flowCapacityLossPct: 88
+    },
+    recommendedAction: 'Enact Emergency Air-Drop Protocol; divert light emergency freight via Tezpur–Balemu–Kalaktang alternate military alignment.',
+    alternateCorridor: 'Guwahati → Tezpur → Balemu → Kalaktang → Dirang Bypass'
+  },
+  {
+    id: 'SCEN-02',
+    name: 'Barak Valley Monsoonal Flooding & Embankment Breach',
+    targetCorridor: 'NH-37 / NH-44 (Silchar–Badarpur Junction)',
+    hazardType: 'MONSOON_FLOOD',
+    severityLevel: 85,
+    description: 'Barak River exceeds extreme danger mark by 2.1m. Overtopping at Badarpur creates 3.4km submerged road corridor halting heavy freight to Mizoram and Tripura.',
+    kpiImpact: {
+      isolatedDistricts: 4,
+      delayIncreaseHours: 19.0,
+      populationAffected: '2,400,000 citizens',
+      flowCapacityLossPct: 76
+    },
+    recommendedAction: 'Activate inland water logistics barges on National Waterway-16 (Barak River) & route essential fuel rakes via Lumding–Badarpur railway line.',
+    alternateCorridor: 'Guwahati → Lumding Rail Transfer → Silchar Port Terminal'
+  },
+  {
+    id: 'SCEN-03',
+    name: 'NH-2 Mao Gate Landslide & Corridor Blockade',
+    targetCorridor: 'NH-2 (Kohima–Mao Gate–Imphal Lifeline)',
+    hazardType: 'LANDSLIDE',
+    severityLevel: 88,
+    description: 'Major slope collapse at Mao Gate on Manipur border blocking both lanes; critical LPG, petrol, and surgical oxygen supply to Imphal Valley compromised.',
+    kpiImpact: {
+      isolatedDistricts: 5,
+      delayIncreaseHours: 32.0,
+      populationAffected: '1,850,000 citizens',
+      flowCapacityLossPct: 94
+    },
+    recommendedAction: 'Immediately mobilize Silchar–Jiribam–Imphal highway (NH-37) as primary national supply arterial under CRPF highway escort.',
+    alternateCorridor: 'Silchar Logistics Hub → Jiribam → Noney → Imphal Valley (NH-37)'
+  },
+  {
+    id: 'SCEN-04',
+    name: 'Brahmaputra Basin Flash Flood Surge (Lower Assam)',
+    targetCorridor: 'NH-27 / NH-127B (Barpeta–Dhubri River Basin)',
+    hazardType: 'MONSOON_FLOOD',
+    severityLevel: 79,
+    description: 'Manas and Beki rivers inundate low-lying arterial bypasses in Barpeta. High-axle food and grain transport restricted.',
+    kpiImpact: {
+      isolatedDistricts: 3,
+      delayIncreaseHours: 11.5,
+      populationAffected: '1,100,000 citizens',
+      flowCapacityLossPct: 62
+    },
+    recommendedAction: 'Divert commercial trucks through elevated Northern Foothills Highway (NH-127A via Bhutan border corridor).',
+    alternateCorridor: 'Guwahati → Rangia → Bijni → Kokrajhar Northern Link'
+  },
+  {
+    id: 'SCEN-05',
+    name: 'Festival Demand & Supply Shock (+65% Surge)',
+    targetCorridor: 'Guwahati Multimodal Logistics Park → Northeast Capitals',
+    hazardType: 'DEMAND_SURGE',
+    severityLevel: 65,
+    description: 'Simultaneous festive season stocking and winter replenishment creating 65% freight volume surge at Guwahati staging yards, risking warehouse stockouts.',
+    kpiImpact: {
+      isolatedDistricts: 0,
+      delayIncreaseHours: 8.2,
+      populationAffected: 'Whole Regional Network',
+      flowCapacityLossPct: 35
+    },
+    recommendedAction: 'Enforce 24/7 off-peak green corridors for essential freight convoys; commission temporary buffer yards at Changsari & Amingaon.',
+    alternateCorridor: 'Direct 24/7 Night Freight Clearance via Jalukbari Bypass'
+  }
+];
 
 export const analyticsService = new AnalyticsService();
