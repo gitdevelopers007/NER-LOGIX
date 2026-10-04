@@ -2,17 +2,25 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-export const GovernmentLoginHeader: React.FC = () => {
+interface GovernmentLoginHeaderProps {
+  portalTitle?: string;
+  backTo?: string;
+}
+
+export const GovernmentLoginHeader: React.FC<GovernmentLoginHeaderProps> = ({
+  portalTitle = 'GOVERNMENT PORTAL',
+  backTo = '/access-portal',
+}) => {
   return (
     <header className="w-full bg-[#0c2340] border-b border-slate-700/80 shadow-md relative z-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3.5 flex items-center justify-between">
         
-        {/* LEFT: NER-LOGIX wordmark & mountain icon (No government seal/emblem) */}
+        {/* LEFT: NER-LOGIX wordmark & mountain icon */}
         <div className="flex items-center gap-4">
           <Link 
-            to="/access-portal" 
+            to={backTo} 
             className="flex items-center gap-2 group text-slate-400 hover:text-white transition-colors"
-            title="Return to Access Portal selection"
+            title="Return to previous selection"
           >
             {/* Subtle Back Arrow */}
             <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-transform group-hover:-translate-x-0.5" />
@@ -37,10 +45,10 @@ export const GovernmentLoginHeader: React.FC = () => {
           </Link>
         </div>
 
-        {/* RIGHT: GOVERNMENT PORTAL in small uppercase typography */}
-        <div className="flex items-center">
+        {/* RIGHT: PORTAL TITLE in small uppercase typography */}
+        <div className="flex items-center gap-3">
           <span className="text-[11.5px] font-semibold tracking-[0.22em] text-slate-400 uppercase select-none">
-            GOVERNMENT PORTAL
+            {portalTitle}
           </span>
         </div>
 

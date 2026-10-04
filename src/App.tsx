@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Welcome } from './pages/Welcome';
 import { AccessPortalPage } from './pages/AccessPortalPage';
 import { GovernmentLogin } from './pages/GovernmentLogin';
+import { FieldLogin } from './pages/FieldLogin';
 import { GovernmentOverview } from './pages/GovernmentOverview';
 import { GovernmentCommandCenter } from './pages/GovernmentCommandCenter';
 import { RouteIntelligencePage } from './pages/RouteIntelligencePage';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/" element={<Welcome />} />
         <Route path="/access-portal" element={<AccessPortalPage />} />
         <Route path="/government-login" element={<GovernmentLogin />} />
+        <Route path="/field-login" element={<FieldLogin />} />
         <Route path="/government-command-center" element={<GovernmentOverview />} />
         <Route path="/live-map" element={<GovernmentCommandCenter />} />
         <Route path="/route-intelligence" element={<RouteIntelligencePage />} />

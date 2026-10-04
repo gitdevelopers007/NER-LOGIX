@@ -5,7 +5,7 @@ import {
   Bell, User, MapPin, AlertTriangle, ChevronDown, 
   Search, RefreshCw, CheckCircle2, XCircle, Clock, 
   Camera, Sparkles, ExternalLink, Shield, Users,
-  Wifi, Zap
+  Wifi, Zap, Radio, Plus
 } from 'lucide-react';
 import { NerLogixLogo } from '../components/NerLogixLogo';
 import { IncidentMiniMap } from '../components/IncidentMiniMap';
@@ -113,7 +113,18 @@ export const IncidentsPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <a
+            href="https://ner-logix-field-operation-app.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-blue-600/80 hover:bg-blue-600 text-white rounded text-xs font-semibold border border-blue-400/40 shadow-xs transition-colors"
+            title="Launch Standalone Field Operations App"
+          >
+            <Radio className="w-3.5 h-3.5 text-blue-200" />
+            <span>Field App PWA ↗</span>
+          </a>
+
           <div className="hidden sm:flex items-center gap-2 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full text-[11px] text-emerald-400 font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>System Online</span>
@@ -173,19 +184,78 @@ export const IncidentsPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 text-xs text-slate-500">
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-                <Clock className="w-3.5 h-3.5 text-blue-600" />
-                <span>Last updated: <strong className="text-slate-700">14:32</strong></span>
-              </div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Primary Direct Standalone App Link */}
+              <a
+                href="https://ner-logix-field-operation-app.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                title="Launch standalone Field Operations PWA in new window"
+              >
+                <Radio className="w-3.5 h-3.5 text-blue-200" />
+                <span>Launch Field App ↗</span>
+              </a>
+
+              {/* Internal Field Report Link */}
+              <button
+                onClick={() => navigate('/field/report')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 text-blue-400" />
+                <span>New Field Report</span>
+              </button>
+
+              {/* Field Login Navigation */}
+              <button
+                onClick={() => navigate('/field-login')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-300 text-xs font-medium shadow-2xs transition-colors cursor-pointer"
+              >
+                <span>Field Login</span>
+              </button>
 
               <button
                 onClick={refreshData}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-300 font-medium shadow-2xs cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-300 text-xs font-medium shadow-2xs cursor-pointer transition-colors"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
                 <span>Refresh ↻</span>
               </button>
+            </div>
+          </div>
+
+          {/* FIELD TELEMETRY & OFFLINE MESH STATUS BANNER */}
+          <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-xl p-3 shadow-xs border border-blue-900/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                <Radio className="w-4 h-4 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white tracking-wide">FIELD TELEMETRY MESH</span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.2 rounded font-mono">
+                    100% OPERATIONAL
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-300">
+                  Live ground reports from BRO Detachments, SDMA Surveyors, and Police Patrol Units.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-[11px] font-mono text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Active Patrols: <strong className="text-white">14 Units</strong></span>
+              </div>
+              <div className="hidden md:flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                <span>2G Canvas Compression: <strong className="text-white">&lt;38 KB</strong></span>
+              </div>
+              <div className="hidden lg:flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+                <span>IndexedDB Sync: <strong className="text-white">Live Buffer</strong></span>
+              </div>
             </div>
           </div>
 

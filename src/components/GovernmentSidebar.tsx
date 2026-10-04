@@ -2,7 +2,8 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, MapPin, Share2, Truck, AlertTriangle, 
-  Bell, BarChart3, Database, Settings, Bot 
+  Bell, BarChart3, Database, Settings, Bot,
+  Radio, ExternalLink 
 } from 'lucide-react';
 
 interface NavItem {
@@ -53,6 +54,13 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
       path: '/incidents',
       icon: AlertTriangle,
       badge: { count: 8 }
+    },
+    {
+      name: 'Field Operations PWA',
+      path: '/field',
+      icon: Radio,
+      badge: { count: 'PWA' },
+      matchPrefix: true
     },
     {
       name: 'Alerts & Emergency Response',
@@ -129,13 +137,32 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
         })}
       </div>
 
-      {/* Regional Branding Card (Consistent across all pages) */}
-      <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg text-center space-y-1">
-        <div className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">
-          North Eastern Council
-        </div>
-        <div className="text-[9.5px] text-slate-500">
-          8 States • Central Command Node
+      {/* Field App Launcher & Regional Branding */}
+      <div className="space-y-2 pt-2 border-t border-slate-100">
+        <a
+          href="https://ner-logix-field-operation-app.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-blue-50/80 hover:bg-blue-100/90 border border-blue-200/80 p-2 rounded-lg text-left flex items-center justify-between transition-colors group cursor-pointer block"
+          title="Open Standalone Field App in a new window"
+        >
+          <div className="flex items-center gap-2">
+            <Radio className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-[10.5px] font-bold text-blue-900 leading-tight">Field App (PWA)</div>
+              <div className="text-[9px] text-blue-600 leading-tight">Direct Standalone App</div>
+            </div>
+          </div>
+          <ExternalLink className="w-3.5 h-3.5 text-blue-500 group-hover:text-blue-700 shrink-0" />
+        </a>
+
+        <div className="bg-slate-50 border border-slate-200 p-2 rounded-lg text-center space-y-0.5">
+          <div className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+            North Eastern Council
+          </div>
+          <div className="text-[9px] text-slate-500">
+            8 States • Central Command Node
+          </div>
         </div>
       </div>
     </aside>

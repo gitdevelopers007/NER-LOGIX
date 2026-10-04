@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { LanguageSelector } from '../features/language/LanguageSelector';
-import { Shield, Wifi, WifiOff, SlidersHorizontal, ArrowLeft } from 'lucide-react';
+import { Shield, Wifi, WifiOff, SlidersHorizontal, ArrowLeft, ExternalLink } from 'lucide-react';
 
 interface HeaderProps {
   onOpenDemo: () => void;
@@ -72,6 +72,18 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Language Switcher */}
           <LanguageSelector compact={true} />
+
+          {/* Standalone App Direct Launcher */}
+          <a
+            href="https://ner-logix-field-operation-app.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Standalone Field App in new tab"
+            aria-label="Open Standalone Field App"
+            className="p-1.5 bg-gov-800 hover:bg-gov-700 active:bg-gov-600 rounded-lg text-slate-300 hover:text-white border border-gov-700 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4 text-sky-400" />
+          </a>
 
           {/* Demo Controls Button */}
           <button

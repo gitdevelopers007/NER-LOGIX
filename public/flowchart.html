@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NER-LOGIX Implementation Flowchart (SIH 2026)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #ffffff; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="p-8 flex flex-col items-center justify-center min-h-screen bg-slate-50">
+
+  <!-- Flowchart Container (Optimized for 16:9 Slide Screenshot) -->
+  <div class="w-full max-w-6xl bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 font-mono">SIH 2026 • Problem Statement #26002</span>
+        <h2 class="text-xl font-extrabold text-slate-900">NER-LOGIX: End-to-End Implementation Flow</h2>
+      </div>
+      <div class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-mono font-bold rounded-full">
+        Working Prototype Pipeline
+      </div>
+    </div>
+
+    <!-- The 5-Step Process Flow -->
+    <div class="grid grid-cols-12 gap-3 items-stretch">
+      
+      <!-- STEP 1 -->
+      <div class="col-span-2 flex flex-col bg-sky-50 border-2 border-sky-300 rounded-xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="flex items-center gap-1.5 mb-2">
+          <span class="w-5 h-5 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+          <span class="text-xs font-bold text-sky-950 uppercase tracking-tight">Ingest Live Data</span>
+        </div>
+        <div class="text-[11px] text-slate-600 space-y-1 flex-1">
+          <p>• <strong>ISRO MOSDAC</strong> radar</p>
+          <p>• <strong>NESAC NERDDR</strong> hazard</p>
+          <p>• <strong>BRO Radio</strong> telemetry</p>
+          <p>• <strong>Ground PWA</strong> fixes</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-sky-200 text-[10px] font-mono font-semibold text-sky-800">
+          GIS Multi-Feed
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="col-span-1 flex items-center justify-center">
+        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="col-span-2 flex flex-col bg-blue-50 border-2 border-blue-300 rounded-xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="flex items-center gap-1.5 mb-2">
+          <span class="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">2</span>
+          <span class="text-xs font-bold text-blue-950 uppercase tracking-tight">Process &amp; Compress</span>
+        </div>
+        <div class="text-[11px] text-slate-600 space-y-1 flex-1">
+          <p>• <strong>Canvas Re-encode</strong></p>
+          <p>• <strong>3.5MB → 38KB</strong> (98.9%)</p>
+          <p>• <strong>2G Link</strong> (~12 KB/m)</p>
+          <p>• <strong>IndexedDB</strong> offline hold</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-blue-200 text-[10px] font-mono font-semibold text-blue-800">
+          Edge Adaptive
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="col-span-1 flex items-center justify-center">
+        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="col-span-2 flex flex-col bg-amber-50 border-2 border-amber-300 rounded-xl p-3 shadow-sm hover:shadow-md transition-all">
+        <div class="flex items-center gap-1.5 mb-2">
+          <span class="w-5 h-5 rounded-full bg-amber-600 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+          <span class="text-xs font-bold text-amber-950 uppercase tracking-tight">Store &amp; Sync</span>
+        </div>
+        <div class="text-[11px] text-slate-600 space-y-1 flex-1">
+          <p>• <strong>Dual-Tier DB:</strong> SQLite</p>
+          <p>• <strong>Auto-sync</strong> on signal</p>
+          <p>• <strong>Audit logs</strong> &amp; versions</p>
+          <p>• <strong>Zero data loss</strong></p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-amber-200 text-[10px] font-mono font-semibold text-amber-800">
+          Offline Durability
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="col-span-1 flex items-center justify-center">
+        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </div>
+
+      <!-- STEP 4: TRIAGE & BRANCHING -->
+      <div class="col-span-3 flex flex-col space-y-2 justify-center">
+        <!-- True Branch -->
+        <div class="p-2.5 bg-emerald-50 border-2 border-emerald-400 rounded-xl">
+          <div class="flex items-center justify-between text-[11px] font-bold text-emerald-900 mb-1">
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              IF VERIFIED (True)
+            </span>
+            <span class="text-[9px] font-mono bg-emerald-200 px-1.5 py-0.5 rounded text-emerald-800">98% Conf.</span>
+          </div>
+          <p class="text-[10.5px] text-emerald-800 leading-tight">
+            • Instant alert to SDMA &amp; BRO<br>
+            • Calculate safe detour (NH-27 bypass)<br>
+            • Reroute essential medicine convoys
+          </p>
+        </div>
+
+        <!-- False Branch -->
+        <div class="p-2.5 bg-rose-50 border border-rose-300 rounded-xl">
+          <div class="flex items-center justify-between text-[11px] font-bold text-rose-900 mb-0.5">
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+              IF INVALID / SPAM
+            </span>
+            <span class="text-[9px] font-mono bg-rose-200 px-1.5 py-0.5 rounded text-rose-800">Rejected</span>
+          </div>
+          <p class="text-[10px] text-rose-700 leading-tight">
+            • Auto-discarded from live map<br>
+            • Zero false alarm dispatches
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Final SLA Footer Tracker -->
+    <div class="mt-4 p-2.5 bg-slate-900 text-white rounded-xl flex items-center justify-between font-mono text-xs">
+      <span class="text-slate-400 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        GOVERNMENT SLA ACTION-REACTION TRACKING:
+      </span>
+      <span class="text-amber-400 font-bold">Reported (0m) ➔ Acknowledged (2m) ➔ Dispatched (6m) ➔ Verified (9m) ➔ Road Cleared (Avg &lt;15m)</span>
+    </div>
+  </div>
+
+</body>
+</html>
