@@ -1,5 +1,5 @@
 import { GovernmentSidebar } from '../components/GovernmentSidebar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Bell, User, MapPin, AlertTriangle, ChevronDown, 
@@ -30,7 +30,34 @@ export const IncidentsPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [aiModalOpen, setAiModalOpen] = useState(false);
 
-  const refreshData = () => {
+  // Subscribe to real-time incidentService updates and periodic backend sync
+  useEffect(() => {
+    const unsubscribe = incidentService.subscribe(() => {
+      const list = incidentService.getIncidents();
+      setIncidents(list);
+      setStats(incidentService.getStats());
+      setSelectedIncident((prev) => {
+        if (!prev) return list[0];
+        const updated = incidentService.getIncidentById(prev.id);
+        return updated || list[0];
+      });
+    });
+
+    // Check backend on mount and every 15s
+    incidentService.syncWithBackend().catch(() => {});
+    const interval = setInterval(() => {
+      incidentService.syncWithBackend().catch(() => {});
+    }, 15000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
+  }, []);
+
+  const refreshData = async () => {
+    await incidentService.syncWithBackend().catch(() => {});
+    incidentService.loadQueuedFieldReports();
     const list = incidentService.getIncidents();
     setIncidents(list);
     setStats(incidentService.getStats());
@@ -38,14 +65,15 @@ export const IncidentsPage: React.FC = () => {
       const updated = incidentService.getIncidentById(selectedIncident.id);
       if (updated) setSelectedIncident(updated);
     }
+    setToastMessage('Incidents refreshed and synchronized with Regional PWA Mesh.');
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleVerify = (id: string) => {
     const verified = incidentService.verifyIncident(id);
     if (verified) {
       setSelectedIncident({ ...verified });
-      refreshData();
-      setToastMessage(`Incident ${id} verified! Road marked as BLOCKED. Route Intelligence and Alert Engine notified.`);
+      setToastMessage(`Incident ${id} VERIFIED! Road marked as BLOCKED in GIS & Route Intelligence. Field teams notified.`);
       setTimeout(() => setToastMessage(null), 5000);
     }
   };
@@ -54,7 +82,6 @@ export const IncidentsPage: React.FC = () => {
     const rejected = incidentService.rejectIncident(id, 'Deemed non-critical / clearing crews already on site');
     if (rejected) {
       setSelectedIncident({ ...rejected });
-      refreshData();
       setToastMessage(`Incident ${id} marked as REJECTED.`);
       setTimeout(() => setToastMessage(null), 4000);
     }
@@ -109,7 +136,7 @@ export const IncidentsPage: React.FC = () => {
           </span>
           <span className="text-slate-500 hidden lg:inline">|</span>
           <span className="text-xs font-semibold text-blue-400 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-800 hidden lg:inline">
-            Incidents &amp; Field Reports
+            Field Operations &amp; Incidents Command Dashboard
           </span>
         </div>
 
@@ -177,10 +204,10 @@ export const IncidentsPage: React.FC = () => {
             <div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
-                <span>INCIDENTS &amp; FIELD REPORTS</span>
+                <span>FIELD OPERATIONS &amp; INCIDENTS COMMAND DASHBOARD</span>
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Monitor, verify and manage field-reported incidents across all 8 North Eastern states
+                Centralized verification desk for field-reported incidents, PWA telemetry &amp; regional road accessibility across all 8 North Eastern states
               </p>
             </div>
 

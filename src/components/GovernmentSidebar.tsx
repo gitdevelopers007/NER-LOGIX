@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, MapPin, Share2, Truck, AlertTriangle, 
   Bell, BarChart3, Database, Settings, Bot,
   Radio, ExternalLink 
 } from 'lucide-react';
+import { incidentService } from '../services/incidentService';
 
 interface NavItem {
   name: string;
@@ -20,6 +21,14 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = activeOverride || location.pathname;
+  const [stats, setStats] = useState(incidentService.getStats());
+
+  useEffect(() => {
+    const unsubscribe = incidentService.subscribe(() => {
+      setStats(incidentService.getStats());
+    });
+    return unsubscribe;
+  }, []);
 
   const navItems: NavItem[] = [
     {
@@ -50,17 +59,10 @@ export const GovernmentSidebar: React.FC<{ activeOverride?: string }> = ({ activ
       matchPrefix: true
     },
     {
-      name: 'Incidents & Field Reports',
+      name: 'Field Operations & Incidents',
       path: '/incidents',
       icon: AlertTriangle,
-      badge: { count: 8 }
-    },
-    {
-      name: 'Field Operations PWA',
-      path: '/field',
-      icon: Radio,
-      badge: { count: 'PWA' },
-      matchPrefix: true
+      badge: { count: stats.pendingVerification }
     },
     {
       name: 'Alerts & Emergency Response',

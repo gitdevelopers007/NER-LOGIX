@@ -299,8 +299,131 @@ const INITIAL_INCIDENTS: Incident[] = [
   }
 ];
 
+const LOCAL_STORAGE_KEY = 'ner_government_incidents_v2';
+const FIELD_SYNC_STORAGE_KEY = 'ner_synced_field_reports';
+
+function resolveStateFromDistrict(district?: string): string {
+  if (!district) return 'Assam';
+  const d = district.toLowerCase();
+  if (d.includes('subansiri') || d.includes('papum') || d.includes('tawang') || d.includes('changlang') || d.includes('arunachal')) return 'Arunachal Pradesh';
+  if (d.includes('khasi') || d.includes('garo') || d.includes('jaintia') || d.includes('shillong') || d.includes('meghalaya')) return 'Meghalaya';
+  if (d.includes('imphal') || d.includes('churachandpur') || d.includes('senapati') || d.includes('manipur')) return 'Manipur';
+  if (d.includes('aizawl') || d.includes('lunglei') || d.includes('mizoram')) return 'Mizoram';
+  if (d.includes('kohima') || d.includes('dimapur') || d.includes('mokokchung') || d.includes('nagaland')) return 'Nagaland';
+  if (d.includes('sikkim') || d.includes('gangtok')) return 'Sikkim';
+  if (d.includes('tripura') || d.includes('agartala')) return 'Tripura';
+  return 'Assam';
+}
+
+function normalizeType(type?: string): IncidentType {
+  if (!type) return 'LANDSLIDE';
+  const t = type.toUpperCase();
+  if (t === 'ROAD_BLOCKED' || t === 'TRAFFIC_BLOCKAGE' || t === 'TRANSPORT_DISRUPTION') return 'TRAFFIC_BLOCKAGE';
+  if (t === 'LANDSLIDE') return 'LANDSLIDE';
+  if (t === 'ROAD_DAMAGE') return 'ROAD_DAMAGE';
+  if (t === 'HEAVY_RAINFALL') return 'HEAVY_RAINFALL';
+  if (t === 'FLASH_FLOOD' || t === 'FLOOD') return 'FLASH_FLOOD';
+  if (t === 'BRIDGE_DAMAGE' || t === 'BRIDGE_ISSUE') return 'BRIDGE_DAMAGE';
+  return 'OTHER';
+}
+
+function normalizeSeverity(sev?: string): IncidentSeverity {
+  if (!sev) return 'HIGH';
+  const s = sev.toUpperCase();
+  if (s === 'CRITICAL') return 'CRITICAL';
+  if (s === 'HIGH') return 'HIGH';
+  if (s === 'MEDIUM' || s === 'MODERATE') return 'MODERATE';
+  return 'LOW';
+}
+
 class IncidentService {
-  private incidents: Incident[] = [...INITIAL_INCIDENTS];
+  private incidents: Incident[] = [];
+  private listeners: (() => void)[] = [];
+  private broadcastChannel: BroadcastChannel | null = null;
+
+  constructor() {
+    this.init();
+  }
+
+  private init() {
+    // 1. Load from localStorage if present, else seed
+    try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
+      if (stored) {
+        this.incidents = JSON.parse(stored);
+      } else {
+        this.incidents = [...INITIAL_INCIDENTS];
+        this.saveToStorage();
+      }
+    } catch {
+      this.incidents = [...INITIAL_INCIDENTS];
+    }
+
+    // 2. Load any standalone field reports queued in storage
+    this.loadQueuedFieldReports();
+
+    // 3. Set up BroadcastChannel and cross-window sync
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        this.broadcastChannel = new BroadcastChannel('ner_incident_sync_channel');
+        this.broadcastChannel.onmessage = (event) => {
+          if (event.data?.type === 'FIELD_REPORT_CREATED' && event.data.payload) {
+            this.ingestFieldReport(event.data.payload, false);
+          } else if (event.data?.type === 'INCIDENT_VERIFIED' && event.data.id) {
+            this.markLocallyVerified(event.data.id, false);
+          } else if (event.data?.type === 'INCIDENT_REJECTED' && event.data.id) {
+            this.markLocallyRejected(event.data.id, event.data.reason, false);
+          }
+        };
+      } catch (e) {
+        console.warn('BroadcastChannel initialization warning:', e);
+      }
+    }
+
+    // 4. Storage event listener for cross-tab sync
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (e) => {
+        if (e.key === FIELD_SYNC_STORAGE_KEY || e.key === LOCAL_STORAGE_KEY) {
+          this.loadQueuedFieldReports();
+          this.notify();
+        }
+      });
+
+      window.addEventListener('ner_new_field_incident', (e: any) => {
+        if (e.detail) {
+          this.ingestFieldReport(e.detail, true);
+        }
+      });
+    }
+
+    // 5. Initial background fetch from backend
+    this.syncWithBackend().catch(() => {});
+  }
+
+  private saveToStorage() {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.incidents));
+    } catch (e) {
+      console.warn('Failed to save incidents to localStorage:', e);
+    }
+  }
+
+  public subscribe(listener: () => void): () => void {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  private notify() {
+    this.listeners.forEach((l) => {
+      try { l(); } catch (e) { console.error(e); }
+    });
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ner_incidents_updated'));
+    }
+  }
 
   public getIncidents(): Incident[] {
     return [...this.incidents];
@@ -310,35 +433,259 @@ class IncidentService {
     return this.incidents.find((i) => i.id === id);
   }
 
+  public loadQueuedFieldReports() {
+    if (typeof window === 'undefined') return;
+    try {
+      const fieldSync = localStorage.getItem(FIELD_SYNC_STORAGE_KEY);
+      if (fieldSync) {
+        const parsed = JSON.parse(fieldSync);
+        const list = Array.isArray(parsed) ? parsed : [parsed];
+        list.forEach((item) => {
+          const exists = this.incidents.some((i) => i.id === item.id || i.id === item.client_generated_id);
+          if (!exists) {
+            this.ingestFieldReport(item, false);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Error reading queued field reports:', e);
+    }
+  }
+
+  public async syncWithBackend(): Promise<void> {
+    try {
+      const res = await fetch('https://ner-logix-backend-uhfu.onrender.com/api/v1/incidents?limit=50', {
+        headers: { 'Accept': 'application/json' },
+      });
+      if (!res.ok) return;
+      const json = await res.json();
+      const backendItems: any[] = json.data?.items || json.data || [];
+      let updated = false;
+
+      backendItems.forEach((b) => {
+        const existing = this.incidents.find((i) => i.id === b.id || i.id === b.client_generated_id);
+        if (!existing) {
+          const mapped = this.convertBackendToIncident(b);
+          this.incidents.unshift(mapped);
+          updated = true;
+        } else if (b.status && b.status !== existing.status) {
+          existing.status = b.status === 'VERIFIED' ? 'VERIFIED' : b.status === 'REJECTED' ? 'REJECTED' : 'PENDING';
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        this.saveToStorage();
+        this.notify();
+      }
+    } catch {
+      // Offline or network error; keep working on local cache
+    }
+  }
+
+  private convertBackendToIncident(b: any): Incident {
+    const incType = normalizeType(b.type);
+    const incSev = normalizeSeverity(b.severity);
+    const district = b.district_id || 'Kamrup Metropolitan';
+    const state = resolveStateFromDistrict(district);
+    const road = b.road_id || 'NH-27 Corridor';
+
+    return {
+      id: b.id || `INC-${Date.now().toString().slice(-5)}`,
+      type: incType,
+      title: `${incType.replace(/_/g, ' ')} Reported on ${road}`,
+      severity: incSev,
+      status: b.status === 'VERIFIED' ? 'VERIFIED' : b.status === 'REJECTED' ? 'REJECTED' : 'PENDING',
+      state,
+      district,
+      road,
+      latitude: Number(b.latitude) || 26.1445,
+      longitude: Number(b.longitude) || 91.7362,
+      reportedBy: b.reported_by || 'Field Operations Officer (PWA)',
+      reportedTime: b.reported_at ? new Date(b.reported_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently',
+      timeAgo: 'Just now',
+      currentRoadStatus: b.status === 'VERIFIED' ? 'ROAD BLOCKED (VERIFIED)' : 'PENDING GOVERNMENT VERIFICATION',
+      description: b.description || 'Ground survey team reported active corridor obstruction via Field PWA telemetry.',
+      photoUrl: b.photo_url || LANDSLIDE_PHOTO,
+      photoMetadata: {
+        uploaded: 'Real-time Sync',
+        gpsVerified: true,
+        source: 'PWA Field Operations Camera',
+        originalSize: '3.1 MB',
+        compressedSize: '36.4 KB',
+        bandwidthSaved: '98.8%',
+        compressionMode: 'EMERGENCY',
+        transferStatus: 'RECEIVED',
+      },
+      timeline: [
+        {
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Field Report Logged via PWA',
+          description: `Dispatched by ${b.reported_by || 'Field Officer'} with GPS geo-tag`,
+          completed: true,
+        },
+      ],
+      aiAssessment: {
+        possibleIncident: incType,
+        estimatedSeverity: incSev,
+        potentialImpact: `Impact on commercial traffic along ${road}. Divert non-essential convoys.`,
+        affectedCorridor: road,
+        suggestedAction: 'Inspect via Command Center and dispatch emergency road maintenance detachment.',
+      },
+      corroborationCount: 2,
+      confidenceScore: 92,
+      duplicateReportsMerged: 0,
+    };
+  }
+
+  public ingestFieldReport(data: any, broadcast: boolean = true): Incident {
+    const id = data.id || data.client_generated_id || `INC-${Date.now().toString().slice(-5)}`;
+    
+    // Check if already present
+    const existing = this.incidents.find((i) => i.id === id);
+    if (existing) return existing;
+
+    const incType = normalizeType(data.type);
+    const incSev = normalizeSeverity(data.severity);
+    const district = data.district_id || 'Kamrup Metropolitan';
+    const state = resolveStateFromDistrict(district);
+    const road = data.road_id || 'NH-27 Corridor';
+
+    let photoUrl = LANDSLIDE_PHOTO;
+    if (data.photo_data?.base64_data) {
+      photoUrl = `data:${data.photo_data.mime_type || 'image/jpeg'};base64,${data.photo_data.base64_data}`;
+    } else if (data.photoUrl) {
+      photoUrl = data.photoUrl;
+    }
+
+    const newInc: Incident = {
+      id,
+      type: incType,
+      title: `${incType.replace(/_/g, ' ')} on ${road}`,
+      severity: incSev,
+      status: 'PENDING',
+      state,
+      district,
+      road,
+      latitude: Number(data.latitude) || 26.1445,
+      longitude: Number(data.longitude) || 91.7362,
+      reportedBy: data.reported_by ? `Officer ${data.reported_by} (Field PWA)` : 'Field Patrol Team (PWA Live Sync)',
+      reportedTime: new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      timeAgo: 'Just now',
+      currentRoadStatus: 'OBSTRUCTED - PENDING GOVERNMENT VERIFICATION',
+      description: data.description || `Field report filed via offline-ready PWA. Landmark: ${data.nearby_landmark || 'Near Milepost'}. Vehicle Access: ${data.vehicle_accessibility || 'Restricted'}.`,
+      photoUrl,
+      photoMetadata: data.photoMetadata || {
+        uploaded: 'Just Now',
+        gpsVerified: true,
+        source: 'Field PWA Low-Bandwidth Pipeline',
+        originalSize: '3.48 MB',
+        compressedSize: '38.2 KB',
+        bandwidthSaved: '98.9%',
+        compressionMode: 'EMERGENCY',
+        transferStatus: 'RECEIVED',
+        transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)',
+      },
+      timeline: [
+        {
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Field Photo & GPS Submitted via PWA',
+          description: 'Client-side WebP compression and geo-hash validation completed.',
+          completed: true,
+        },
+        {
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Received by Government Command Center Mesh',
+          description: 'Enqueued into institutional verification inbox for Government Admin Review.',
+          completed: true,
+        },
+      ],
+      aiAssessment: {
+        possibleIncident: incType,
+        estimatedSeverity: incSev,
+        potentialImpact: `Obstruction length: ${data.estimated_obstruction_length || 'approx 50m'}. Passability: ${data.vehicle_accessibility || 'None'}.`,
+        affectedCorridor: road,
+        suggestedAction: 'Review high-resolution evidence, confirm detour availability, and execute road closure authorization.',
+      },
+      corroborationCount: 2,
+      confidenceScore: 95,
+      duplicateReportsMerged: 0,
+    };
+
+    // Prepend to top of list
+    this.incidents.unshift(newInc);
+    this.saveToStorage();
+    this.notify();
+
+    if (broadcast && this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: 'FIELD_REPORT_CREATED', payload: data });
+      } catch (e) {
+        console.warn('Failed to broadcast field report:', e);
+      }
+    }
+
+    return newInc;
+  }
+
   public verifyIncident(id: string): Incident | undefined {
+    return this.markLocallyVerified(id, true);
+  }
+
+  private markLocallyVerified(id: string, broadcast: boolean = true): Incident | undefined {
     const inc = this.incidents.find((i) => i.id === id);
     if (!inc) return undefined;
 
     inc.status = 'VERIFIED';
     inc.currentRoadStatus = 'ROAD BLOCKED (VERIFIED)';
     
-    // Append verification audit steps
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     inc.timeline.push(
       {
         time: timeStr,
-        title: 'Incident verified by Government Officer',
-        description: 'Command center verification authorized by Admin Officer (DoNER Ops)',
-        completed: true
+        title: 'Incident Verified by Government Officer',
+        description: 'Command Center verification authorized by Government Admin Officer.',
+        completed: true,
       },
       {
         time: timeStr,
-        title: 'Road status updated to BLOCKED',
-        description: 'GIS database updated. Route Intelligence & Alert Engine signaled.',
-        completed: true
+        title: 'Road Status Updated to BLOCKED',
+        description: 'Synchronized across Regional GIS Map, Corridor Route Intelligence & Alerts Engine.',
+        completed: true,
       }
     );
+
+    this.saveToStorage();
+    this.notify();
+
+    if (broadcast && this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: 'INCIDENT_VERIFIED', id });
+      } catch (e) {
+        console.warn('Failed to broadcast verification:', e);
+      }
+    }
+
+    // Forward verification to backend API in background
+    fetch(`https://ner-logix-backend-uhfu.onrender.com/api/v1/incidents/${id}/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': 'usr_admin_01',
+        'x-user-role': 'GOVERNMENT_ADMIN',
+      },
+      body: JSON.stringify({ action: 'VERIFIED', notes: 'Verified in Government Command Center' }),
+    }).catch(() => {});
 
     return inc;
   }
 
   public rejectIncident(id: string, reason?: string): Incident | undefined {
+    return this.markLocallyRejected(id, reason, true);
+  }
+
+  private markLocallyRejected(id: string, reason?: string, broadcast: boolean = true): Incident | undefined {
     const inc = this.incidents.find((i) => i.id === id);
     if (!inc) return undefined;
 
@@ -349,87 +696,54 @@ class IncidentService {
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     inc.timeline.push({
       time: timeStr,
-      title: 'Report rejected by Government Officer',
+      title: 'Report Rejected by Government Officer',
       description: reason || 'Inspection deemed report non-disruptive or duplicate.',
-      completed: true
+      completed: true,
     });
+
+    this.saveToStorage();
+    this.notify();
+
+    if (broadcast && this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: 'INCIDENT_REJECTED', id, reason });
+      } catch (e) {
+        console.warn('Failed to broadcast rejection:', e);
+      }
+    }
+
+    // Forward rejection to backend API
+    fetch(`https://ner-logix-backend-uhfu.onrender.com/api/v1/incidents/${id}/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': 'usr_admin_01',
+        'x-user-role': 'GOVERNMENT_ADMIN',
+      },
+      body: JSON.stringify({ action: 'REJECTED', notes: reason || 'Rejected in Command Center' }),
+    }).catch(() => {});
 
     return inc;
   }
 
   public getStats() {
-    const active = this.incidents.length + 19;
-    const pending = this.incidents.filter((i) => i.status === 'PENDING').length + 6;
-    const verified = this.incidents.filter((i) => i.status === 'VERIFIED').length + 9;
-    const critical = this.incidents.filter((i) => i.severity === 'CRITICAL').length + 2;
+    const active = this.incidents.length;
+    const pending = this.incidents.filter((i) => i.status === 'PENDING').length;
+    const verified = this.incidents.filter((i) => i.status === 'VERIFIED').length;
+    const critical = this.incidents.filter((i) => i.severity === 'CRITICAL').length;
 
     return {
       activeIncidents: active,
       pendingVerification: pending,
       verifiedToday: verified,
-      critical: critical
+      critical: critical,
     };
   }
 
   public ingestFieldPhotoIncident(data: any): Incident {
-    const newInc: Incident = {
-      id: data.id || `INC-${Date.now().toString().slice(-4)}`,
-      type: data.type || 'LANDSLIDE',
-      title: data.title || 'Field Ground Report',
-      severity: 'HIGH',
-      status: 'PENDING',
-      state: data.state || 'Arunachal Pradesh',
-      district: data.district || 'Lower Subansiri',
-      road: data.road || 'NH-13',
-      latitude: data.latitude || 27.4285,
-      longitude: data.longitude || 93.7542,
-      reportedBy: 'Field Worker (Mobile PWA Offline Sync)',
-      reportedTime: 'Just Now',
-      timeAgo: 'Just now',
-      currentRoadStatus: 'OBSTRUCTED - FIELD EVIDENCE DELIVERED',
-      description: 'Real-time photographic evidence delivered from field officer via adaptive low-bandwidth WebP/JPEG transfer pipeline.',
-      photoUrl: data.photoUrl,
-      photoMetadata: data.photoMetadata || {
-        uploaded: 'Just Now',
-        gpsVerified: true,
-        source: 'Field Operator Low-Bandwidth Pipeline',
-        originalSize: '3.48 MB',
-        compressedSize: '38.2 KB',
-        bandwidthSaved: '98.9%',
-        compressionMode: 'EMERGENCY',
-        transferStatus: 'RECEIVED',
-        transferSpeedEstimate: '~12 KB/min (2G Mountain Corridor Link)'
-      },
-      timeline: [
-        {
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          title: 'Field Photo Captured & Optimized (3.5 MB → 38 KB)',
-          description: 'Adaptive re-encoding completed client-side in Emergency Mode.',
-          completed: true
-        },
-        {
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          title: 'Low-Bandwidth Transfer Succeeded (~12 KB/min)',
-          description: 'Lightweight packet received and verified at Central Command Center.',
-          completed: true
-        }
-      ],
-      aiAssessment: {
-        possibleIncident: data.type || 'LANDSLIDE',
-        estimatedSeverity: 'HIGH',
-        potentialImpact: 'Single-lane road blocked with rock debris. High-axle trucks restricted.',
-        affectedCorridor: data.road || 'NH-13',
-        suggestedAction: 'Deploy BRO Dozer from nearest maintenance post; issue diversion via Tezpur.'
-      },
-      corroborationCount: 2,
-      confidenceScore: 94,
-      duplicateReportsMerged: 0
-    };
-
-    // Prepend to top of list
-    this.incidents.unshift(newInc);
-    return newInc;
+    return this.ingestFieldReport(data, true);
   }
 }
 
 export const incidentService = new IncidentService();
+

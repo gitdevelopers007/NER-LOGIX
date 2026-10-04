@@ -12,6 +12,7 @@ import {
   enqueueSyncReport,
 } from '../services/indexedDb';
 import { api } from '../services/api';
+import { incidentService } from '../../services/incidentService';
 import {
   IncidentType,
   IncidentSeverity,
@@ -158,6 +159,15 @@ export const ReportIncident: React.FC = () => {
         : undefined,
       is_demo: !position.isRealDeviceGps,
     };
+
+    // Immediately ingest into Government Command Center Incident Service & Broadcast Mesh
+    try {
+      incidentService.ingestFieldReport(payload, true);
+      const existing = JSON.parse(localStorage.getItem('ner_synced_field_reports') || '[]');
+      localStorage.setItem('ner_synced_field_reports', JSON.stringify([payload, ...existing.slice(0, 50)]));
+    } catch (e) {
+      console.warn('Command center sync notice:', e);
+    }
 
     try {
       // Check offline status
