@@ -1,11 +1,12 @@
 import React from 'react';
-import type { IncidentStatus, IncidentSeverity } from '../types/incident';
-import type { AlertSeverity } from '../types/alert';
+import { IncidentStatus, IncidentSeverity } from '../types/incident';
+import { AlertSeverity } from '../types/alert';
 import { useLanguage } from '../features/language/LanguageContext';
 import {
   CheckCircle2,
   Clock,
   RefreshCw,
+  AlertTriangle,
   XCircle,
   ShieldCheck,
   Radio,

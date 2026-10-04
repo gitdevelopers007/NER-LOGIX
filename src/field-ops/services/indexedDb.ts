@@ -1,7 +1,6 @@
-import { openDB } from "idb";
-import type { DBSchema, IDBPDatabase } from "idb";
-import type { Incident, IncidentCreatePayload } from "../types/incident";
-import type { SyncQueueItem } from "../types/sync";
+import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { Incident, IncidentCreatePayload } from '../types/incident';
+import { SyncQueueItem } from '../types/sync';
 
 interface FieldDB extends DBSchema {
   incidents: {

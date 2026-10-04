@@ -1,4 +1,5 @@
-import type { Alert } from "../types/alert";
+import { Alert } from '../types/alert';
+import { getApiBaseUrl } from './api';
 
 export type AlertEventHandler = (alert: Alert) => void;
 
@@ -15,7 +16,17 @@ class WebSocketService {
     }
 
     this.isExplicitlyClosed = false;
-    const wsBase = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/alerts';
+    let wsBase = import.meta.env.VITE_WS_URL;
+    if (!wsBase) {
+      const apiBase = getApiBaseUrl();
+      if (apiBase.startsWith('https://')) {
+        wsBase = apiBase.replace('https://', 'wss://').replace(/\/api\/v1\/?$/, '/ws/alerts');
+      } else if (apiBase.startsWith('http://')) {
+        wsBase = apiBase.replace('http://', 'ws://').replace(/\/api\/v1\/?$/, '/ws/alerts');
+      } else {
+        wsBase = 'ws://localhost:8000/ws/alerts';
+      }
+    }
     const role = localStorage.getItem('demo_user_role') || 'FIELD_OFFICER';
     const district = localStorage.getItem('demo_user_district') || '';
 

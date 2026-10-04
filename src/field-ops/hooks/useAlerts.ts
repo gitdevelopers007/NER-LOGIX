@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { wsService } from '../services/websocket';
-import type { Alert } from '../types/alert';
+import { Alert } from '../types/alert';
 
 export const useAlerts = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
-import { getCurrentGpsPosition } from '../services/geolocation';
-import type { GeoLocationResult, GeoLocationError } from '../services/geolocation';
+import { getCurrentGpsPosition, GeoLocationResult, GeoLocationError } from '../services/geolocation';
 
 export const useGeolocation = () => {
   const [position, setPosition] = useState<GeoLocationResult | null>(null);

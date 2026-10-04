@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../features/language/LanguageContext';
 import { useAlerts } from '../hooks/useAlerts';
+import { Alert, AlertSeverity } from '../types/alert';
 import { SeverityBadge } from '../components/StatusBadge';
-import { formatRelativeTime } from '../utils/formatters';
+import { formatRelativeTime, formatCoordinates } from '../utils/formatters';
 import {
   Bell,
-  
+  AlertTriangle,
   CheckCircle2,
   MapPin,
-  
-  
-    Check,
-  
+  Clock,
+  Radio,
+  Filter,
+  Check,
+  ShieldAlert,
 } from 'lucide-react';
 
 export const FieldAlerts: React.FC = () => {
   const { t } = useLanguage();
-  const { alerts, loading, acknowledgeAlert } = useAlerts();
+  const { alerts, loading, acknowledgeAlert, refreshAlerts } = useAlerts();
   const [severityFilter, setSeverityFilter] = useState<string>('ALL');
   const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
 

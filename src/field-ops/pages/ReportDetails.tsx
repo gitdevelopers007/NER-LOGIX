@@ -3,17 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../features/language/LanguageContext';
 import { getLocalIncident } from '../services/indexedDb';
 import { api, API_BASE_URL } from '../services/api';
-import type { Incident } from "../types/incident";
+import { Incident } from '../types/incident';
 import { StatusBadge, SeverityBadge } from '../components/StatusBadge';
 import { FieldLocationMap } from '../components/MapLibreViewer';
 import { formatCoordinates, formatDate } from '../utils/formatters';
 import {
   ArrowLeft,
+  MapPin,
+  Clock,
   ShieldCheck,
   CheckCircle2,
   XCircle,
+  FileText,
   Camera,
-  } from 'lucide-react';
+  Info,
+} from 'lucide-react';
 
 export const ReportDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -222,7 +226,7 @@ export const ReportDetails: React.FC = () => {
                 src={
                   incident.photos[0].photo_url.startsWith('http')
                     ? incident.photos[0].photo_url
-                    : `${API_BASE_URL.replace('/api/v1', '')}${incident.photos[0].photo_url}`
+                    : `${api.getBaseUrl().replace('/api/v1', '')}${incident.photos[0].photo_url}`
                 }
                 alt="Field photograph"
                 className="w-full max-h-72 object-cover"

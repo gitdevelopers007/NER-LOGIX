@@ -6,6 +6,7 @@ import {
   setAppState,
   removeSyncedItem,
 } from './indexedDb';
+import { SyncQueueItem } from '../types/sync';
 
 export type SyncStateCallback = (syncing: boolean, count: number) => void;
 

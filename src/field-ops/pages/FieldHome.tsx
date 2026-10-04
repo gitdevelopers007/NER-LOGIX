@@ -7,9 +7,9 @@ import { useAlerts } from '../hooks/useAlerts';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { getAllLocalIncidents } from '../services/indexedDb';
 import { api } from '../services/api';
-import type { Incident } from "../types/incident";
+import { Incident } from '../types/incident';
 import { StatusBadge, SeverityBadge } from '../components/StatusBadge';
-import { formatRelativeTime } from '../utils/formatters';
+import { formatRelativeTime, formatCoordinates } from '../utils/formatters';
 import {
   Navigation,
   Wifi,
@@ -18,7 +18,9 @@ import {
   PlusCircle,
   AlertTriangle,
   MapPin,
+  Clock,
   ChevronRight,
+  Shield,
   Layers,
 } from 'lucide-react';
 
@@ -26,7 +28,7 @@ export const FieldHome: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { isOnline } = useNetworkStatus();
-  const { pendingCount, lastSyncedAt, isSyncing } = useSyncQueue();
+  const { pendingCount, lastSyncedAt, triggerSync, isSyncing } = useSyncQueue();
   const { alerts } = useAlerts();
   const { position, captureGps, loading: gpsLoading } = useGeolocation();
 

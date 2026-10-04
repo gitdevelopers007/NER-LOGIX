@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   AlertOctagon,
   ArrowLeft,
+  ShieldCheck,
+  Layers,
   Info,
 } from 'lucide-react';
 
@@ -19,7 +21,7 @@ export const SyncQueue: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { items, pendingCount, isSyncing, lastSyncedAt, triggerSync } = useSyncQueue();
-  const { isOnline } = useNetworkStatus();
+  const { isOnline, isSimulatedOffline, toggleSimulatedOffline } = useNetworkStatus();
 
   return (
     <div className="space-y-4 pb-24">

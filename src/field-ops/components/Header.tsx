@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { LanguageSelector } from '../features/language/LanguageSelector';
-import { Shield, Wifi, WifiOff, SlidersHorizontal, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Shield, Wifi, WifiOff, SlidersHorizontal, User } from 'lucide-react';
 
 interface HeaderProps {
   onOpenDemo: () => void;
@@ -12,8 +11,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenDemo,
-  userRole: _userRole = 'FIELD_OFFICER',
-  userName: _userName = 'R. Borah',
+  userRole = 'FIELD_OFFICER',
+  userName = 'R. Borah',
 }) => {
   const { isOnline } = useNetworkStatus();
 
@@ -21,22 +20,15 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="bg-gov-900 text-white sticky top-0 z-40 shadow-md border-b border-gov-800">
       <div className="max-w-md mx-auto px-4 py-2.5 flex items-center justify-between">
         {/* Logo & National/Gov Identification */}
-        <div className="flex items-center space-x-2">
-          <Link
-            to="/access-portal"
-            title="Return to Access Portal"
-            className="p-1 -ml-1 text-slate-400 hover:text-white hover:bg-gov-800 rounded transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
+        <div className="flex items-center space-x-2.5">
           <div className="w-8 h-8 rounded-lg bg-blue-700 flex items-center justify-center shadow-inner border border-blue-500/40">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center space-x-1.5">
-              <Link to="/field" className="font-extrabold tracking-tight text-sm text-white hover:text-blue-200">
+              <span className="font-extrabold tracking-tight text-sm text-white">
                 NER-LOGIX
-              </Link>
+              </span>
               <span className="text-[10px] font-semibold bg-emerald-700/80 text-emerald-100 px-1.5 py-0.2 rounded border border-emerald-500/40 uppercase">
                 FIELD APP
               </span>
@@ -72,18 +64,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Language Switcher */}
           <LanguageSelector compact={true} />
-
-          {/* Standalone App Direct Launcher */}
-          <a
-            href="https://ner-logix-field-operation-app.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Open Standalone Field App in new tab"
-            aria-label="Open Standalone Field App"
-            className="p-1.5 bg-gov-800 hover:bg-gov-700 active:bg-gov-600 rounded-lg text-slate-300 hover:text-white border border-gov-700 transition-colors"
-          >
-            <ExternalLink className="w-4 h-4 text-sky-400" />
-          </a>
 
           {/* Demo Controls Button */}
           <button

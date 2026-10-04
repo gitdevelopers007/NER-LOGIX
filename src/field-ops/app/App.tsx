@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from '../features/language/LanguageContext';
 import { Layout } from './Layout';
 import { FieldHome } from '../pages/FieldHome';
@@ -12,7 +12,7 @@ import { FieldAlerts } from '../pages/FieldAlerts';
 export const App: React.FC = () => {
   return (
     <LanguageProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/field" replace />} />
@@ -24,7 +24,7 @@ export const App: React.FC = () => {
             <Route path="field/alerts" element={<FieldAlerts />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </LanguageProvider>
   );
 };

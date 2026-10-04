@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { useLanguage } from '../features/language/LanguageContext';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, AlertTriangle } from 'lucide-react';
 
 export const OfflineBanner: React.FC = () => {
   const { isOnline, isSimulatedOffline } = useNetworkStatus();

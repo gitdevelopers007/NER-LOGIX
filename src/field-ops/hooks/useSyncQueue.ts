@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllSyncItems, getAppState } from '../services/indexedDb';
 import { syncEngine } from '../services/syncService';
-import type { SyncQueueItem } from '../types/sync';
+import { SyncQueueItem } from '../types/sync';
 
 export const useSyncQueue = () => {
   const [items, setItems] = useState<SyncQueueItem[]>([]);

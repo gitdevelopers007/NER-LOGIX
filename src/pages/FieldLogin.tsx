@@ -2,141 +2,122 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Eye, EyeOff, Lock, Radio, AlertCircle, 
-  Loader2, ExternalLink, ArrowRight, Truck, MapPin, 
-  Shield, Zap
+  Loader2, ExternalLink, ArrowRight, Truck, 
+  Shield, UserCheck, Sliders, Zap
 } from 'lucide-react';
 import { GovernmentLoginHeader } from '../components/GovernmentLoginHeader';
 
-interface FieldRoleProfile {
+export interface FieldRole {
   id: string;
   title: string;
-  name: string;
-  roleCode: string;
-  email: string;
+  code: string;
+  defaultEmail: string;
   defaultPass: string;
-  unit: string;
-  sector: string;
-  clearance: string;
-  badgeColor: string;
+  description: string;
+  badgeClass: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const FIELD_ROLES: FieldRoleProfile[] = [
+export const FIELD_ROLES: FieldRole[] = [
   {
-    id: 'patrol',
-    title: 'Highway Patrol Officer',
-    name: 'Officer T. Ronya',
-    roleCode: 'FIELD_OFFICER',
-    email: 'officer.ronya@mdoner.gov.in',
-    defaultPass: 'FieldPatrol#2026',
-    unit: 'East Kameng Highway Patrol Unit 4',
-    sector: 'NH-13 Pasighat-Mariyang Corridor (Arunachal)',
-    clearance: 'Level 2 - Mountain Border Clearance',
-    badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
-    icon: Radio
+    id: 'usr_officer_01',
+    title: 'Field Officer',
+    code: 'FIELD_OFFICER',
+    defaultEmail: 'field.officer@mdoner.gov.in',
+    defaultPass: 'Officer#2026',
+    description: 'Ground reporting, GPS incident capture & live photo documentation',
+    badgeClass: 'bg-blue-100 text-blue-800 border-blue-300',
+    icon: Radio,
   },
   {
-    id: 'bro',
-    title: 'BRO Quick Reaction Unit',
-    name: 'Maj. S. Banerjee',
-    roleCode: 'BRO_COMMANDER',
-    email: 'bro.vartak@bro.nic.in',
-    defaultPass: 'BroVartak#2026',
-    unit: '753 Border Roads Task Force / Project Vartak',
-    sector: 'BCT Axis, Sela Pass & Tawang Lifeline',
-    clearance: 'Military Highway Engineering Cleared',
-    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-    icon: Shield
+    id: 'usr_operator_01',
+    title: 'Government Operator',
+    code: 'GOVERNMENT_OPERATOR',
+    defaultEmail: 'gov.operator@mdoner.gov.in',
+    defaultPass: 'Operator#2026',
+    description: 'State disaster telemetry monitor & emergency response dispatch',
+    badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    icon: Shield,
   },
   {
-    id: 'sdma',
-    title: 'SDMA Field Disaster Surveyor',
-    name: 'P. Hazarika',
-    roleCode: 'SDMA_SURVEYOR',
-    email: 'surveyor.dima@sdma.gov.in',
-    defaultPass: 'SdmaAssam#2026',
-    unit: 'Dima Hasao Disaster Rapid Assessment Squad',
-    sector: 'NH-27 Lumding-Haflong Ridge & Barak Lifeline',
-    clearance: 'Rapid Damage Assessment Level 3',
-    badgeColor: 'bg-amber-100 text-amber-800 border-amber-300',
-    icon: MapPin
+    id: 'usr_logistics_01',
+    title: 'Logistics Convoy',
+    code: 'LOGISTICS_OPERATOR',
+    defaultEmail: 'logistics.convoy@mdoner.gov.in',
+    defaultPass: 'Logistics#2026',
+    description: 'Freight corridor updates, bridge clearance & lifeline route access',
+    badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+    icon: Truck,
   },
   {
-    id: 'convoy',
-    title: 'Critical Logistics Fleet Escort',
-    name: 'R. Sangma',
-    roleCode: 'CONVOY_LEAD',
-    email: 'convoy.fci@mdoner.gov.in',
-    defaultPass: 'ConvoyFleet#2026',
-    unit: 'FCI Essential Supplies Heavy Transport Detachment',
-    sector: 'Guwahati-Shillong-Silchar Mountain Lifeline',
-    clearance: 'Hazardous Terrain Fleet Operator',
-    badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-300',
-    icon: Truck
-  }
+    id: 'usr_admin_01',
+    title: 'Government Admin',
+    code: 'GOVERNMENT_ADMIN',
+    defaultEmail: 'gov.admin@mdoner.gov.in',
+    defaultPass: 'Admin#2026',
+    description: 'Regional master control, agency administration & priority overrides',
+    badgeClass: 'bg-purple-100 text-purple-800 border-purple-300',
+    icon: UserCheck,
+  },
 ];
 
 export const FieldLogin: React.FC = () => {
   const navigate = useNavigate();
 
-  // Selected role profile
-  const [selectedRole, setSelectedRole] = useState<FieldRoleProfile>(FIELD_ROLES[0]);
-  const [officialId, setOfficialId] = useState(FIELD_ROLES[0].email);
+  // Selected role
+  const [selectedRole, setSelectedRole] = useState<FieldRole>(FIELD_ROLES[0]);
+  const [officialId, setOfficialId] = useState(FIELD_ROLES[0].defaultEmail);
   const [password, setPassword] = useState(FIELD_ROLES[0].defaultPass);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ officialId?: string; password?: string; general?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
 
   // Switch role handler
-  const handleSelectRole = (role: FieldRoleProfile) => {
+  const handleSelectRole = (role: FieldRole) => {
     setSelectedRole(role);
-    setOfficialId(role.email);
+    setOfficialId(role.defaultEmail);
     setPassword(role.defaultPass);
     setErrors({});
   };
 
-  // Validation
-  const validateForm = () => {
-    const newErrors: { officialId?: string; password?: string } = {};
-
-    if (!officialId.trim()) {
-      newErrors.officialId = 'Field Officer ID or registered email is required.';
-    } else if (officialId.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(officialId)) {
-      newErrors.officialId = 'Please enter a valid official email address.';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required.';
-    } else if (password.length < 4) {
-      newErrors.password = 'Password must be at least 4 characters.';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  // Execute actual login
+  const completeLogin = (role: FieldRole) => {
+    localStorage.setItem('demo_user_role', role.code);
+    localStorage.setItem('demo_user_id', role.id);
+    localStorage.setItem('demo_user_name', role.title);
+    localStorage.setItem('field_auth_token', `token_${Date.now()}`);
+    navigate('/field');
   };
 
-  // Handle Submit
+  // Demo Login Handler (1-click)
+  const handleDemoLogin = (roleToLogin?: FieldRole) => {
+    const role = roleToLogin || selectedRole;
+    setIsDemoLoading(true);
+    setTimeout(() => {
+      setIsDemoLoading(false);
+      completeLogin(role);
+    }, 400);
+  };
+
+  // Standard Form Submit Handler
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!officialId.trim()) {
+      setErrors({ officialId: 'Official ID or registered email is required.' });
+      return;
+    }
+    if (!password || password.length < 4) {
+      setErrors({ password: 'Password must be at least 4 characters.' });
+      return;
+    }
 
     setIsLoading(true);
     setErrors({});
-
     setTimeout(() => {
-      // Store session state in localStorage for Field Layout & Incident Reporting
-      localStorage.setItem('demo_user_name', selectedRole.name);
-      localStorage.setItem('demo_user_role', selectedRole.roleCode);
-      localStorage.setItem('demo_user_email', officialId);
-      localStorage.setItem('demo_user_unit', selectedRole.unit);
-      localStorage.setItem('demo_user_sector', selectedRole.sector);
-      localStorage.setItem('demo_user_clearance', selectedRole.clearance);
-      localStorage.setItem('field_auth_token', `ft_${Date.now()}`);
-
       setIsLoading(false);
-      // Navigate to internal field app
-      navigate('/field');
-    }, 600);
+      completeLogin(selectedRole);
+    }, 500);
   };
 
   return (
@@ -148,7 +129,7 @@ export const FieldLogin: React.FC = () => {
       {/* Main Container */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 relative z-10">
         
-        {/* Direct Launcher Card */}
+        {/* Direct Launcher Card for Standalone PWA */}
         <div className="w-full max-w-[560px] bg-gradient-to-r from-blue-900 to-[#0c2340] text-white rounded-2xl p-4 sm:p-5 mb-5 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 border border-blue-800">
           <div className="flex items-center gap-3 text-left">
             <div className="w-10 h-10 rounded-xl bg-blue-600/40 border border-blue-400/30 flex items-center justify-center text-blue-200 shrink-0">
@@ -181,7 +162,7 @@ export const FieldLogin: React.FC = () => {
         {/* Center Login Card */}
         <div className="w-full max-w-[560px] bg-white border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-200/60 p-6 sm:p-8 relative">
           
-          {/* Top Icon & Heading */}
+          {/* Top Abstract Icon & Heading */}
           <div className="flex justify-center">
             <div className="w-13 h-13 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-xs">
               <Radio className="w-6 h-6" />
@@ -193,22 +174,22 @@ export const FieldLogin: React.FC = () => {
               FIELD OPERATIONS LOGIN
             </h1>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-              Offline-First Incident Logging &amp; Ground Telemetry
+              Select Your Role &amp; Enter Platform
             </p>
           </div>
 
-          {/* Quick Role Selection Tabs */}
+          {/* Role Selection Grid - Exactly 4 Roles Without Names */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
-                Select Field Role Profile:
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-[11.5px] font-bold text-slate-700 uppercase tracking-wide">
+                Select Operational Role:
               </span>
-              <span className="text-[10.5px] text-blue-600 font-semibold">
-                Click to switch persona
+              <span className="text-[10.5px] text-slate-400 font-medium">
+                Choose 1 of 4 authorized roles
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {FIELD_ROLES.map((role) => {
                 const isSelected = selectedRole.id === role.id;
                 const RoleIcon = role.icon;
@@ -217,23 +198,29 @@ export const FieldLogin: React.FC = () => {
                     key={role.id}
                     type="button"
                     onClick={() => handleSelectRole(role)}
-                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-2.5 ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[92px] ${
                       isSelected
-                        ? 'border-blue-600 bg-blue-50/70 shadow-xs'
+                        ? 'border-blue-600 bg-blue-50/80 shadow-xs ring-2 ring-blue-500/20'
                         : 'border-slate-200 hover:border-slate-300 bg-slate-50/60 hover:bg-slate-50'
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
-                      isSelected ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
-                    }`}>
-                      <RoleIcon className="w-4 h-4" />
+                    <div className="flex items-center justify-between gap-2">
+                      <div className={`p-1.5 rounded-lg shrink-0 ${
+                        isSelected ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
+                      }`}>
+                        <RoleIcon className="w-4 h-4" />
+                      </div>
+                      <span className={`text-[9.5px] px-1.5 py-0.2 rounded font-bold border ${role.badgeClass}`}>
+                        {role.code.replace('_', ' ')}
+                      </span>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-bold text-slate-900 leading-tight truncate">
+
+                    <div className="mt-2">
+                      <div className="text-xs font-bold text-slate-900 leading-tight">
                         {role.title}
                       </div>
-                      <div className="text-[11px] text-slate-500 truncate mt-0.5 font-medium">
-                        {role.name}
+                      <div className="text-[10.5px] text-slate-500 mt-0.5 line-clamp-1">
+                        {role.description}
                       </div>
                     </div>
                   </button>
@@ -241,17 +228,19 @@ export const FieldLogin: React.FC = () => {
               })}
             </div>
 
-            {/* Selected Role Operational Details Pill */}
-            <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-800">{selectedRole.unit}</span>
-                <span className={`text-[9.5px] px-2 py-0.5 rounded font-bold border ${selectedRole.badgeColor}`}>
-                  {selectedRole.roleCode}
+            {/* Selected Role Banner */}
+            <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Active Selected Role
+                </span>
+                <span className="font-extrabold text-slate-900 text-[13px]">
+                  {selectedRole.title}
                 </span>
               </div>
-              <div className="text-[11px] text-slate-500 font-mono">
-                Assigned: {selectedRole.sector}
-              </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded font-bold border ${selectedRole.badgeClass}`}>
+                {selectedRole.code}
+              </span>
             </div>
           </div>
 
@@ -263,10 +252,10 @@ export const FieldLogin: React.FC = () => {
             </div>
           )}
 
-          {/* Login Form */}
+          {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-4" noValidate>
             
-            {/* Field ID / Email */}
+            {/* Operator ID / Email */}
             <div>
               <label 
                 htmlFor="officialId"
@@ -283,7 +272,7 @@ export const FieldLogin: React.FC = () => {
                   if (errors.officialId) setErrors((prev) => ({ ...prev, officialId: undefined }));
                 }}
                 placeholder="Enter operator ID"
-                disabled={isLoading}
+                disabled={isLoading || isDemoLoading}
                 className={`w-full h-11 px-3.5 bg-slate-50 border rounded-lg text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
                   errors.officialId
                     ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
@@ -304,7 +293,7 @@ export const FieldLogin: React.FC = () => {
                 htmlFor="password"
                 className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5"
               >
-                Operational Access Key / Password
+                Access Password
               </label>
               <div className="relative">
                 <input
@@ -316,7 +305,7 @@ export const FieldLogin: React.FC = () => {
                     if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
                   }}
                   placeholder="Enter password"
-                  disabled={isLoading}
+                  disabled={isLoading || isDemoLoading}
                   className={`w-full h-11 pl-3.5 pr-11 bg-slate-50 border rounded-lg text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
                     errors.password
                       ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
@@ -341,33 +330,47 @@ export const FieldLogin: React.FC = () => {
               )}
             </div>
 
-            {/* Actions */}
+            {/* Primary Action Buttons */}
             <div className="pt-2 space-y-2.5">
+              
+              {/* 1. Instant Demo Login Button */}
               <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-11 bg-[#1a56db] hover:bg-[#1546b8] active:bg-[#0f348c] disabled:opacity-60 text-white font-bold text-xs tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg cursor-pointer disabled:cursor-not-allowed"
+                type="button"
+                onClick={() => handleDemoLogin(selectedRole)}
+                disabled={isLoading || isDemoLoading}
+                className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-60 text-white font-bold text-xs tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg cursor-pointer disabled:cursor-not-allowed"
+                title="1-Click Login into selected role"
               >
-                {isLoading ? (
+                {isDemoLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-white" />
-                    <span>AUTHENTICATING GROUND UNIT...</span>
+                    <span>LOGGING IN AS {selectedRole.title.toUpperCase()}...</span>
                   </>
                 ) : (
                   <>
-                    <span>SIGN IN AS {selectedRole.title.toUpperCase()}</span>
+                    <Zap className="w-4 h-4 text-amber-300" />
+                    <span>DEMO LOGIN AS {selectedRole.title.toUpperCase()}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
+              {/* 2. Standard Form Sign In Button */}
               <button
-                type="button"
-                onClick={() => navigate('/field/report')}
-                className="w-full h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2"
+                type="submit"
+                disabled={isLoading || isDemoLoading}
+                className="w-full h-11 bg-[#1a56db] hover:bg-[#1546b8] active:bg-[#0f348c] disabled:opacity-60 text-white font-bold text-xs tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 transition-all shadow-xs hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
               >
-                <span>Jump Directly to Incident Reporting Kit</span>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>AUTHENTICATING CREDENTIALS...</span>
+                  </>
+                ) : (
+                  <span>SIGN IN WITH CREDENTIALS</span>
+                )}
               </button>
+
             </div>
 
           </form>
@@ -394,7 +397,7 @@ export const FieldLogin: React.FC = () => {
           <div className="flex items-center justify-center gap-2 text-slate-500 text-xs mt-4">
             <Lock className="w-3.5 h-3.5 text-blue-600" />
             <span className="font-medium text-[11.5px]">
-              Offline IndexedDB Sync &amp; 2G Adaptive Compression Enabled
+              Offline IndexedDB Sync &amp; Adaptive Photo Compression Ready
             </span>
           </div>
 

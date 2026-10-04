@@ -1,6 +1,5 @@
 import React from 'react';
-import { useLanguage, SUPPORTED_LANGUAGES } from './LanguageContext';
-import type { LanguageCode } from './LanguageContext';
+import { useLanguage, SUPPORTED_LANGUAGES, LanguageCode } from './LanguageContext';
 import { Globe } from 'lucide-react';
 
 export const LanguageSelector: React.FC<{ compact?: boolean }> = ({ compact = false }) => {

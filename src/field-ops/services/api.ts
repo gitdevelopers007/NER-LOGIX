@@ -1,9 +1,16 @@
-import type { Incident, IncidentCreatePayload } from "../types/incident";
-import type { Alert } from "../types/alert";
-import type { UserProfile } from "../types/user";
+import { Incident, IncidentCreatePayload } from '../types/incident';
+import { Alert } from '../types/alert';
+import { SyncQueueItem } from '../types/sync';
+import { UserProfile } from '../types/user';
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || '/api/v1';
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://ner-logix-backend-uhfu.onrender.com/api/v1';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -19,6 +26,10 @@ export interface PaginatedResult<T> {
 }
 
 class ApiService {
+  public getBaseUrl(): string {
+    return getApiBaseUrl();
+  }
+
   private getHeaders(): HeadersInit {
     const activeUserId = localStorage.getItem('demo_user_id') || 'usr_officer_01';
     const activeUserRole = localStorage.getItem('demo_user_role') || 'FIELD_OFFICER';
@@ -31,7 +42,7 @@ class ApiService {
   }
 
   async getMe(): Promise<UserProfile> {
-    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+    const res = await fetch(`${this.getBaseUrl()}/auth/me`, {
       headers: this.getHeaders(),
     });
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -40,14 +51,14 @@ class ApiService {
   }
 
   async listDemoUsers(): Promise<UserProfile[]> {
-    const res = await fetch(`${API_BASE_URL}/auth/users`);
+    const res = await fetch(`${this.getBaseUrl()}/auth/users`);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     const body: ApiResponse<UserProfile[]> = await res.json();
     return body.data;
   }
 
   async createIncident(payload: IncidentCreatePayload): Promise<Incident> {
-    const res = await fetch(`${API_BASE_URL}/incidents`, {
+    const res = await fetch(`${this.getBaseUrl()}/incidents`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(payload),
@@ -68,7 +79,7 @@ class ApiService {
     type?: string;
     limit?: number;
   }): Promise<PaginatedResult<Incident>> {
-    const url = new URL(`${API_BASE_URL}/incidents`);
+    const url = new URL(`${this.getBaseUrl()}/incidents`);
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         if (v !== undefined && v !== '') url.searchParams.append(k, String(v));
@@ -84,7 +95,7 @@ class ApiService {
   }
 
   async getIncidentById(id: string): Promise<Incident> {
-    const res = await fetch(`${API_BASE_URL}/incidents/${id}`, {
+    const res = await fetch(`${this.getBaseUrl()}/incidents/${id}`, {
       headers: this.getHeaders(),
     });
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -93,7 +104,7 @@ class ApiService {
   }
 
   async verifyIncident(id: string, action: 'VERIFIED' | 'REJECTED', notes?: string): Promise<Incident> {
-    const res = await fetch(`${API_BASE_URL}/incidents/${id}/verify`, {
+    const res = await fetch(`${this.getBaseUrl()}/incidents/${id}/verify`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ action, notes }),
@@ -109,7 +120,7 @@ class ApiService {
     failed_count: number;
     results: any[];
   }> {
-    const res = await fetch(`${API_BASE_URL}/incidents/sync`, {
+    const res = await fetch(`${this.getBaseUrl()}/incidents/sync`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ reports }),
@@ -124,7 +135,7 @@ class ApiService {
     severity?: string;
     status?: string;
   }): Promise<PaginatedResult<Alert>> {
-    const url = new URL(`${API_BASE_URL}/alerts`);
+    const url = new URL(`${this.getBaseUrl()}/alerts`);
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         if (v !== undefined && v !== '') url.searchParams.append(k, String(v));
@@ -140,7 +151,7 @@ class ApiService {
   }
 
   async acknowledgeAlert(id: string): Promise<Alert> {
-    const res = await fetch(`${API_BASE_URL}/alerts/${id}/acknowledge`, {
+    const res = await fetch(`${this.getBaseUrl()}/alerts/${id}/acknowledge`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({}),
@@ -158,7 +169,7 @@ class ApiService {
     district_id: string;
     description: string;
   }): Promise<Alert> {
-    const res = await fetch(`${API_BASE_URL}/alerts/simulate`, {
+    const res = await fetch(`${this.getBaseUrl()}/alerts/simulate`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(eventData),

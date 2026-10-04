@@ -8,6 +8,7 @@ import {
   WifiOff,
   RefreshCw,
   AlertTriangle,
+  UserCheck,
   Zap,
   Info,
 } from 'lucide-react';

@@ -1,30 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../features/language/LanguageContext';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { generateUUID } from '../utils/idGenerator';
-import type { CompressedImageResult } from "../utils/imageCompressor";
-import { LowBandwidthPhotoUploader } from '../components/LowBandwidthPhotoUploader';
+import { compressImage, CompressedImageResult } from '../utils/imageCompressor';
 import { formatCoordinates } from '../utils/formatters';
 import {
   saveLocalIncident,
+  saveLocalPhoto,
   enqueueSyncReport,
 } from '../services/indexedDb';
 import { api } from '../services/api';
-import type {
+import {
   IncidentType,
   IncidentSeverity,
   IncidentCreatePayload,
 } from '../types/incident';
 import { FieldLocationMap } from '../components/MapLibreViewer';
 import {
+  MapPin,
   Navigation,
   Camera,
+  Upload,
+  Trash2,
   AlertTriangle,
   CheckCircle2,
   ArrowRight,
   RotateCcw,
+  Sparkles,
   Info,
 } from 'lucide-react';
 
@@ -85,6 +89,9 @@ export const ReportIncident: React.FC = () => {
 
   // Photo State
   const [photo, setPhoto] = useState<CompressedImageResult | null>(null);
+  const [compressing, setCompressing] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -99,27 +106,43 @@ export const ReportIncident: React.FC = () => {
     captureGps();
   }, [captureGps]);
 
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCompressing(true);
+    try {
+      const result = await compressImage(file, 1600, 0.8);
+      setPhoto(result);
+    } catch (err: any) {
+      alert(err.message || 'Error processing photo');
+    } finally {
+      setCompressing(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!position) {
+      alert('Location is required. Please capture GPS location before submitting.');
+      return;
+    }
 
     setIsSubmitting(true);
     const clientGeneratedId = generateUUID();
     const reportedAt = new Date().toISOString();
     const activeUserId = localStorage.getItem('demo_user_id') || 'usr_officer_01';
 
-    const effectiveLat = position ? position.latitude : 26.1542;
-    const effectiveLng = position ? position.longitude : 91.7618;
-    const effectiveAccuracy = position ? position.accuracy : 12;
-
     const payload: IncidentCreatePayload = {
       client_generated_id: clientGeneratedId,
       type: selectedType,
       severity: selectedSeverity,
-      latitude: effectiveLat,
-      longitude: effectiveLng,
-      location_accuracy: effectiveAccuracy,
+      latitude: position.latitude,
+      longitude: position.longitude,
+      location_accuracy: position.accuracy,
       district_id: localStorage.getItem('demo_user_district') || 'Kamrup Metropolitan',
-      road_id: roadName.trim() || 'NH-27',
+      road_id: roadName.trim() || undefined,
       description: description.trim() || undefined,
       nearby_landmark: landmark.trim() || undefined,
       estimated_obstruction_length: obstructionLength.trim() || undefined,
@@ -133,7 +156,7 @@ export const ReportIncident: React.FC = () => {
             captured_at: reportedAt,
           }
         : undefined,
-      is_demo: !position?.isRealDeviceGps,
+      is_demo: !position.isRealDeviceGps,
     };
 
     try {
@@ -146,9 +169,9 @@ export const ReportIncident: React.FC = () => {
           reported_by: activeUserId,
           type: selectedType,
           severity: selectedSeverity,
-          latitude: effectiveLat,
-          longitude: effectiveLng,
-          location_accuracy: effectiveAccuracy,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          location_accuracy: position.accuracy,
           district_id: payload.district_id,
           road_id: payload.road_id,
           description: payload.description,
@@ -175,49 +198,42 @@ export const ReportIncident: React.FC = () => {
         // Online: directly send to API
         const created = await api.createIncident(payload);
 
-        // Also cache locally with SUBMITTED status (safely wrapped)
-        try {
-          await saveLocalIncident(created);
-        } catch (localErr) {
-          console.warn('Local indexedDB cache skipped:', localErr);
-        }
+        // Also cache locally with SUBMITTED status
+        await saveLocalIncident(created);
 
         setSubmitFeedback({
           status: 'ONLINE_SUBMITTED',
-          message: t('msg_report_submitted') || 'Incident report submitted successfully',
+          message: t('msg_report_submitted'),
           incidentId: created.id,
         });
       }
     } catch (err: any) {
-      console.error('Submission fallback to offline queue:', err);
-      try {
-        await saveLocalIncident({
-          id: clientGeneratedId,
-          client_generated_id: clientGeneratedId,
-          reported_by: activeUserId,
-          type: selectedType,
-          severity: selectedSeverity,
-          latitude: effectiveLat,
-          longitude: effectiveLng,
-          location_accuracy: effectiveAccuracy,
-          district_id: payload.district_id,
-          road_id: payload.road_id,
-          description: payload.description,
-          status: 'QUEUED',
-          source: 'FIELD_REPORT',
-          reported_at: reportedAt,
-          is_demo: false,
-          created_at: reportedAt,
-          updated_at: reportedAt,
-        });
-        await enqueueSyncReport(payload);
-      } catch (localQueueErr) {
-        console.warn('Local queue save skipped:', localQueueErr);
-      }
+      console.error('Submission failed, falling back to local queue:', err);
+      // Even if network crashed during post, guarantee local offline persistence
+      await saveLocalIncident({
+        id: clientGeneratedId,
+        client_generated_id: clientGeneratedId,
+        reported_by: activeUserId,
+        type: selectedType,
+        severity: selectedSeverity,
+        latitude: position.latitude,
+        longitude: position.longitude,
+        location_accuracy: position.accuracy,
+        district_id: payload.district_id,
+        road_id: payload.road_id,
+        description: payload.description,
+        status: 'QUEUED',
+        source: 'FIELD_REPORT',
+        reported_at: reportedAt,
+        is_demo: false,
+        created_at: reportedAt,
+        updated_at: reportedAt,
+      });
+      await enqueueSyncReport(payload);
 
       setSubmitFeedback({
         status: 'OFFLINE_SAVED',
-        message: t('msg_saved_offline') || 'Report saved in queue',
+        message: t('msg_saved_offline'),
         incidentId: clientGeneratedId,
       });
     } finally {
@@ -542,23 +558,82 @@ export const ReportIncident: React.FC = () => {
           {t('step_photo')}
         </span>
 
-        <LowBandwidthPhotoUploader
-          currentPhoto={photo}
-          onPhotoReady={(res) => setPhoto(res)}
-          onPhotoCleared={() => setPhoto(null)}
-          incidentType={selectedType}
-          roadName={roadName}
-          districtName={localStorage.getItem('demo_user_district') || 'Kamrup Metropolitan'}
+        {/* Hidden inputs for camera capture and upload */}
+        <input
+          type="file"
+          ref={cameraInputRef}
+          accept="image/*"
+          capture="environment"
+          onChange={handlePhotoSelect}
+          className="hidden"
         />
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handlePhotoSelect}
+          className="hidden"
+        />
+
+        {photo ? (
+          <div className="space-y-2">
+            <div className="relative rounded-xl overflow-hidden border border-slate-200">
+              <img
+                src={photo.base64Data}
+                alt="Field preview"
+                className="w-full h-48 object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => setPhoto(null)}
+                className="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full shadow-md hover:bg-red-700"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="text-[11px] text-slate-500 flex items-center justify-between font-mono">
+              <span>{photo.filename}</span>
+              <span>{(photo.fileSize / 1024).toFixed(0)} KB (Compressed)</span>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              disabled={compressing}
+              className="py-3 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 flex flex-col items-center justify-center space-y-1 touch-target transition-all"
+            >
+              <Camera className="w-5 h-5 text-blue-600" />
+              <span>{t('photo_btn_camera')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={compressing}
+              className="py-3 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 flex flex-col items-center justify-center space-y-1 touch-target transition-all"
+            >
+              <Upload className="w-5 h-5 text-emerald-600" />
+              <span>{t('photo_btn_upload')}</span>
+            </button>
+          </div>
+        )}
+
+        {compressing && (
+          <p className="text-xs text-blue-600 text-center animate-pulse">
+            {t('photo_compressing')}
+          </p>
+        )}
       </div>
 
       {/* ================= SUBMIT ACTION ================= */}
       <button
         type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-extrabold py-4 px-4 rounded-2xl shadow-lg flex items-center justify-center space-x-2 touch-target text-sm transition-all cursor-pointer"
+        disabled={isSubmitting || !position}
+        className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-extrabold py-4 px-4 rounded-2xl shadow-lg flex items-center justify-center space-x-2 touch-target text-sm transition-all"
       >
-        <span>{isSubmitting ? 'Submitting Report...' : t('btn_submit_report')}</span>
+        <span>{isSubmitting ? t('submitting_report') : t('btn_submit_report')}</span>
         <ArrowRight className="w-4 h-4" />
       </button>
 

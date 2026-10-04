@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { formatCoordinates } from '../utils/formatters';
-import { MapPin } from 'lucide-react';
+import { MapPin, Navigation, Compass } from 'lucide-react';
 
 interface FieldLocationMapProps {
   latitude: number;
@@ -160,7 +160,7 @@ export const IncidentLocationPicker: React.FC<{
   initialLat: number;
   initialLng: number;
   onLocationSelect: (lat: number, lng: number) => void;
-}> = ({ initialLat, initialLng, onLocationSelect: _onLocationSelect }) => {
+}> = ({ initialLat, initialLng, onLocationSelect }) => {
   return (
     <div className="space-y-2">
       <FieldLocationMap

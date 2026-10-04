@@ -4,15 +4,16 @@ import { useLanguage } from '../features/language/LanguageContext';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { getAllLocalIncidents } from '../services/indexedDb';
 import { api } from '../services/api';
-import type { Incident } from '../types/incident';
+import { Incident, IncidentStatus } from '../types/incident';
 import { StatusBadge, SeverityBadge } from '../components/StatusBadge';
 import { formatRelativeTime, formatCoordinates } from '../utils/formatters';
 import {
   FileText,
-    ChevronRight,
+  Filter,
+  ChevronRight,
   Clock,
   Camera,
-  
+  Layers,
   MapPin,
 } from 'lucide-react';
 
