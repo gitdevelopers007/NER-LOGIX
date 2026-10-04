@@ -184,7 +184,7 @@ export const Welcome: React.FC = () => {
 
               {/* Button 2: White with Blue Outline EXPLORE REGION */}
               <button
-                onClick={() => navigate('/live-map')}
+                onClick={() => navigate('/access-portal')}
                 className="px-6 py-3.5 bg-white hover:bg-blue-50/60 active:bg-blue-100/60 border border-[#1a56db] text-[#1a56db] font-bold text-xs tracking-wider uppercase rounded-lg transition-all flex items-center gap-2.5 cursor-pointer shadow-xs"
               >
                 <BookOpen className="w-4 h-4 text-[#1a56db]" />
@@ -214,7 +214,7 @@ export const Welcome: React.FC = () => {
           
           {/* CARD 1: Regional Connectivity */}
           <div 
-            onClick={() => navigate('/route-intelligence')}
+            onClick={() => navigate('/government-login')}
             className="bg-white hover:bg-blue-50/30 border border-slate-200/90 rounded-xl p-4 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-3 group"
           >
             <div className="flex items-center gap-3 min-w-0">
@@ -239,7 +239,7 @@ export const Welcome: React.FC = () => {
 
           {/* CARD 2: Live Accessibility */}
           <div 
-            onClick={() => navigate('/live-map')}
+            onClick={() => navigate('/government-login')}
             className="bg-white hover:bg-emerald-50/30 border border-slate-200/90 rounded-xl p-4 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-3 group"
           >
             <div className="flex items-center gap-3 min-w-0">
@@ -260,7 +260,7 @@ export const Welcome: React.FC = () => {
 
           {/* CARD 3: Risk Intelligence */}
           <div 
-            onClick={() => navigate('/alerts')}
+            onClick={() => navigate('/government-login')}
             className="bg-white hover:bg-amber-50/30 border border-slate-200/90 rounded-xl p-4 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-3 group"
           >
             <div className="flex items-center gap-3 min-w-0">
@@ -281,7 +281,7 @@ export const Welcome: React.FC = () => {
 
           {/* CARD 4: Field Operations */}
           <div 
-            onClick={() => navigate('/incidents')}
+            onClick={() => navigate('/field-login')}
             className="bg-white hover:bg-sky-50/30 border border-slate-200/90 rounded-xl p-4 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-between gap-3 group"
           >
             <div className="flex items-center gap-3 min-w-0">
@@ -445,7 +445,7 @@ export const Welcome: React.FC = () => {
 
               <div className="pt-3">
                 <button
-                  onClick={() => navigate('/live-map')}
+                  onClick={() => navigate('/government-login')}
                   className="px-6 py-3.5 bg-[#0066d6] hover:bg-[#0055b8] text-white font-bold text-xs tracking-wider uppercase rounded-lg shadow-lg hover:shadow-blue-500/20 transition-all inline-flex items-center gap-2 cursor-pointer"
                 >
                   <span>LAUNCH REGIONAL GIS MAP</span>
@@ -952,7 +952,7 @@ export const Welcome: React.FC = () => {
               <span className="text-base">→</span>
             </button>
             <button
-              onClick={() => navigate('/live-map')}
+              onClick={() => navigate('/government-login')}
               className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold text-xs tracking-wider uppercase rounded-lg transition-all flex items-center gap-2 cursor-pointer"
             >
               <Compass className="w-4 h-4" />
@@ -994,11 +994,11 @@ export const Welcome: React.FC = () => {
                 Product Modules
               </div>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-400">
-                <li><button onClick={() => navigate('/live-map')} className="hover:text-white transition-colors cursor-pointer text-left">Live Accessibility Map</button></li>
-                <li><button onClick={() => navigate('/route-intelligence')} className="hover:text-white transition-colors cursor-pointer text-left">Corridor Route Intelligence</button></li>
-                <li><button onClick={() => navigate('/alerts')} className="hover:text-white transition-colors cursor-pointer text-left">Risk &amp; Weather Alerts</button></li>
-                <li><button onClick={() => navigate('/incidents')} className="hover:text-white transition-colors cursor-pointer text-left">Field Incident Reporting</button></li>
-                <li><button onClick={() => navigate('/command-center')} className="hover:text-white transition-colors cursor-pointer text-left">Executive Command Center</button></li>
+                <li><button onClick={() => navigate('/government-login')} className="hover:text-white transition-colors cursor-pointer text-left">Live Accessibility Map</button></li>
+                <li><button onClick={() => navigate('/government-login')} className="hover:text-white transition-colors cursor-pointer text-left">Corridor Route Intelligence</button></li>
+                <li><button onClick={() => navigate('/government-login')} className="hover:text-white transition-colors cursor-pointer text-left">Risk &amp; Weather Alerts</button></li>
+                <li><button onClick={() => navigate('/field-login')} className="hover:text-white transition-colors cursor-pointer text-left">Field Incident Reporting</button></li>
+                <li><button onClick={() => navigate('/government-login')} className="hover:text-white transition-colors cursor-pointer text-left">Executive Command Center</button></li>
                 <li><button onClick={() => navigate('/access-portal')} className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer text-left font-semibold">Access Portal →</button></li>
               </ul>
             </div>
