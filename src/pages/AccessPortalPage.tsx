@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ShieldCheck, X, Sparkles, CheckCircle2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShieldCheck, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { GovBuildingIcon, FieldOpsIcon, TravelerMapIcon, CheckBadge } from '../components/CardIcons';
@@ -163,27 +163,14 @@ export const AccessPortalPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-2 mt-4">
-              <button
-                onClick={() => navigate('/field-login')}
-                className="w-full py-3 px-4 rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer group-hover:shadow-sm"
-              >
-                <span>Continue as Field User</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
-
-              <a
-                href="https://ner-logix-field-operation-app.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2 px-3 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
-                title="Launch standalone Field PWA directly in a new tab"
-              >
-                <span>Launch Direct App (Standalone PWA)</span>
-                <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-              </a>
-            </div>
+            {/* Action Button */}
+            <button
+              onClick={() => navigate('/field-login')}
+              className="w-full py-3 px-4 rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer group-hover:shadow-sm"
+            >
+              <span>Continue as Field User (PWA)</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </button>
           </div>
 
           {/* CARD 3: Traveler & Public Access */}
