@@ -29,6 +29,21 @@ export const IncidentsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const getDisplayPhoto = (inc: Incident): string => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem(`ner_photo_${inc.id}`);
+      if (cached) return cached;
+    }
+    if (inc.photoUrl && !inc.photoUrl.startsWith('data:image/svg+xml')) {
+      if (inc.photoUrl.startsWith('/')) {
+        return `https://ner-logix-backend-uhfu.onrender.com${inc.photoUrl}`;
+      }
+      return inc.photoUrl;
+    }
+    return inc.photoUrl;
+  };
 
   // Subscribe to real-time incidentService updates and periodic backend sync
   useEffect(() => {
@@ -651,16 +666,24 @@ export const IncidentsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="w-full h-44 rounded-lg overflow-hidden border border-slate-300 shadow-inner bg-slate-900 relative group">
+                  <div 
+                    onClick={() => setLightboxOpen(true)}
+                    className="w-full h-48 rounded-lg overflow-hidden border border-slate-300 shadow-inner bg-slate-900 relative group cursor-pointer"
+                    title="Click to inspect high-resolution field evidence photograph"
+                  >
                     <img
-                      src={selectedIncident.photoUrl}
+                      src={getDisplayPhoto(selectedIncident)}
                       alt="Field evidence"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Top overlay badge */}
                     <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/75 backdrop-blur-md text-emerald-400 font-mono text-[10px] border border-emerald-500/30">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                       <span>2G COMPRESSED PACKET</span>
+                    </div>
+
+                    <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded bg-black/75 backdrop-blur-md text-slate-200 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span>🔍 Expand Photo</span>
                     </div>
 
                     {/* Bottom overlay badge */}
@@ -882,6 +905,56 @@ export const IncidentsPage: React.FC = () => {
                   >
                     Close Analysis
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* FULL PHOTO EVIDENCE LIGHTBOX MODAL */}
+          {lightboxOpen && (
+            <div 
+              onClick={() => setLightboxOpen(false)}
+              className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+            >
+              <div 
+                onClick={(e) => e.stopPropagation()} 
+                className="bg-slate-900 rounded-2xl max-w-4xl w-full overflow-hidden border border-slate-700 shadow-2xl flex flex-col"
+              >
+                <div className="p-3.5 bg-slate-950 flex items-center justify-between text-white border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs font-bold font-mono tracking-wider">
+                      HIGH-RESOLUTION FIELD EVIDENCE • {selectedIncident.id}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setLightboxOpen(false)}
+                    className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs cursor-pointer transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="max-h-[75vh] overflow-auto flex items-center justify-center p-3 bg-black">
+                  <img 
+                    src={getDisplayPhoto(selectedIncident)} 
+                    alt="Full incident evidence" 
+                    className="max-h-[70vh] w-auto max-w-full object-contain rounded shadow-lg"
+                  />
+                </div>
+                <div className="p-3 bg-slate-950 border-t border-slate-800 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white font-semibold">{selectedIncident.road}</span>
+                    <span>•</span>
+                    <span>{selectedIncident.district}, {selectedIncident.state}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-emerald-400 text-[11px]">
+                      GPS: {selectedIncident.latitude.toFixed(4)}°N, {selectedIncident.longitude.toFixed(4)}°E
+                    </span>
+                    <span className="text-[10px] bg-blue-900/60 text-blue-300 border border-blue-700 px-2 py-0.5 rounded font-mono">
+                      Reported by: {selectedIncident.reportedBy}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

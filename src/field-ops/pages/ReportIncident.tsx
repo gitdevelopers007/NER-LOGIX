@@ -160,6 +160,16 @@ export const ReportIncident: React.FC = () => {
       is_demo: !position.isRealDeviceGps,
     };
 
+    const photoDataUrl = photo ? `data:${photo.mimeType};base64,${photo.base64Data}` : undefined;
+    if (photoDataUrl) {
+      (payload as any).photoUrl = photoDataUrl;
+      try {
+        localStorage.setItem(`ner_photo_${clientGeneratedId}`, photoDataUrl);
+      } catch (e) {
+        console.warn('LocalStorage image cache limit reached:', e);
+      }
+    }
+
     // Immediately ingest into Government Command Center Incident Service & Broadcast Mesh
     try {
       incidentService.ingestFieldReport(payload, true);
@@ -207,6 +217,13 @@ export const ReportIncident: React.FC = () => {
       } else {
         // Online: directly send to API
         const created = await api.createIncident(payload);
+        if (photoDataUrl) {
+          try {
+            localStorage.setItem(`ner_photo_${created.id}`, photoDataUrl);
+          } catch (e) {
+            console.warn(e);
+          }
+        }
 
         // Also cache locally with SUBMITTED status
         await saveLocalIncident(created);

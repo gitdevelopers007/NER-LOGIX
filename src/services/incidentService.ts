@@ -351,6 +351,14 @@ class IncidentService {
       const stored = typeof window !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
       if (stored) {
         this.incidents = JSON.parse(stored);
+        if (typeof window !== 'undefined') {
+          this.incidents.forEach((inc) => {
+            if (inc.photoUrl === LANDSLIDE_PHOTO || inc.photoUrl.startsWith('data:image/svg+xml')) {
+              const cached = localStorage.getItem(`ner_photo_${inc.id}`);
+              if (cached) inc.photoUrl = cached;
+            }
+          });
+        }
       } else {
         this.incidents = [...INITIAL_INCIDENTS];
         this.saveToStorage();
@@ -464,13 +472,24 @@ class IncidentService {
 
       backendItems.forEach((b) => {
         const existing = this.incidents.find((i) => i.id === b.id || i.id === b.client_generated_id);
+        const freshPhoto = this.extractBackendPhoto(b);
+
         if (!existing) {
           const mapped = this.convertBackendToIncident(b);
           this.incidents.unshift(mapped);
           updated = true;
-        } else if (b.status && b.status !== existing.status) {
-          existing.status = b.status === 'VERIFIED' ? 'VERIFIED' : b.status === 'REJECTED' ? 'REJECTED' : 'PENDING';
-          updated = true;
+        } else {
+          if (b.status && b.status !== existing.status) {
+            existing.status = b.status === 'VERIFIED' ? 'VERIFIED' : b.status === 'REJECTED' ? 'REJECTED' : 'PENDING';
+            updated = true;
+          }
+          if (
+            freshPhoto !== LANDSLIDE_PHOTO &&
+            (existing.photoUrl === LANDSLIDE_PHOTO || existing.photoUrl.startsWith('data:image/svg+xml'))
+          ) {
+            existing.photoUrl = freshPhoto;
+            updated = true;
+          }
         }
       });
 
@@ -483,12 +502,59 @@ class IncidentService {
     }
   }
 
+  public extractBackendPhoto(b: any): string {
+    // 1. Check local client cache for this client_generated_id or id
+    if (typeof window !== 'undefined') {
+      if (b.client_generated_id) {
+        const cached = localStorage.getItem(`ner_photo_${b.client_generated_id}`);
+        if (cached) return cached;
+      }
+      if (b.id) {
+        const cached = localStorage.getItem(`ner_photo_${b.id}`);
+        if (cached) return cached;
+      }
+    }
+
+    // 2. Check photos array from backend
+    if (Array.isArray(b.photos) && b.photos.length > 0) {
+      const p = b.photos[0];
+      const url = p?.photo_url || p?.url;
+      if (url) {
+        if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        if (url.startsWith('/')) return `https://ner-logix-backend-uhfu.onrender.com${url}`;
+        return `https://ner-logix-backend-uhfu.onrender.com/${url}`;
+      }
+    }
+
+    // 3. Check direct photo_url or photoUrl fields
+    const directUrl = b.photo_url || b.photoUrl;
+    if (directUrl && directUrl !== LANDSLIDE_PHOTO && directUrl !== ROAD_DAMAGE_PHOTO && directUrl !== RAINFALL_PHOTO) {
+      if (directUrl.startsWith('data:') || directUrl.startsWith('blob:') || directUrl.startsWith('http://') || directUrl.startsWith('https://')) {
+        return directUrl;
+      }
+      if (directUrl.startsWith('/')) {
+        return `https://ner-logix-backend-uhfu.onrender.com${directUrl}`;
+      }
+      return `https://ner-logix-backend-uhfu.onrender.com/${directUrl}`;
+    }
+
+    // 4. Check base64 in photo_data
+    if (b.photo_data?.base64_data) {
+      const b64 = b.photo_data.base64_data;
+      return b64.startsWith('data:') ? b64 : `data:${b.photo_data.mime_type || 'image/jpeg'};base64,${b64}`;
+    }
+
+    return LANDSLIDE_PHOTO;
+  }
+
   private convertBackendToIncident(b: any): Incident {
     const incType = normalizeType(b.type);
     const incSev = normalizeSeverity(b.severity);
     const district = b.district_id || 'Kamrup Metropolitan';
     const state = resolveStateFromDistrict(district);
     const road = b.road_id || 'NH-27 Corridor';
+    const photoUrl = this.extractBackendPhoto(b);
 
     return {
       id: b.id || `INC-${Date.now().toString().slice(-5)}`,
@@ -506,7 +572,7 @@ class IncidentService {
       timeAgo: 'Just now',
       currentRoadStatus: b.status === 'VERIFIED' ? 'ROAD BLOCKED (VERIFIED)' : 'PENDING GOVERNMENT VERIFICATION',
       description: b.description || 'Ground survey team reported active corridor obstruction via Field PWA telemetry.',
-      photoUrl: b.photo_url || LANDSLIDE_PHOTO,
+      photoUrl,
       photoMetadata: {
         uploaded: 'Real-time Sync',
         gpsVerified: true,
@@ -552,10 +618,30 @@ class IncidentService {
     const road = data.road_id || 'NH-27 Corridor';
 
     let photoUrl = LANDSLIDE_PHOTO;
-    if (data.photo_data?.base64_data) {
-      photoUrl = `data:${data.photo_data.mime_type || 'image/jpeg'};base64,${data.photo_data.base64_data}`;
-    } else if (data.photoUrl) {
+    if (data.photoUrl && !data.photoUrl.startsWith('data:image/svg+xml')) {
       photoUrl = data.photoUrl;
+    } else if (data.photo_data?.base64_data) {
+      const b64 = data.photo_data.base64_data;
+      photoUrl = b64.startsWith('data:') ? b64 : `data:${data.photo_data.mime_type || 'image/jpeg'};base64,${b64}`;
+    } else if (data.photo_data?.dataUrl) {
+      photoUrl = data.photo_data.dataUrl;
+    } else if (data.photo) {
+      photoUrl = typeof data.photo === 'string' ? data.photo : data.photo.base64Data ? `data:${data.photo.mimeType || 'image/jpeg'};base64,${data.photo.base64Data}` : LANDSLIDE_PHOTO;
+    } else if (typeof window !== 'undefined') {
+      const cached = (data.client_generated_id && localStorage.getItem(`ner_photo_${data.client_generated_id}`)) ||
+                     (data.id && localStorage.getItem(`ner_photo_${data.id}`));
+      if (cached) photoUrl = cached;
+    }
+
+    // Persist photo in local storage cache so it can never be lost on reloads
+    if (typeof window !== 'undefined' && photoUrl !== LANDSLIDE_PHOTO) {
+      try {
+        if (data.client_generated_id) localStorage.setItem(`ner_photo_${data.client_generated_id}`, photoUrl);
+        if (data.id) localStorage.setItem(`ner_photo_${data.id}`, photoUrl);
+        if (id) localStorage.setItem(`ner_photo_${id}`, photoUrl);
+      } catch (e) {
+        console.warn('Failed to cache photo in localStorage:', e);
+      }
     }
 
     const newInc: Incident = {
