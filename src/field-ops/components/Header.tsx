@@ -12,7 +12,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   onOpenDemo,
   userRole = 'FIELD_OFFICER',
-  userName = 'R. Borah',
+  userName = 'Field Officer',
 }) => {
   const { isOnline } = useNetworkStatus();
 
@@ -65,14 +65,14 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Language Switcher */}
           <LanguageSelector compact={true} />
 
-          {/* Demo Controls Button */}
+          {/* Operational Controls Button */}
           <button
             onClick={onOpenDemo}
-            title="Demo Simulation Controls"
-            aria-label="Demo Controls"
-            className="p-1.5 bg-gov-800 hover:bg-gov-700 active:bg-gov-600 rounded-lg text-slate-300 hover:text-white border border-gov-700 transition-colors"
+            title="Field Diagnostics &amp; Network Console"
+            aria-label="Operations Console"
+            className="p-1.5 bg-gov-800 hover:bg-gov-700 active:bg-gov-600 rounded-lg text-slate-300 hover:text-white border border-gov-700 transition-colors cursor-pointer"
           >
-            <SlidersHorizontal className="w-4 h-4 text-amber-400" />
+            <SlidersHorizontal className="w-4 h-4 text-blue-400" />
           </button>
         </div>
       </div>

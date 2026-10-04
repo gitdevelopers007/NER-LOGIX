@@ -8,7 +8,7 @@ import { DemoControlModal } from '../components/DemoControlModal';
 export const Layout: React.FC = () => {
   const [demoOpen, setDemoOpen] = useState<boolean>(false);
 
-  const userName = localStorage.getItem('demo_user_name') || 'Officer R. Borah';
+  const userName = localStorage.getItem('demo_user_name') || 'Field Officer';
   const userRole = localStorage.getItem('demo_user_role') || 'FIELD_OFFICER';
 
   return (

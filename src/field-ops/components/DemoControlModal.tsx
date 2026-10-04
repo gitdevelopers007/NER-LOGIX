@@ -64,36 +64,29 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-end sm:items-center justify-center p-2 sm:p-4">
       <div className="bg-slate-900 text-white rounded-2xl max-w-md w-full p-5 border border-slate-700 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center space-x-2">
-            <Zap className="w-5 h-5 text-amber-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-400">
+              <Zap className="w-4 h-4" />
+            </div>
             <div>
               <h3 className="font-bold text-sm tracking-tight text-white">
-                SIH Judge & Dev Simulation Panel
+                Field Operations &amp; Network Console
               </h3>
               <p className="text-[11px] text-slate-400">
-                Simulate offline conditions, roles, and emergency events
+                Network telemetry, local sync &amp; operational role profiles
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800"
+            className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Data Honesty Notice */}
-        <div className="bg-blue-950/80 border border-blue-800 rounded-lg p-3 text-xs text-blue-200 flex items-start space-x-2">
-          <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
-          <div>
-            <strong>Data Honesty Standard:</strong> Actions here generate tagged{' '}
-            <code className="text-amber-300 font-mono">[DEMO DATA]</code>. Real device GPS and actual user reports remain uncorrupted.
-          </div>
         </div>
 
         {/* 1. Offline / Online Simulation */}
@@ -104,7 +97,7 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => toggleSimulatedOffline(true)}
-              className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
+              className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
                 isSimulatedOffline
                   ? 'bg-amber-600 border-amber-500 text-white shadow-lg'
                   : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
@@ -116,7 +109,7 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
 
             <button
               onClick={() => toggleSimulatedOffline(false)}
-              className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
+              className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
                 !isSimulatedOffline
                   ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg'
                   : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
@@ -126,8 +119,8 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
               <span>Network Online</span>
             </button>
           </div>
-          <p className="text-[11px] text-slate-400">
-            Current: {isOnline ? 'Online (sync active)' : 'Offline (reports queued locally)'}
+          <p className="text-[11px] text-slate-400 font-mono">
+            Status: {isOnline ? 'Online (Real-time sync active)' : 'Offline (Local IndexedDB queue buffer)'}
           </p>
         </div>
 
@@ -139,7 +132,7 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
           <button
             onClick={triggerSync}
             disabled={isSyncing || isSimulatedOffline}
-            className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center space-x-2 transition-all shadow"
+            className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center space-x-2 transition-all shadow cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             <span>
@@ -153,7 +146,7 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
         {/* 3. Demo Event Generators */}
         <div className="space-y-2">
           <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-            3. Instant NER Disruption Simulation
+            3. Corridor Telemetry Triggers
           </label>
           <div className="space-y-1.5">
             <button
@@ -167,11 +160,11 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
                 )
               }
               disabled={loadingAction !== null}
-              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-left text-xs flex items-center justify-between text-slate-200"
+              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-left text-xs flex items-center justify-between text-slate-200 cursor-pointer"
             >
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                <span>Sonapur Landslide (NH-27 Critical)</span>
+                <span>Sonapur Landslide (NH-27)</span>
               </div>
               <span className="text-[10px] bg-red-900/60 text-red-300 px-1.5 py-0.5 rounded font-mono">
                 CRITICAL
@@ -189,7 +182,7 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
                 )
               }
               disabled={loadingAction !== null}
-              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-left text-xs flex items-center justify-between text-slate-200"
+              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-left text-xs flex items-center justify-between text-slate-200 cursor-pointer"
             >
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />
@@ -211,7 +204,7 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
                 )
               }
               disabled={loadingAction !== null}
-              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-left text-xs flex items-center justify-between text-slate-200"
+              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-left text-xs flex items-center justify-between text-slate-200 cursor-pointer"
             >
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
@@ -224,58 +217,58 @@ export const DemoControlModal: React.FC<DemoControlModalProps> = ({
           </div>
         </div>
 
-        {/* 4. Switch Active Role */}
+        {/* 4. Switch Active Role (STRICTLY ROLES ONLY, NO NAMES) */}
         <div className="space-y-2 border-t border-slate-800 pt-3">
           <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-            4. Switch Demo User Role
+            4. Active User Role
           </label>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <button
               onClick={() => handleRoleChange('FIELD_OFFICER', 'usr_officer_01')}
-              className={`p-2 rounded-lg border text-left ${
+              className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                 activeRole === 'FIELD_OFFICER'
-                  ? 'bg-blue-900/80 border-blue-500 text-white'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-white'
+                  ? 'bg-blue-600/30 border-blue-500 text-white shadow-md ring-1 ring-blue-500'
+                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
               }`}
             >
-              <div className="font-bold">Field Officer</div>
-              <div className="text-[10px] text-slate-400">R. Borah (Kamrup)</div>
+              <div className="font-bold text-xs">Field Officer</div>
+              <div className="text-[10px] text-blue-300 mt-0.5">Ground Reporting</div>
             </button>
 
             <button
               onClick={() => handleRoleChange('GOVERNMENT_OPERATOR', 'usr_operator_01')}
-              className={`p-2 rounded-lg border text-left ${
+              className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                 activeRole === 'GOVERNMENT_OPERATOR'
-                  ? 'bg-blue-900/80 border-blue-500 text-white'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-white'
+                  ? 'bg-blue-600/30 border-blue-500 text-white shadow-md ring-1 ring-blue-500'
+                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
               }`}
             >
-              <div className="font-bold">Gov Operator</div>
-              <div className="text-[10px] text-slate-400">State Control</div>
+              <div className="font-bold text-xs">Government Operator</div>
+              <div className="text-[10px] text-blue-300 mt-0.5">Control Room</div>
             </button>
 
             <button
               onClick={() => handleRoleChange('LOGISTICS_OPERATOR', 'usr_logistics_01')}
-              className={`p-2 rounded-lg border text-left ${
+              className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                 activeRole === 'LOGISTICS_OPERATOR'
-                  ? 'bg-blue-900/80 border-blue-500 text-white'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-white'
+                  ? 'bg-blue-600/30 border-blue-500 text-white shadow-md ring-1 ring-blue-500'
+                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
               }`}
             >
-              <div className="font-bold">Logistics Convoy</div>
-              <div className="text-[10px] text-slate-400">Brahmaputra Freight</div>
+              <div className="font-bold text-xs">Logistics Convoy</div>
+              <div className="text-[10px] text-blue-300 mt-0.5">Freight &amp; Supply</div>
             </button>
 
             <button
               onClick={() => handleRoleChange('GOVERNMENT_ADMIN', 'usr_admin_01')}
-              className={`p-2 rounded-lg border text-left ${
+              className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                 activeRole === 'GOVERNMENT_ADMIN'
-                  ? 'bg-blue-900/80 border-blue-500 text-white'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-white'
+                  ? 'bg-blue-600/30 border-blue-500 text-white shadow-md ring-1 ring-blue-500'
+                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
               }`}
             >
-              <div className="font-bold">Gov Admin</div>
-              <div className="text-[10px] text-slate-400">NER Master Cmd</div>
+              <div className="font-bold text-xs">Government Admin</div>
+              <div className="text-[10px] text-blue-300 mt-0.5">Executive Ops</div>
             </button>
           </div>
         </div>
