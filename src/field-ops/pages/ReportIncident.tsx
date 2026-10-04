@@ -327,7 +327,7 @@ export const ReportIncident: React.FC = () => {
                 setPhoto(null);
                 captureGps();
               }}
-              className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow"
+              className="flex-1 py-3 bg-gov-900 hover:bg-gov-800 text-white text-xs font-bold rounded-xl shadow border border-gov-700 transition-colors"
             >
               File Another Report
             </button>
@@ -353,7 +353,7 @@ export const ReportIncident: React.FC = () => {
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-            <Navigation className="w-4 h-4 text-blue-600" />
+            <Navigation className="w-4 h-4 text-gov-800" />
             {t('step_location')}
           </span>
           {position?.isRealDeviceGps && (
@@ -368,7 +368,7 @@ export const ReportIncident: React.FC = () => {
           type="button"
           onClick={captureGps}
           disabled={gpsLoading}
-          className="w-full py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold flex items-center justify-center space-x-2 touch-target transition-all"
+          className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-gov-900 text-xs font-bold flex items-center justify-center space-x-2 touch-target transition-all"
         >
           <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin' : ''}`} />
           <span>{gpsLoading ? t('loc_retrying') : t('loc_btn_capture')}</span>
@@ -468,7 +468,7 @@ export const ReportIncident: React.FC = () => {
                 onClick={() => setSelectedType(it.type)}
                 className={`p-2.5 rounded-xl border text-left text-xs font-medium transition-all ${
                   selectedType === it.type
-                    ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold ring-2 ring-blue-500/20'
+                    ? 'border-gov-900 bg-slate-100 text-gov-900 font-bold ring-2 ring-gov-900/20'
                     : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                 }`}
               >
@@ -631,7 +631,7 @@ export const ReportIncident: React.FC = () => {
               disabled={compressing}
               className="py-3 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 flex flex-col items-center justify-center space-y-1 touch-target transition-all"
             >
-              <Camera className="w-5 h-5 text-blue-600" />
+              <Camera className="w-5 h-5 text-gov-800" />
               <span>{t('photo_btn_camera')}</span>
             </button>
 
@@ -648,7 +648,7 @@ export const ReportIncident: React.FC = () => {
         )}
 
         {compressing && (
-          <p className="text-xs text-blue-600 text-center animate-pulse">
+          <p className="text-xs text-gov-800 font-medium text-center animate-pulse">
             {t('photo_compressing')}
           </p>
         )}
@@ -658,7 +658,7 @@ export const ReportIncident: React.FC = () => {
       <button
         type="submit"
         disabled={isSubmitting || !position}
-        className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-extrabold py-4 px-4 rounded-2xl shadow-lg flex items-center justify-center space-x-2 touch-target text-sm transition-all"
+        className="w-full bg-gov-900 hover:bg-gov-800 active:bg-slate-900 disabled:opacity-50 text-white font-extrabold py-4 px-4 rounded-2xl shadow-lg border border-gov-700 flex items-center justify-center space-x-2 touch-target text-sm transition-all"
       >
         <span>{isSubmitting ? t('submitting_report') : t('btn_submit_report')}</span>
         <ArrowRight className="w-4 h-4" />

@@ -94,7 +94,7 @@ export const MyReports: React.FC = () => {
             onClick={() => setActiveFilter(tab.key)}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeFilter === tab.key
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-gov-900 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
@@ -124,7 +124,7 @@ export const MyReports: React.FC = () => {
               onClick={() =>
                 navigate(`/field/reports/${report.id || report.client_generated_id}`)
               }
-              className="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 hover:border-blue-300 cursor-pointer transition-all space-y-2.5"
+              className="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 hover:border-gov-700 cursor-pointer transition-all space-y-2.5"
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-1">

@@ -20,7 +20,7 @@ export const BottomNav: React.FC = () => {
           end
           className={({ isActive }) =>
             `flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[11px] font-medium transition-colors ${
-              isActive ? 'text-blue-700 font-semibold' : 'text-slate-600 hover:text-slate-900'
+              isActive ? 'text-gov-900 font-bold' : 'text-slate-600 hover:text-slate-900'
             }`
           }
         >
@@ -32,11 +32,11 @@ export const BottomNav: React.FC = () => {
           to="/field/report"
           className={({ isActive }) =>
             `flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[11px] font-medium transition-colors ${
-              isActive ? 'text-blue-700 font-semibold' : 'text-slate-600 hover:text-slate-900'
+              isActive ? 'text-gov-900 font-bold' : 'text-slate-600 hover:text-slate-900'
             }`
           }
         >
-          <div className="bg-blue-600 text-white rounded-full p-1 -mt-3 shadow-md border-2 border-white">
+          <div className="bg-gov-900 text-white rounded-full p-1 -mt-3 shadow-md border-2 border-white hover:bg-gov-800 transition-colors">
             <PlusCircle className="w-5 h-5" />
           </div>
           <span className="mt-0.5">{t('nav_report')}</span>
@@ -46,7 +46,7 @@ export const BottomNav: React.FC = () => {
           to="/field/reports"
           className={({ isActive }) =>
             `flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[11px] font-medium transition-colors ${
-              isActive ? 'text-blue-700 font-semibold' : 'text-slate-600 hover:text-slate-900'
+              isActive ? 'text-gov-900 font-bold' : 'text-slate-600 hover:text-slate-900'
             }`
           }
         >

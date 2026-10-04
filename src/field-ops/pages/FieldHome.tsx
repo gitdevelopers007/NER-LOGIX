@@ -36,7 +36,7 @@ export const FieldHome: React.FC = () => {
   const [loadingReports, setLoadingReports] = useState<boolean>(true);
 
   // Active user details
-  const userName = localStorage.getItem('demo_user_name') || 'Officer R. Borah';
+  const userName = localStorage.getItem('demo_user_name') || 'Field Officer';
   const assignedDistrict = localStorage.getItem('demo_user_district') || 'Kamrup Metropolitan';
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export const FieldHome: React.FC = () => {
       <div className="bg-gradient-to-r from-gov-900 via-gov-800 to-gov-900 rounded-2xl p-4 text-white shadow-md border border-gov-700">
         <div className="flex items-start justify-between">
           <div>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-blue-300">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400">
               OPERATIONAL OUTPOST • ASSAM / NER
             </span>
             <h2 className="text-base font-bold text-white tracking-tight">{userName}</h2>
@@ -112,7 +112,7 @@ export const FieldHome: React.FC = () => {
           {/* GPS Status */}
           <div className="bg-gov-800/80 rounded-xl p-2 border border-gov-700">
             <div className="flex items-center justify-center space-x-1 text-[11px] text-slate-400 mb-0.5">
-              <Navigation className="w-3 h-3 text-blue-400" />
+              <Navigation className="w-3 h-3 text-slate-300" />
               <span>{t('ops_gps_status')}</span>
             </div>
             <span
@@ -201,9 +201,9 @@ export const FieldHome: React.FC = () => {
       {/* Primary Action CTA: Report Incident */}
       <button
         onClick={() => navigate('/field/report')}
-        className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 touch-target text-sm transition-all transform active:scale-[0.99]"
+        className="w-full bg-gov-900 hover:bg-gov-800 active:bg-slate-900 text-white font-bold py-3.5 px-4 rounded-xl shadow-md border border-gov-700/60 flex items-center justify-center space-x-2 touch-target text-sm transition-all transform active:scale-[0.99]"
       >
-        <PlusCircle className="w-5 h-5" />
+        <PlusCircle className="w-5 h-5 text-emerald-400" />
         <span>{t('ops_quick_report')}</span>
       </button>
 
@@ -211,12 +211,12 @@ export const FieldHome: React.FC = () => {
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
-            <Layers className="w-4 h-4 text-blue-600" />
+            <Layers className="w-4 h-4 text-gov-800" />
             <span>{t('ops_recent_reports')}</span>
           </h3>
           <button
             onClick={() => navigate('/field/reports')}
-            className="text-xs text-blue-600 hover:text-blue-800 font-semibold"
+            className="text-xs text-gov-800 hover:text-gov-950 font-bold"
           >
             View All
           </button>

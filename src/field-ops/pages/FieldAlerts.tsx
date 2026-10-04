@@ -47,8 +47,8 @@ export const FieldAlerts: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-base font-bold text-slate-900">{t('alerts_title')}</h2>
-            <span className="flex items-center gap-1 text-[10px] font-mono bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full border border-blue-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
               {t('alert_realtime_badge')}
             </span>
           </div>
@@ -72,7 +72,7 @@ export const FieldAlerts: React.FC = () => {
             onClick={() => setSeverityFilter(sev)}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               severityFilter === sev
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-gov-900 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
@@ -174,7 +174,7 @@ export const FieldAlerts: React.FC = () => {
                       disabled={acknowledgingId === alert.id}
                       className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-black text-white text-xs font-bold rounded-lg shadow-sm flex items-center space-x-1.5 transition-all"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                       <span>
                         {acknowledgingId === alert.id ? 'Saving...' : t('alert_ack_btn')}
                       </span>

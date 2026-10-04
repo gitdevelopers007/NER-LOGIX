@@ -89,7 +89,7 @@ export const ReportDetails: React.FC = () => {
         <p className="text-sm font-bold text-slate-700">Incident report not found</p>
         <button
           onClick={() => navigate('/field/reports')}
-          className="text-xs text-blue-600 font-bold"
+          className="text-xs text-gov-800 hover:text-gov-950 font-bold"
         >
           Return to Reports
         </button>
@@ -245,14 +245,14 @@ export const ReportDetails: React.FC = () => {
 
       {/* Operator Verification Card */}
       {canVerify && incident.status === 'SUBMITTED' && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div className="bg-slate-50 border border-slate-300 rounded-2xl p-4 space-y-3 shadow-sm">
           <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-5 h-5 text-blue-700" />
+            <ShieldCheck className="w-5 h-5 text-gov-800" />
             <div>
-              <h4 className="text-xs font-bold text-blue-900">
+              <h4 className="text-xs font-bold text-gov-900">
                 Government Operator Verification
               </h4>
-              <p className="text-[11px] text-blue-700">
+              <p className="text-[11px] text-slate-600">
                 Verify this report to trigger elevated regional logistics rerouting alerts.
               </p>
             </div>
@@ -263,7 +263,7 @@ export const ReportDetails: React.FC = () => {
             onChange={(e) => setVerifyNotes(e.target.value)}
             placeholder="Add verification notes / dispatch dispatch confirmation..."
             rows={2}
-            className="w-full text-xs p-2.5 border border-blue-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full text-xs p-2.5 border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-gov-800"
           />
 
           <div className="flex gap-2">

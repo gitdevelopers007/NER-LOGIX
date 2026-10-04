@@ -54,7 +54,7 @@ export const SyncQueue: React.FC = () => {
             </p>
           </div>
           <div className="text-right">
-            <span className="text-2xl font-black text-blue-600 font-mono">
+            <span className="text-2xl font-black text-gov-900 font-mono">
               {pendingCount}
             </span>
             <span className="text-[10px] text-slate-400 block uppercase font-bold">
@@ -67,7 +67,7 @@ export const SyncQueue: React.FC = () => {
         <button
           onClick={triggerSync}
           disabled={isSyncing || !isOnline || pendingCount === 0}
-          className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-extrabold text-xs flex items-center justify-center space-x-2 shadow-md touch-target transition-all"
+          className="w-full py-3.5 px-4 rounded-xl bg-gov-900 hover:bg-gov-800 active:bg-slate-900 disabled:opacity-50 text-white font-extrabold text-xs flex items-center justify-center space-x-2 shadow-md border border-gov-700 touch-target transition-all"
         >
           <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
           <span>

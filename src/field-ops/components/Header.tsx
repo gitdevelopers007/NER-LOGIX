@@ -1,16 +1,14 @@
 import React from 'react';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { LanguageSelector } from '../features/language/LanguageSelector';
-import { Shield, Wifi, WifiOff, SlidersHorizontal, User } from 'lucide-react';
+import { Shield, Wifi, WifiOff } from 'lucide-react';
 
 interface HeaderProps {
-  onOpenDemo: () => void;
   userRole?: string;
   userName?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onOpenDemo,
   userRole = 'FIELD_OFFICER',
   userName = 'Field Officer',
 }) => {
@@ -21,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-md mx-auto px-4 py-2.5 flex items-center justify-between">
         {/* Logo & National/Gov Identification */}
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-700 flex items-center justify-center shadow-inner border border-blue-500/40">
+          <div className="w-8 h-8 rounded-lg bg-gov-800 flex items-center justify-center shadow-inner border border-gov-700">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -64,16 +62,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Language Switcher */}
           <LanguageSelector compact={true} />
-
-          {/* Operational Controls Button */}
-          <button
-            onClick={onOpenDemo}
-            title="Field Diagnostics &amp; Network Console"
-            aria-label="Operations Console"
-            className="p-1.5 bg-gov-800 hover:bg-gov-700 active:bg-gov-600 rounded-lg text-slate-300 hover:text-white border border-gov-700 transition-colors cursor-pointer"
-          >
-            <SlidersHorizontal className="w-4 h-4 text-blue-400" />
-          </button>
         </div>
       </div>
     </header>
