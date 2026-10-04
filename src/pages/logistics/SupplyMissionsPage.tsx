@@ -48,7 +48,6 @@ export const SupplyMissionsPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
             <NerLogixLogo variant="white"  />
-            <span className="font-bold text-lg tracking-wider text-white">NER-LOGIX</span>
           </div>
           <span className="text-slate-500 hidden sm:inline">|</span>
           <span className="text-xs text-slate-300 font-medium hidden md:inline">
