@@ -1,25 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HelpCircle, ChevronDown, Check, X, Phone, Mail } from 'lucide-react';
 import { EmblemOfIndia } from './EmblemOfIndia';
 import { NerLogixLogo } from './NerLogixLogo';
 import { LiveTelemetryToggle } from './LiveTelemetryToggle';
+import { PORTAL_TRANSLATIONS, SupportedLanguage } from '../services/portalTranslations';
 
 interface HeaderProps {
   onHelpClick?: () => void;
+  onLanguageChange?: (lang: SupportedLanguage) => void;
 }
 
-export const Header: React.FC<HeaderProps> = () => {
+export const Header: React.FC<HeaderProps> = ({ onLanguageChange }) => {
   const [langOpen, setLangOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState('English');
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(() => {
+    return (localStorage.getItem('preferred_language') as SupportedLanguage) || 'en';
+  });
   const [helpOpen, setHelpOpen] = useState(false);
 
-  const languages = [
+  const languages: { code: SupportedLanguage; name: string; native: string }[] = [
     { code: 'en', name: 'English', native: 'English' },
     { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
     { code: 'as', name: 'Assamese', native: 'অসমীয়া' },
     { code: 'bn', name: 'Bengali', native: 'বাংলা' },
     { code: 'mni', name: 'Manipuri', native: 'মৈতৈলোন্' },
   ];
+
+  const t = PORTAL_TRANSLATIONS[currentLang] || PORTAL_TRANSLATIONS.en;
+  const activeLangObj = languages.find((l) => l.code === currentLang) || languages[0];
+
+  const handleSelectLanguage = (code: SupportedLanguage) => {
+    setCurrentLang(code);
+    setLangOpen(false);
+    localStorage.setItem('preferred_language', code);
+    window.dispatchEvent(new CustomEvent('ner_language_change', { detail: code }));
+    onLanguageChange?.(code);
+  };
+
+  useEffect(() => {
+    const handleLangSync = (e: any) => {
+      if (e.detail && PORTAL_TRANSLATIONS[e.detail as SupportedLanguage]) {
+        setCurrentLang(e.detail as SupportedLanguage);
+      }
+    };
+    window.addEventListener('ner_language_change', handleLangSync);
+    return () => window.removeEventListener('ner_language_change', handleLangSync);
+  }, []);
 
   return (
     <header className="w-full bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -44,10 +69,10 @@ export const Header: React.FC<HeaderProps> = () => {
           {/* Platform Title */}
           <div className="pl-4 hidden md:flex flex-col justify-center text-left">
             <span className="text-[13px] leading-tight font-semibold text-slate-800 tracking-normal">
-              North Eastern Region Logistics &amp;
+              {t.platform_title_line1}
             </span>
             <span className="text-[13px] leading-tight font-semibold text-slate-800 tracking-normal">
-              Accessibility Intelligence
+              {t.platform_title_line2}
             </span>
           </div>
         </div>
@@ -63,7 +88,7 @@ export const Header: React.FC<HeaderProps> = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-slate-700 text-xs sm:text-[13px]">System Online</span>
+            <span className="text-slate-700 text-xs sm:text-[13px]">{t.system_online}</span>
           </div>
 
           {/* Divider */}
@@ -76,7 +101,7 @@ export const Header: React.FC<HeaderProps> = () => {
             title="Help & Support Desk"
           >
             <HelpCircle className="w-4 h-4 text-slate-600" />
-            <span className="hidden xs:inline text-xs sm:text-[13px]">Help</span>
+            <span className="hidden xs:inline text-xs sm:text-[13px]">{t.help}</span>
           </button>
 
           {/* Divider */}
@@ -88,29 +113,26 @@ export const Header: React.FC<HeaderProps> = () => {
               onClick={() => setLangOpen(!langOpen)}
               className="flex items-center gap-1.5 hover:text-blue-700 transition-colors cursor-pointer py-1"
             >
-              <span className="text-xs sm:text-[13px]">{selectedLang}</span>
+              <span className="text-xs sm:text-[13px]">{activeLangObj.native}</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
             </button>
 
             {/* Language Dropdown */}
             {langOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-slate-200 py-1.5 z-50 text-left">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1.5 z-50 text-left">
                 <div className="px-3 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Select Language
+                  {t.select_language}
                 </div>
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
-                    onClick={() => {
-                      setSelectedLang(lang.name);
-                      setLangOpen(false);
-                    }}
-                    className={`w-full px-3 py-1.5 text-xs text-left flex items-center justify-between hover:bg-slate-50 ${
-                      selectedLang === lang.name ? 'text-blue-700 font-semibold bg-blue-50/50' : 'text-slate-700'
+                    onClick={() => handleSelectLanguage(lang.code)}
+                    className={`w-full px-3 py-1.5 text-xs text-left flex items-center justify-between hover:bg-slate-50 cursor-pointer ${
+                      currentLang === lang.code ? 'text-blue-700 font-semibold bg-blue-50/50' : 'text-slate-700'
                     }`}
                   >
                     <span>{lang.native} ({lang.name})</span>
-                    {selectedLang === lang.name && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                    {currentLang === lang.code && <Check className="w-3.5 h-3.5 text-blue-600" />}
                   </button>
                 ))}
               </div>
