@@ -10,11 +10,7 @@ import {
   CheckCircle2,
   Wrench,
   Radio,
-  FileText,
-  Calendar,
-  Eye,
-  Truck,
-  Car
+  Truck
 } from 'lucide-react';
 
 interface Bulletin {
@@ -139,56 +135,58 @@ export const BulletinsPage: React.FC = () => {
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Title & Official Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#0b1a30] via-[#0f284e] to-[#0b1a30] p-6 rounded-xl border border-blue-900/60 shadow-lg text-white">
+    <div className="space-y-5">
+      {/* 1. Header Banner - Clean Light Institutional Design */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider flex items-center gap-1.5">
-              <Radio className="w-3 h-3 text-amber-400 animate-pulse" />
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider flex items-center gap-1.5">
+              <Radio className="w-3 h-3 text-amber-600 animate-pulse" />
               Live Emergency Dispatches
             </span>
-            <span className="text-xs text-blue-300">BRO · NHIDCL · SDMA Joint Telemetry</span>
+            <span className="text-xs text-slate-500">BRO · NHIDCL · SDMA Joint Telemetry</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">North East Road Disruption Bulletins</h1>
-          <p className="text-sm text-slate-300 mt-1">
+          <h1 className="text-xl font-bold text-[#0f2547] tracking-tight uppercase">
+            North East Road Disruption Bulletins
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
             Real-time verified highway closures, landslide clearance countdowns, and heavy-freight bypass advisories.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="bg-slate-900/80 border border-blue-900/80 rounded-lg p-3 text-center min-w-[120px]">
-            <div className="text-xs text-slate-400 font-medium">Active Incidents</div>
-            <div className="text-2xl font-bold text-amber-400 mt-0.5">3 Critical</div>
+          <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-center min-w-[120px]">
+            <div className="text-[10px] uppercase font-bold text-slate-400">Active Incidents</div>
+            <div className="text-lg font-black text-amber-600 mt-0.5">3 Critical</div>
           </div>
-          <div className="bg-slate-900/80 border border-blue-900/80 rounded-lg p-3 text-center min-w-[120px]">
-            <div className="text-xs text-slate-400 font-medium">Restored (24h)</div>
-            <div className="text-2xl font-bold text-emerald-400 mt-0.5">9 Corridors</div>
+          <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-center min-w-[120px]">
+            <div className="text-[10px] uppercase font-bold text-slate-400">Restored (24h)</div>
+            <div className="text-lg font-black text-emerald-600 mt-0.5">9 Corridors</div>
           </div>
         </div>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      {/* 2. Filter Toolbar */}
+      <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
             placeholder="Search highway, section, hazard..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+            className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1.5 focus:ring-blue-600"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-slate-400" />
-            <span className="text-xs text-slate-300 font-medium">State:</span>
+            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-xs text-slate-600 font-semibold">State:</span>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="bg-slate-900 border border-slate-700 text-xs text-white rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500"
+              className="bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1.5 focus:ring-blue-600 cursor-pointer"
             >
               {states.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -197,11 +195,11 @@ export const BulletinsPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-300 font-medium">Status:</span>
+            <span className="text-xs text-slate-600 font-semibold">Status:</span>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-slate-900 border border-slate-700 text-xs text-white rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500"
+              className="bg-white border border-slate-200 text-xs font-semibold text-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1.5 focus:ring-blue-600 cursor-pointer"
             >
               <option value="ALL">All Statuses</option>
               <option value="BLOCKED">Blocked</option>
@@ -213,8 +211,8 @@ export const BulletinsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bulletins List */}
-      <div className="space-y-4">
+      {/* 3. Bulletins List */}
+      <div className="space-y-3.5">
         {filtered.map((b) => {
           const isBlocked = b.status === 'BLOCKED';
           const isRestricted = b.status === 'RESTRICTED';
@@ -223,27 +221,28 @@ export const BulletinsPage: React.FC = () => {
           return (
             <div
               key={b.id}
-              className={`p-5 rounded-xl border transition-all ${
+              className={`p-4.5 rounded-xl border bg-white shadow-2xs transition-all hover:shadow-xs ${
                 isBlocked
-                  ? 'bg-[#131b2e] border-rose-900/60 hover:border-rose-700'
+                  ? 'border-red-200 hover:border-red-300'
                   : isRestricted
-                  ? 'bg-[#131b2e] border-amber-900/60 hover:border-amber-700'
+                  ? 'border-amber-200 hover:border-amber-300'
                   : isRestored
-                  ? 'bg-[#131b2e] border-emerald-900/60 hover:border-emerald-700'
-                  : 'bg-[#131b2e] border-blue-900/60 hover:border-blue-700'
+                  ? 'border-emerald-200 hover:border-emerald-300'
+                  : 'border-slate-200 hover:border-slate-300'
               }`}
             >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-3">
+              {/* Header inside Card */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2.5">
                   <span
-                    className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide flex items-center gap-1.5 ${
+                    className={`px-2.5 py-0.5 rounded-md text-xs font-bold tracking-wide flex items-center gap-1.5 ${
                       isBlocked
-                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        ? 'bg-red-50 text-red-700 border border-red-200'
                         : isRestricted
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
                         : isRestored
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-blue-50 text-blue-700 border border-blue-200'
                     }`}
                   >
                     {isBlocked && <AlertTriangle className="w-3.5 h-3.5" />}
@@ -251,72 +250,74 @@ export const BulletinsPage: React.FC = () => {
                     {b.status}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-bold text-base">{b.highway}</span>
-                    <span className="text-xs text-slate-400 font-mono">[{b.state}]</span>
+                    <span className="text-[#0f2547] font-bold text-sm">{b.highway}</span>
+                    <span className="text-xs text-slate-500 font-medium">[{b.state}]</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
+                <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-blue-400" />
+                    <Clock className="w-3.5 h-3.5 text-blue-600" />
                     {b.issuedAt}
                   </span>
-                  <span className="text-slate-600">•</span>
+                  <span className="text-slate-300">•</span>
                   <span>ID: {b.id}</span>
                 </div>
               </div>
 
+              {/* Title & Body */}
               <div className="mt-3">
-                <h3 className="text-base font-semibold text-white tracking-tight">{b.headline}</h3>
-                <div className="flex items-center gap-1.5 text-xs text-amber-400/90 mt-1">
+                <h3 className="text-base font-bold text-slate-900 tracking-tight">{b.headline}</h3>
+                <div className="flex items-center gap-1.5 text-xs text-amber-700 font-medium mt-1">
                   <MapPin className="w-3.5 h-3.5" />
                   <span>Section: {b.section}</span>
                 </div>
-                <p className="text-sm text-slate-300 mt-2 leading-relaxed">{b.description}</p>
+                <p className="text-xs text-slate-600 mt-2 leading-relaxed">{b.description}</p>
               </div>
 
               {/* Technical Telemetry Strip */}
-              <div className="mt-4 pt-3 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
-                <div className="bg-slate-900/70 p-2.5 rounded-lg border border-slate-800">
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <Truck className="w-3.5 h-3.5 text-amber-400" />
+              <div className="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                  <div className="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <Truck className="w-3.5 h-3.5 text-amber-600" />
                     Heavy Cargo (GVW):
                   </div>
-                  <div className="font-semibold text-slate-200 mt-1 truncate">{b.heavyVehicleImpact}</div>
+                  <div className="font-bold text-slate-800 mt-1 truncate">{b.heavyVehicleImpact}</div>
                 </div>
 
-                <div className="bg-slate-900/70 p-2.5 rounded-lg border border-slate-800">
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <Wrench className="w-3.5 h-3.5 text-cyan-400" />
+                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                  <div className="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <Wrench className="w-3.5 h-3.5 text-blue-600" />
                     BRO Machinery:
                   </div>
-                  <div className="font-semibold text-cyan-300 mt-1">
+                  <div className="font-bold text-slate-800 mt-1">
                     {b.earthmoversDeployed > 0 ? `${b.earthmoversDeployed} Earthmovers On-Site` : 'Patrol Standby'}
                   </div>
                 </div>
 
-                <div className="bg-slate-900/70 p-2.5 rounded-lg border border-slate-800">
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-blue-400" />
+                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                  <div className="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-blue-600" />
                     Est. Clearance:
                   </div>
-                  <div className="font-semibold text-blue-300 mt-1">{b.estClearance}</div>
+                  <div className="font-bold text-slate-800 mt-1">{b.estClearance}</div>
                 </div>
 
-                <div className="bg-slate-900/70 p-2.5 rounded-lg border border-slate-800">
-                  <div className="text-slate-400 flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                  <div className="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     Verification Source:
                   </div>
-                  <div className="font-semibold text-emerald-300 mt-1 truncate">{b.verifiedBy}</div>
+                  <div className="font-bold text-emerald-700 mt-1 truncate">{b.verifiedBy}</div>
                 </div>
               </div>
 
+              {/* Detour Alert */}
               {b.detourRoute && (
-                <div className="mt-3 bg-blue-950/40 border border-blue-900/50 rounded-lg p-2.5 flex items-start gap-2 text-xs text-blue-200">
-                  <ExternalLink className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="mt-3 bg-blue-50/70 border border-blue-200 rounded-lg p-2.5 flex items-start gap-2 text-xs text-blue-900">
+                  <ExternalLink className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white">Recommended Diversion: </span>
+                    <strong className="text-blue-950">Recommended Diversion: </strong>
                     {b.detourRoute}
                   </div>
                 </div>
