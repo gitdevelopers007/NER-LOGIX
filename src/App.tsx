@@ -27,6 +27,14 @@ import { ReportDetails } from './field-ops/pages/ReportDetails';
 import { SyncQueue } from './field-ops/pages/SyncQueue';
 import { FieldAlerts } from './field-ops/pages/FieldAlerts';
 
+import { TravelerLogin } from './pages/TravelerLogin';
+import { TravelerLayout } from './pages/traveler/TravelerLayout';
+import { SafeCorridorPage } from './pages/traveler/SafeCorridorPage';
+import { BulletinsPage } from './pages/traveler/BulletinsPage';
+import { WeatherRadarPage } from './pages/traveler/WeatherRadarPage';
+import { LifelinesPage } from './pages/traveler/LifelinesPage';
+import { OfflinePassPage } from './pages/traveler/OfflinePassPage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +43,7 @@ function App() {
         <Route path="/access-portal" element={<AccessPortalPage />} />
         <Route path="/government-login" element={<GovernmentLogin />} />
         <Route path="/field-login" element={<FieldLogin />} />
+        <Route path="/traveler-login" element={<TravelerLogin />} />
         <Route path="/government-command-center" element={<GovernmentOverview />} />
         <Route path="/live-map" element={<GovernmentCommandCenter />} />
         <Route path="/route-intelligence" element={<RouteIntelligencePage />} />
@@ -72,6 +81,15 @@ function App() {
         </Route>
         <Route path="/field-operations" element={<Navigate to="/field" replace />} />
         <Route path="/field-operations/*" element={<Navigate to="/field" replace />} />
+
+        {/* Traveler & Public Logistics Module */}
+        <Route path="/traveler" element={<TravelerLayout />}>
+          <Route index element={<SafeCorridorPage />} />
+          <Route path="bulletins" element={<BulletinsPage />} />
+          <Route path="weather" element={<WeatherRadarPage />} />
+          <Route path="lifelines" element={<LifelinesPage />} />
+          <Route path="offline-pass" element={<OfflinePassPage />} />
+        </Route>
 
         {/* Fallback redirect */}
         <Route path="*" element={<Navigate to="/access-portal" replace />} />

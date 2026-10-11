@@ -241,7 +241,7 @@ export const AccessPortalPage: React.FC = () => {
 
             {/* Action Button */}
             <button
-              onClick={() => handlePortalSelect(t.card3_title)}
+              onClick={() => navigate('/traveler-login')}
               className="w-full py-3 px-4 rounded-lg bg-[#1d4ed8] hover:bg-[#1e40af] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer group-hover:shadow-sm"
             >
               <span>{t.card3_btn}</span>
