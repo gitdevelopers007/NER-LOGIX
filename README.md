@@ -6,18 +6,16 @@
 
 ---
 
-## 👥 Project Team: UNI MIND
+## 👥 Team Name: UNI MIND
 
-| Role | Member Name | Key Contributions & Modules Handled |
+| Role | Member Name | Responsibility |
 | :--- | :--- | :--- |
-| **Team Leader** | **Sai Ganesh** | • System Architecture & End-to-End Project Orchestration<br>• Full-Stack Integration across Government Command Center, Field Ops, and Traveler Portals<br>• Client-Side 2G Adaptive Photo Compression Engine (Canvas downscaling 3.5MB → 38KB)<br>• 100% Offline-First IndexedDB Architecture & Background Sync Engine<br>• Dynamic Alternative Bypass Routing & Bridge Tonnage/GVW Clearance Logic<br>• Multi-source incident corroboration & Anti-Rumor verification engine<br>• SIH submission compliance, UI/UX Gov-Navy institutional design system (GIGW 3.0 / WCAG AA) |
-| **Team Member** | *[Collaborator Name]* | *[To be updated by teammate via Git contribution / pull request]* |
-| **Team Member** | *[Collaborator Name]* | *[To be updated by teammate via Git contribution / pull request]* |
-| **Team Member** | *[Collaborator Name]* | *[To be updated by teammate via Git contribution / pull request]* |
-| **Team Member** | *[Collaborator Name]* | *[To be updated by teammate via Git contribution / pull request]* |
-| **Team Member** | *[Collaborator Name]* | *[To be updated by teammate via Git contribution / pull request]* |
-
-> *Note for Team Members:* Teammates can fork/clone the repository, update their respective rows in the table with their name and contributions, commit, and push so their GitHub profiles appear in the repository contributors and collaborator activity list.
+| **Team Leader** | **Sai Ganesh Pushadapu** | Team Lead & System Integration — Architecture, platform integration, and final build |
+| **Team Member** | **Koushik Rahul** | AI & Disruption Intelligence — AI/ML risk intelligence and disruption prediction |
+| **Team Member** | **Shashank Reddy** | GIS & Route Intelligence — GIS mapping, road accessibility and route intelligence |
+| **Team Member** | **Jahnavi** | Government Command Dashboard — Government-facing monitoring, visualization and command interface |
+| **Team Member** | **Hamsika** | Logistics & Vehicle Tracking — Vehicle movement, logistics missions and delivery monitoring |
+| **Team Member** | **Niharika** | Field Intelligence & Alerts — Field reporting, incident intelligence and alert workflows |
 
 ---
 
