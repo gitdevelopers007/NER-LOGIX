@@ -13,7 +13,7 @@
 | **Team Leader** | **Sai Ganesh Pushadapu** | Team Lead & System Integration — Architecture, platform integration, and final build |
 | **Team Member** | **K.Koushik Rahul** | AI & Disruption Intelligence — AI/ML risk intelligence and disruption prediction |
 | **Team Member** | **Shashank Reddy Dachani** | GIS & Route Intelligence — GIS mapping, road accessibility and route intelligence |
-| **Team Member** | **Jahnavi** | Government Command Dashboard — Government-facing monitoring, visualization and command interface |
+| **Team Member** | **Jahnavi G** | Government Command Dashboard — Government-facing monitoring, visualization and command interface |
 | **Team Member** | **Hamsika** | Logistics & Vehicle Tracking — Vehicle movement, logistics missions and delivery monitoring |
 | **Team Member** | **Niharika** | Field Intelligence & Alerts — Field reporting, incident intelligence and alert workflows |
 
