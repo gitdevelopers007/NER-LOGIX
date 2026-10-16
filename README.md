@@ -123,4 +123,4 @@ NER-LOGIX runs entirely without expensive proprietary API licenses, utilizing ve
 
 ## 🏛️ Governance & Compliance
 
-Built in compliance with the **National Data Sharing and Accessibility Policy (NDSAP)** and **Open Geospatial Consortium (OGC)** open standards for disaster resilience in Northeast India.
+Built in compliance with the **National Data Sharing and Accessibility Policy (NDSAP)** and **Open Geospatial Consortium (OGC)** open standards for disaster resilience in the Northeast India.
