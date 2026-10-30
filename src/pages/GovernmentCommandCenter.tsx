@@ -291,24 +291,24 @@ export const GovernmentCommandCenter: React.FC = () => {
 
           </div>
 
-          {/* LIVE RAINFALL & IMD DOPPLER RADAR TELEMETRY BAR */}
-          <div className="bg-gradient-to-r from-slate-950 via-[#0b1e38] to-slate-950 text-white rounded-xl p-3.5 border border-blue-900/60 shadow-md space-y-3">
+          {/* LIVE RAINFALL & IMD DOPPLER RADAR TELEMETRY BAR (Clean White Institutional UI) */}
+          <div className="bg-white text-slate-800 rounded-xl p-4 border border-slate-200 shadow-2xs space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               {/* Left Title */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 text-xl shadow-xs">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 text-xl shadow-xs">
                   🌧️
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs tracking-wider uppercase text-white">Live Rainfall &amp; Doppler Radar Telemetry</span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                    <span className="font-bold text-xs tracking-wider uppercase text-[#0f2547]">Live Rainfall &amp; Doppler Radar Telemetry</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                       18 DOPPLER RADARS LIVE
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">IMD &amp; Open-Meteo Gateway</span>
+                    <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">IMD &amp; Open-Meteo Gateway</span>
                   </div>
-                  <p className="text-[11.5px] text-slate-300 mt-0.5">
+                  <p className="text-[11.5px] text-slate-500 mt-0.5">
                     Real-time precipitation rates, catchment inundation levels &amp; cloudburst indicators across the 8 North Eastern States.
                   </p>
                 </div>
@@ -316,23 +316,23 @@ export const GovernmentCommandCenter: React.FC = () => {
 
               {/* Quick Summary Pill Stats */}
               <div className="flex items-center gap-2 text-xs">
-                <div className="bg-slate-800/80 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
-                  <span className="text-slate-400 text-[11px]">Peak Rain:</span>
-                  <span className="text-blue-400 font-bold">14.8 mm/hr (Meghalaya)</span>
+                <div className="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-slate-500 text-[11px] font-medium">Peak Rain:</span>
+                  <span className="text-blue-700 font-bold">14.8 mm/hr (Meghalaya)</span>
                 </div>
-                <div className="bg-slate-800/80 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
-                  <span className="text-slate-400 text-[11px]">Regional Avg:</span>
-                  <span className="text-white font-bold">4.8 mm/hr</span>
+                <div className="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-slate-500 text-[11px] font-medium">Regional Avg:</span>
+                  <span className="text-slate-900 font-bold">4.8 mm/hr</span>
                 </div>
-                <div className="bg-slate-800/80 border border-slate-700 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
-                  <span className="text-slate-400 text-[11px]">24h Volume:</span>
-                  <span className="text-amber-400 font-bold">78.2 mm</span>
+                <div className="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-slate-500 text-[11px] font-medium">24h Volume:</span>
+                  <span className="text-amber-700 font-bold">78.2 mm</span>
                 </div>
               </div>
             </div>
 
             {/* 8 State Rainfall Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 pt-2 border-t border-slate-800/80">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 pt-2 border-t border-slate-100">
               {(rainfallData.length > 0 ? rainfallData : [
                 { state: 'Meghalaya', currentPrecipitationMm: 14.8, status: 'Heavy Downpour', alertLevel: 'ORANGE_ALERT' },
                 { state: 'Assam', currentPrecipitationMm: 6.2, status: 'Moderate Rain', alertLevel: 'YELLOW_WATCH' },
@@ -345,16 +345,16 @@ export const GovernmentCommandCenter: React.FC = () => {
               ]).map((st: any, idx: number) => {
                 const isOrange = st.alertLevel === 'ORANGE_ALERT' || st.currentPrecipitationMm >= 10;
                 const isYellow = st.alertLevel === 'YELLOW_WATCH' || st.currentPrecipitationMm >= 4;
-                const badgeColor = isOrange ? 'bg-red-500/25 text-red-300 border-red-500/40' : isYellow ? 'bg-amber-500/25 text-amber-300 border-amber-500/40' : 'bg-blue-500/25 text-blue-300 border-blue-500/40';
+                const badgeColor = isOrange ? 'bg-red-50 text-red-700 border-red-200' : isYellow ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-blue-50 text-blue-700 border-blue-200';
                 return (
-                  <div key={idx} className="bg-slate-800/60 hover:bg-slate-800 transition-colors border border-slate-700/70 rounded-lg p-2 flex flex-col justify-between">
+                  <div key={idx} className="bg-slate-50 hover:bg-slate-100/80 transition-colors border border-slate-200 rounded-lg p-2 flex flex-col justify-between">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-200 truncate">{st.state}</span>
+                      <span className="text-[11px] font-bold text-slate-800 truncate">{st.state}</span>
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}`}>
                         {st.currentPrecipitationMm} mm/h
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-400 truncate mt-1 flex items-center gap-1">
+                    <div className="text-[10px] text-slate-500 truncate mt-1 flex items-center gap-1">
                       <span>{st.currentPrecipitationMm > 5 ? '🌧️' : '🌦️'}</span>
                       <span className="truncate">{st.status}</span>
                     </div>

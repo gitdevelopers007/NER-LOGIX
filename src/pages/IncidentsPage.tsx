@@ -266,36 +266,36 @@ export const IncidentsPage: React.FC = () => {
           </div>
 
           {/* FIELD TELEMETRY & OFFLINE MESH STATUS BANNER */}
-          <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-xl p-3 shadow-xs border border-blue-900/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="bg-white text-slate-800 rounded-xl p-3.5 shadow-2xs border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-400">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                 <Radio className="w-4 h-4 animate-pulse" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white tracking-wide">FIELD TELEMETRY MESH</span>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.2 rounded font-mono">
+                  <span className="font-bold text-[#0f2547] tracking-wide">FIELD TELEMETRY MESH</span>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded font-mono font-bold">
                     100% OPERATIONAL
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-300">
+                <div className="text-[11px] text-slate-500">
                   Live ground reports from BRO Detachments, SDMA Surveyors, and Police Patrol Units.
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-[11px] font-mono text-slate-300">
+            <div className="flex items-center gap-4 text-[11px] font-mono text-slate-600">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>Active Patrols: <strong className="text-white">14 Units</strong></span>
+                <span>Active Patrols: <strong className="text-slate-900 font-bold">14 Units</strong></span>
               </div>
               <div className="hidden md:flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                <span>2G Canvas Compression: <strong className="text-white">&lt;38 KB</strong></span>
+                <span>2G Canvas Compression: <strong className="text-slate-900 font-bold">&lt;38 KB</strong></span>
               </div>
               <div className="hidden lg:flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-                <span>IndexedDB Sync: <strong className="text-white">Live Buffer</strong></span>
+                <span>IndexedDB Sync: <strong className="text-slate-900 font-bold">Live Buffer</strong></span>
               </div>
             </div>
           </div>

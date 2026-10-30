@@ -1189,7 +1189,7 @@ export const AnalyticsPage: React.FC = () => {
           {/* Active Scenario Simulation Workbench */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
             {/* Workbench Header */}
-            <div className="bg-[#0b1a30] text-white p-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="bg-slate-50 text-slate-800 border-b border-slate-200 p-4.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-amber-400" />

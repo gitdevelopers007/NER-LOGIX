@@ -588,18 +588,18 @@ export const RouteIntelligencePage: React.FC = () => {
 
             {/* QUANTUM CONVERGENCE CHART (Renders when Quantum PSO is selected) */}
             {optResult.algorithm === 'Quantum PSO' && optResult.convergence.length > 0 && (
-              <div className="bg-gradient-to-r from-slate-900 to-[#0b1a30] text-white p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+              <div className="bg-white text-slate-800 p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-                    <span className="text-xs font-bold text-slate-100">Quantum-Inspired PSO Convergence Curve</span>
+                    <span className="text-xs font-bold text-[#0f2547]">Quantum-Inspired PSO Convergence Curve</span>
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+                  <span className="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     Swarm Optimality: 100% Converged
                   </span>
                 </div>
 
-                <div className="text-[11px] text-slate-300 font-sans">
+                <div className="text-[11px] text-slate-600 font-sans leading-relaxed">
                   The heuristic simulates a 30-particle quantum probability wave packet across 25 iterative generations, perturbing road impedances ($\beta \in [0.75, 1.25]$) to escape local minima in mountainous multi-path topologies.
                 </div>
 
@@ -608,8 +608,8 @@ export const RouteIntelligencePage: React.FC = () => {
                   <div className="h-16 w-full flex items-end">
                     <svg className="w-full h-full overflow-visible" viewBox="0 0 500 60" preserveAspectRatio="none">
                       {/* Grid lines */}
-                      <line x1="0" y1="15" x2="500" y2="15" stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
-                      <line x1="0" y1="45" x2="500" y2="45" stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
+                      <line x1="0" y1="15" x2="500" y2="15" stroke="#e2e8f0" strokeDasharray="3 3" strokeWidth="0.5" />
+                      <line x1="0" y1="45" x2="500" y2="45" stroke="#e2e8f0" strokeDasharray="3 3" strokeWidth="0.5" />
                       
                       {/* Polyline of convergence */}
                       {(() => {

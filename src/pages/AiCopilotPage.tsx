@@ -328,17 +328,17 @@ Select one of the **Quick Intelligence Queries** below or type any logistics cri
             </div>
 
             {/* Action Shortcut to Driver HUD */}
-            <div className="bg-gradient-to-r from-blue-900 to-indigo-950 rounded-xl p-4 text-white shadow-sm space-y-2">
+            <div className="bg-white rounded-xl p-4 text-slate-800 border border-slate-200 shadow-2xs space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold flex items-center gap-1.5">
+                <span className="text-xs font-bold text-[#0f2547] flex items-center gap-1.5">
                   <Cpu className="w-4 h-4 text-blue-400" />
                   <span>Driver Tactical Console</span>
                 </span>
-                <span className="text-[9.5px] font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30 px-1.5 py-0.5 rounded">
+                <span className="text-[9.5px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">
                   HUD ACTIVE
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300">
+              <p className="text-[11px] text-slate-600 leading-relaxed">
                 Experience the in-transit high-contrast mountain HUD with live speedometer, upcoming hazard beeps, and 1-tap detour recalculations.
               </p>
               <button

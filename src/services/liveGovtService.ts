@@ -1,12 +1,12 @@
 /**
  * Live Government Telemetry Service
  * Interfaces with NESAC NERDRR, ISRO MOSDAC, and NCS Seismology feeds
- * Provides Mode Management (LIVE vs SIMULATION) and subscription
+ * Operates strictly in real-time verified LIVE mode
  */
 
 const API_BASE = '/api/live';
 
-export type DataMode = 'LIVE' | 'SIMULATION';
+export type DataMode = 'LIVE';
 
 export interface LiveEarthquake {
   id: string | number;
@@ -63,39 +63,33 @@ class LiveGovtService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY) as DataMode | null;
-      if (saved === 'LIVE' || saved === 'SIMULATION') {
-        this.currentMode = saved;
-      } else {
-        this.currentMode = 'LIVE';
-        localStorage.setItem(STORAGE_KEY, 'LIVE');
-      }
+      this.currentMode = 'LIVE';
+      localStorage.setItem(STORAGE_KEY, 'LIVE');
     }
   }
 
   public getMode(): DataMode {
-    return this.currentMode;
+    return 'LIVE';
   }
 
-  public setMode(mode: DataMode) {
-    this.currentMode = mode;
+  public setMode(_mode: DataMode) {
+    this.currentMode = 'LIVE';
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, mode);
-      window.dispatchEvent(new CustomEvent(EVENT_KEY, { detail: mode }));
+      localStorage.setItem(STORAGE_KEY, 'LIVE');
+      window.dispatchEvent(new CustomEvent(EVENT_KEY, { detail: 'LIVE' }));
     }
   }
 
   public toggleMode(): DataMode {
-    const next = this.currentMode === 'LIVE' ? 'SIMULATION' : 'LIVE';
-    this.setMode(next);
-    return next;
+    this.setMode('LIVE');
+    return 'LIVE';
   }
 
   public onModeChange(callback: (mode: DataMode) => void): () => void {
     if (typeof window === 'undefined') return () => {};
     const handler = (e: Event) => {
       const customEvent = e as CustomEvent<DataMode>;
-      callback(customEvent.detail || this.currentMode);
+      callback(customEvent.detail || 'LIVE');
     };
     window.addEventListener(EVENT_KEY, handler);
     return () => window.removeEventListener(EVENT_KEY, handler);

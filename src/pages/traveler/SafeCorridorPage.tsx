@@ -221,7 +221,7 @@ export const SafeCorridorPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/traveler/offline-pass')}
-            className="px-3 py-2 bg-[#0b1a30] hover:bg-[#071223] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3 py-2 bg-[#0b1a30] hover:bg-[#071223] text-white text-xs font-bold rounded-lg shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-emerald-400" />
             <span>Save Offline Pass</span>
@@ -471,15 +471,15 @@ export const SafeCorridorPage: React.FC = () => {
           </div>
 
           {/* Emergency SOS & Quick Actions */}
-          <div className="bg-gradient-to-br from-[#0b1a30] to-[#122847] text-white rounded-2xl p-5 space-y-3.5 shadow-md">
+          <div className="bg-white text-slate-800 rounded-xl p-5 space-y-3 border border-slate-200 shadow-2xs">
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-700 block mb-1">
                 Mountain Driver Lifeline
               </span>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-[#0f2547]">
                 Before Entering Mountain Dead Zones
               </h3>
-              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Mobile signals drop to zero along mountain river passes. Download or screenshot your route pass with emergency police contacts now.
               </p>
             </div>
@@ -495,7 +495,7 @@ export const SafeCorridorPage: React.FC = () => {
 
               <button
                 onClick={() => navigate('/traveler/lifelines')}
-                className="w-full py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-lg border border-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <MapPin className="w-3.5 h-3.5 text-blue-400" />
                 <span>View Emergency Diesel &amp; Trauma Centers</span>
